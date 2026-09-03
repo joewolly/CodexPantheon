@@ -39,11 +39,11 @@
   <rect x="962" y="155" width="610" height="390" rx="18" class="box purple"/>
   <text x="986" y="190" class="h">3. PANTHEON AGENTS — SPECIALIZED ROLES</text>
   <g transform="translate(985 215)">
-    <rect width="560" height="42" rx="9" fill="#131823"/><text x="18" y="26" class="b">Explorer — repo/system mapping</text><text x="445" y="18" class="tag" fill="#57d7ff">LUNA</text><text x="445" y="34" class="tag" fill="#57d7ff">medium</text>
-    <rect y="48" width="560" height="42" rx="9" fill="#131823"/><text x="18" y="74" class="b">Librarian — docs &amp; research</text><text x="445" y="66" class="tag" fill="#57d7ff">LUNA</text><text x="445" y="82" class="tag" fill="#57d7ff">medium</text>
+    <rect width="560" height="42" rx="9" fill="#131823"/><text x="18" y="26" class="b">Explorer — repo/system mapping</text><text x="445" y="18" class="tag" fill="#57d7ff">LUNA</text><text x="445" y="34" class="tag" fill="#57d7ff">high</text>
+    <rect y="48" width="560" height="42" rx="9" fill="#131823"/><text x="18" y="74" class="b">Librarian — docs &amp; research</text><text x="445" y="66" class="tag" fill="#57d7ff">LUNA</text><text x="445" y="82" class="tag" fill="#57d7ff">high</text>
     <rect y="96" width="560" height="42" rx="9" fill="#171722"/><text x="18" y="122" class="b">Oracle — architecture &amp; reasoning</text><text x="445" y="114" class="tag" fill="#ffaf58">SOL</text><text x="445" y="130" class="tag" fill="#ffaf58">high</text>
     <rect y="144" width="560" height="42" rx="9" fill="#131823"/><text x="18" y="170" class="b">Fixer — focused implementation</text><text x="445" y="162" class="tag" fill="#57d7ff">LUNA</text><text x="445" y="178" class="tag" fill="#57d7ff">max</text>
-    <rect y="192" width="560" height="42" rx="9" fill="#171722"/><text x="18" y="218" class="b">Designer — UI/UX specialist</text><text x="445" y="210" class="tag" fill="#ffaf58">SOL</text><text x="445" y="226" class="tag" fill="#ffaf58">high</text>
+    <rect y="192" width="560" height="42" rx="9" fill="#131823"/><text x="18" y="218" class="b">Designer — UI/UX specialist</text><text x="445" y="210" class="tag" fill="#57d7ff">LUNA</text><text x="445" y="226" class="tag" fill="#57d7ff">max</text>
     <rect y="240" width="560" height="42" rx="9" fill="#171722"/><text x="18" y="266" class="b">Reviewer — independent code review</text><text x="445" y="258" class="tag" fill="#ffaf58">SOL</text><text x="445" y="274" class="tag" fill="#ffaf58">high</text>
     <rect y="288" width="560" height="42" rx="9" fill="#132019"/><text x="18" y="314" class="b">Verifier — tests, builds, evidence</text><text x="445" y="306" class="tag" fill="#7bd989">TERRA</text><text x="445" y="322" class="tag" fill="#7bd989">medium</text>
   </g>
