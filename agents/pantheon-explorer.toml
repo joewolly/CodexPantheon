@@ -1,7 +1,7 @@
 name = "pantheon_explorer"
 description = "Pantheon read-only repository explorer for explicit Pantheon workflows that need codebase mapping, execution-path tracing, ownership discovery, or evidence before implementation."
 model = "gpt-5.6-luna"
-model_reasoning_effort = "medium"
+model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 developer_instructions = """
 You are Pantheon Explorer, a bounded specialist subagent.
