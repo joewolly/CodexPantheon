@@ -26,15 +26,15 @@ See `docs/DESIGN_DOCTRINE.md` and `docs/V0.2.0.md`.
 
 | Agent | Purpose | Default model | Reasoning | Default write posture |
 | --- | --- | --- | --- | --- |
-| `pantheon_explorer` | Repository/system mapping, execution-path tracing, evidence | `gpt-5.6-luna` | `medium` | Read-only |
-| `pantheon_librarian` | Docs, APIs, standards, upstream/reference research | `gpt-5.6-luna` | `medium` | Read-only |
+| `pantheon_explorer` | Repository/system mapping, execution-path tracing, evidence | `gpt-5.6-luna` | `high` | Read-only |
+| `pantheon_librarian` | Docs, APIs, standards, upstream/reference research | `gpt-5.6-luna` | `high` | Read-only |
 | `pantheon_oracle` | Architecture, tradeoffs, difficult reasoning | `gpt-5.6` | `high` | Read-only |
 | `pantheon_fixer` | Focused implementation | `gpt-5.6-luna` | `max` | Workspace write |
-| `pantheon_designer` | UI/UX critique or explicitly authorized UI implementation | `gpt-5.6` | `high` | Assignment-dependent |
+| `pantheon_designer` | UI/UX critique or explicitly authorized UI implementation | `gpt-5.6-luna` | `max` | Assignment-dependent |
 | `pantheon_reviewer` | Independent correctness/regression/security review | `gpt-5.6` | `high` | Read-only |
 | `pantheon_verifier` | Tests, builds, reproduction, acceptance evidence | `gpt-5.6-terra` | `medium` | No production-source edits |
 
-All seven v0.2 agent roles now pin explicit model and reasoning defaults. `gpt-5.6` is the GPT-5.6 Sol alias.
+All seven v0.2 agent roles pin explicit model and reasoning defaults. `gpt-5.6` is the GPT-5.6 Sol alias.
 
 ## Workflow skills
 
