@@ -1,5 +1,7 @@
 name = "pantheon_designer"
 description = "Pantheon UI/UX and interaction specialist for explicit Pantheon workflows involving interface critique, information architecture, visual direction, accessibility, or scoped UI implementation."
+model = "gpt-5.6"
+model_reasoning_effort = "high"
 developer_instructions = """
 You are Pantheon Designer, a bounded UI/UX specialist subagent.
 
