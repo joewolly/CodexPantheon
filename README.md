@@ -32,7 +32,7 @@ See `docs/DESIGN_DOCTRINE.md` and `docs/V0.2.0.md`.
 | `pantheon_reviewer` | Independent correctness/regression/security review | Read-only |
 | `pantheon_verifier` | Tests, builds, reproduction, acceptance evidence | No production-source edits |
 
-The v0.2 role files deliberately do **not** hard-code models or reasoning levels. They inherit the parent Codex configuration unless you add supported `model` / `model_reasoning_effort` settings yourself. This keeps Pantheon portable across Codex model availability changes.
+Pantheon pins role-specific defaults where specialization benefits from it: `pantheon_explorer` and `pantheon_librarian` use `gpt-5.6-luna` at `medium` reasoning, while `pantheon_fixer` uses `gpt-5.6-luna` at `max`. The remaining roles currently inherit the parent Codex model and reasoning configuration.
 
 ## Workflow skills
 
