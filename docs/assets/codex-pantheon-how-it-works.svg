@@ -1,84 +1,120 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
-  <title id="title">Codex Pantheon — How It Works</title>
-  <desc id="desc">Diagram showing explicit Pantheon activation, parent Codex orchestration, seven specialist agents, task flow, effort levels, and core principles.</desc>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#080b12"/><stop offset="1" stop-color="#11101b"/></linearGradient>
-    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#101722"/><stop offset="1" stop-color="#171323"/></linearGradient>
-    <style>
-      .title{font:700 38px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#f3f4f6}.sub{font:500 20px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#b6a9cf}.h{font:700 19px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#b78cff}.b{font:500 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#e4e7ec}.s{font:500 14px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#aeb5c2}.mono{font:600 15px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#5ad7ff}.tag{font:700 13px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}.box{fill:url(#panel);stroke:#5d497c;stroke-width:1.5}.blue{stroke:#2c8bd8}.purple{stroke:#7955a8}.orange{stroke:#c9782d}.green{stroke:#4d9b62}.cyan{stroke:#318b9d}.arrow{stroke:#a986d4;stroke-width:3;fill:none;marker-end:url(#arrow)}
-    </style>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#a986d4"/></marker>
-  </defs>
-  <rect width="1600" height="1000" fill="url(#bg)"/>
-  <text x="36" y="55" class="title">CODEX PANTHEON — HOW IT WORKS</text>
-  <text x="36" y="88" class="sub">A slim, explicit, opt-in multi-agent layer that augments Codex.</text>
-  <text x="36" y="125" class="b" fill="#ffffff"><tspan fill="#5ad7ff" font-weight="700">SOLO</tspan> BY DEFAULT. <tspan fill="#c18cff" font-weight="700">PANTHEON</tspan> ONLY WHEN YOU ASK.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1080" viewBox="0 0 1600 1080" role="img" aria-labelledby="title desc">
+<title id="title">Codex Pantheon — How It Works</title>
+<desc id="desc">Codex Pantheon explicit opt-in orchestration with seven bounded specialist agents, current model defaults, verification, and installation flow.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#05070b"/><stop offset="0.55" stop-color="#080b12"/><stop offset="1" stop-color="#11101b"/></linearGradient>
+  <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0d121b"/><stop offset="1" stop-color="#171323"/></linearGradient>
+  <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#a986d4"/></marker>
+  <g id="lock"><path d="M3 7V5a5 5 0 0 1 10 0v2" fill="none" stroke="#aeb5c2" stroke-width="1.6"/><rect x="1" y="7" width="14" height="11" rx="2.5" fill="#aeb5c2"/><circle cx="8" cy="12" r="1.2" fill="#11131a"/><rect x="7.35" y="12" width="1.3" height="3.2" rx=".6" fill="#11131a"/></g>
+  <style>
+    .title{font:700 38px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#f4f4f7}.sub{font:500 20px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#b9adce}.h{font:700 18px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#b98cff}.b{font:500 15px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#e6e8ed}.s{font:500 13px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#aeb5c2}.xs{font:500 12px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;fill:#9ca4b1}.mono{font:600 14px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#58d9ff}.tag{font:700 13px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}.box{fill:url(#panel);stroke:#5d497c;stroke-width:1.4}.blue{stroke:#238ed2}.purple{stroke:#7955a8}.orange{stroke:#ba6827}.green{stroke:#438d56}.cyan{stroke:#288593}.arrow{stroke:#a986d4;stroke-width:2.6;fill:none;marker-end:url(#arrow)}
+  </style>
+</defs>
+<rect width="1600" height="1080" fill="url(#bg)"/>
+<text x="28" y="48" class="title">CODEX PANTHEON — HOW IT WORKS</text>
+<text x="28" y="79" class="sub">A slim, explicit, opt-in multi-agent layer that augments Codex.</text>
+<text x="28" y="113" class="b"><tspan fill="#51d6ff" font-weight="700">SOLO</tspan> BY DEFAULT. <tspan fill="#c58cff" font-weight="700">PANTHEON</tspan> ONLY WHEN YOU ASK.</text>
 
-  <rect x="28" y="155" width="340" height="390" rx="18" class="box blue"/>
-  <text x="52" y="190" class="h" fill="#65baff">1. ACTIVATION — EXPLICIT OPT-IN</text>
-  <text x="52" y="222" class="b">Pantheon never starts on its own.</text>
-  <text x="52" y="248" class="s">You explicitly invoke it:</text>
-  <text x="72" y="290" class="mono">$pantheon</text><text x="72" y="313" class="s">full orchestration</text>
-  <text x="72" y="352" class="mono">$pantheon-plan</text><text x="72" y="375" class="s">analysis &amp; planning</text>
-  <text x="72" y="414" class="mono">$pantheon-review</text><text x="72" y="437" class="s">independent review</text>
-  <text x="72" y="476" class="mono">$pantheon-team</text><text x="72" y="499" class="s">explicit broader fan-out</text>
-  <text x="52" y="525" class="s">Or name a Pantheon agent directly.</text>
+<!-- 1 activation -->
+<rect x="20" y="135" width="340" height="405" rx="18" class="box blue"/>
+<circle cx="48" cy="160" r="15" fill="#1475bb"/><text x="43" y="166" class="b" font-weight="700">1</text>
+<text x="72" y="166" class="h" fill="#58c0ff">ACTIVATION — EXPLICIT OPT-IN</text>
+<text x="48" y="201" class="b">Pantheon never starts on its own.</text>
+<text x="48" y="225" class="s">You explicitly invoke it:</text>
+<text x="76" y="270" class="mono">$pantheon</text><text x="76" y="292" class="s">full orchestration</text>
+<text x="76" y="335" class="mono">$pantheon-plan</text><text x="76" y="357" class="s">analysis &amp; plan</text>
+<text x="76" y="400" class="mono">$pantheon-review</text><text x="76" y="422" class="s">independent review</text>
+<text x="76" y="465" class="mono">$pantheon-team [agents...]</text><text x="76" y="487" class="s">specified team</text>
+<text x="48" y="520" class="s">Or name any Pantheon agent directly.</text>
 
-  <rect x="405" y="155" width="520" height="390" rx="18" class="box purple"/>
-  <text x="430" y="190" class="h">2. PARENT CODEX — ALWAYS THE ORCHESTRATOR</text>
-  <rect x="500" y="235" width="330" height="250" rx="18" fill="#211832" stroke="#845cb4" stroke-width="1.5"/>
-  <text x="535" y="275" class="h">PARENT CODEX THREAD</text>
-  <text x="535" y="315" class="b">• Understands the request</text>
-  <text x="535" y="347" class="b">• Decomposes the task</text>
-  <text x="535" y="379" class="b">• Selects the right agent(s)</text>
-  <text x="535" y="411" class="b">• Delegates bounded work</text>
-  <text x="535" y="443" class="b">• Integrates, validates, answers</text>
-  <path d="M368 350 H500" class="arrow"/><text x="392" y="335" class="s">request</text>
-  <path d="M830 350 H954" class="arrow"/><text x="842" y="335" class="s">bounded work</text>
+<!-- 2 parent -->
+<rect x="390" y="135" width="555" height="405" rx="18" class="box purple"/>
+<circle cx="420" cy="160" r="15" fill="#684096"/><text x="415" y="166" class="b" font-weight="700">2</text>
+<text x="446" y="166" class="h">PARENT CODEX — ALWAYS THE ORCHESTRATOR</text>
+<text x="475" y="198" class="b">The primary Codex thread stays in control.</text>
+<rect x="535" y="228" width="290" height="252" rx="18" fill="#211832" stroke="#845cb4" stroke-width="1.4" filter="url(#glow)"/>
+<text x="568" y="264" class="h">PARENT CODEX THREAD</text>
+<text x="570" y="307" class="b">• Understands the request</text>
+<text x="570" y="338" class="b">• Decomposes the task</text>
+<text x="570" y="369" class="b">• Selects the right agent(s)</text>
+<text x="570" y="400" class="b">• Delegates bounded work</text>
+<text x="570" y="431" class="b">• Integrates results</text>
+<text x="570" y="462" class="b">• Validates and answers you</text>
+<path d="M360 332 H535" class="arrow"/><text x="401" y="315" class="s">Request / Goal</text>
+<path d="M825 332 H958" class="arrow"/><text x="846" y="315" class="s">Bounded work</text>
+<path d="M958 382 H825" class="arrow"/><text x="849" y="407" class="s">Results &amp; evidence</text>
 
-  <rect x="962" y="155" width="610" height="390" rx="18" class="box purple"/>
-  <text x="986" y="190" class="h">3. PANTHEON AGENTS — SPECIALIZED ROLES</text>
-  <g transform="translate(985 215)">
-    <rect width="560" height="42" rx="9" fill="#131823"/><text x="18" y="26" class="b">Explorer — repo/system mapping</text><text x="445" y="18" class="tag" fill="#57d7ff">LUNA</text><text x="445" y="34" class="tag" fill="#57d7ff">high</text>
-    <rect y="48" width="560" height="42" rx="9" fill="#131823"/><text x="18" y="74" class="b">Librarian — docs &amp; research</text><text x="445" y="66" class="tag" fill="#57d7ff">LUNA</text><text x="445" y="82" class="tag" fill="#57d7ff">high</text>
-    <rect y="96" width="560" height="42" rx="9" fill="#171722"/><text x="18" y="122" class="b">Oracle — architecture &amp; reasoning</text><text x="445" y="114" class="tag" fill="#ffaf58">SOL</text><text x="445" y="130" class="tag" fill="#ffaf58">high</text>
-    <rect y="144" width="560" height="42" rx="9" fill="#131823"/><text x="18" y="170" class="b">Fixer — focused implementation</text><text x="445" y="162" class="tag" fill="#57d7ff">LUNA</text><text x="445" y="178" class="tag" fill="#57d7ff">max</text>
-    <rect y="192" width="560" height="42" rx="9" fill="#131823"/><text x="18" y="218" class="b">Designer — UI/UX specialist</text><text x="445" y="210" class="tag" fill="#57d7ff">LUNA</text><text x="445" y="226" class="tag" fill="#57d7ff">max</text>
-    <rect y="240" width="560" height="42" rx="9" fill="#171722"/><text x="18" y="266" class="b">Reviewer — independent code review</text><text x="445" y="258" class="tag" fill="#ffaf58">SOL</text><text x="445" y="274" class="tag" fill="#ffaf58">high</text>
-    <rect y="288" width="560" height="42" rx="9" fill="#132019"/><text x="18" y="314" class="b">Verifier — tests, builds, evidence</text><text x="445" y="306" class="tag" fill="#7bd989">TERRA</text><text x="445" y="322" class="tag" fill="#7bd989">medium</text>
-  </g>
+<!-- 3 agents -->
+<rect x="970" y="105" width="610" height="435" rx="18" class="box purple"/>
+<circle cx="1003" cy="134" r="15" fill="#684096"/><text x="998" y="140" class="b" font-weight="700">3</text>
+<text x="1030" y="140" class="h">PANTHEON AGENTS — SPECIALIZED ROLES</text>
+<text x="1030" y="165" class="s">Purpose-built agents. Each has a clear lane.</text>
+<g transform="translate(990 182)">
+  <rect width="560" height="45" rx="9" fill="#10151e" stroke="#25323f"/><text x="18" y="20" class="b">Explorer</text><text x="18" y="37" class="xs">Repository/system mapping, read-only discovery</text><text x="448" y="20" class="tag" fill="#54d7ff">LUNA</text><text x="448" y="37" class="tag" fill="#54d7ff">high</text><use href="#lock" transform="translate(529 14) scale(.72)"/>
+  <rect y="49" width="560" height="45" rx="9" fill="#10151e" stroke="#25323f"/><text x="18" y="69" class="b">Librarian</text><text x="18" y="86" class="xs">External docs, references, read-only research</text><text x="448" y="69" class="tag" fill="#54d7ff">LUNA</text><text x="448" y="86" class="tag" fill="#54d7ff">high</text><use href="#lock" transform="translate(529 63) scale(.72)"/>
+  <rect y="98" width="560" height="45" rx="9" fill="#14141c" stroke="#2e2c31"/><text x="18" y="118" class="b">Oracle</text><text x="18" y="135" class="xs">Architecture, tradeoffs, deep reasoning</text><text x="448" y="118" class="tag" fill="#ffad54">SOL</text><text x="448" y="135" class="tag" fill="#ffad54">high</text><use href="#lock" transform="translate(529 112) scale(.72)"/>
+  <rect y="147" width="560" height="45" rx="9" fill="#10151e" stroke="#2d2926"/><text x="18" y="167" class="b">Fixer</text><text x="18" y="184" class="xs">Focused implementation, code changes</text><text x="448" y="167" class="tag" fill="#54d7ff">LUNA</text><text x="448" y="184" class="tag" fill="#54d7ff">max</text><use href="#lock" transform="translate(529 161) scale(.72)"/>
+  <rect y="196" width="560" height="45" rx="9" fill="#10151e" stroke="#2d2926"/><text x="18" y="216" class="b">Designer</text><text x="18" y="233" class="xs">UI/UX design &amp; specs, write when permitted</text><text x="448" y="216" class="tag" fill="#54d7ff">LUNA</text><text x="448" y="233" class="tag" fill="#54d7ff">max</text><use href="#lock" transform="translate(529 210) scale(.72)"/>
+  <rect y="245" width="560" height="45" rx="9" fill="#14141c" stroke="#2e2c31"/><text x="18" y="265" class="b">Reviewer</text><text x="18" y="282" class="xs">Independent code review, read-only</text><text x="448" y="265" class="tag" fill="#ffad54">SOL</text><text x="448" y="282" class="tag" fill="#ffad54">high</text><use href="#lock" transform="translate(529 259) scale(.72)"/>
+  <rect y="294" width="560" height="45" rx="9" fill="#102018" stroke="#24452e"/><text x="18" y="314" class="b">Verifier</text><text x="18" y="331" class="xs">Tests, builds, reproduction, independent verification</text><text x="448" y="314" class="tag" fill="#7bd989">TERRA</text><text x="448" y="331" class="tag" fill="#7bd989">medium</text><use href="#lock" transform="translate(529 308) scale(.72)"/>
+</g>
 
-  <rect x="28" y="575" width="1544" height="190" rx="18" class="box"/>
-  <text x="52" y="610" class="h" fill="#65baff">4. HOW A PANTHEON TASK FLOWS</text>
-  <g transform="translate(48 635)">
-    <rect width="190" height="95" rx="13" class="box blue"/><text x="18" y="30" class="h">INTENT</text><text x="18" y="58" class="s">You explicitly invoke</text><text x="18" y="79" class="s">Pantheon or an agent.</text>
-    <path d="M195 47 H235" class="arrow"/>
-    <rect x="240" width="190" height="95" rx="13" class="box purple"/><text x="258" y="30" class="h">DECOMPOSE</text><text x="258" y="58" class="s">Codex breaks the task</text><text x="258" y="79" class="s">into clear parts.</text>
-    <path d="M435 47 H475" class="arrow"/>
-    <rect x="480" width="190" height="95" rx="13" class="box"/><text x="498" y="30" class="h">SELECT</text><text x="498" y="58" class="s">Minimum useful</text><text x="498" y="79" class="s">specialists.</text>
-    <path d="M675 47 H715" class="arrow"/>
-    <rect x="720" width="190" height="95" rx="13" class="box blue"/><text x="738" y="30" class="h">DELEGATE</text><text x="738" y="58" class="s">Bounded scope, limits,</text><text x="738" y="79" class="s">expected evidence.</text>
-    <path d="M915 47 H955" class="arrow"/>
-    <rect x="960" width="190" height="95" rx="13" class="box cyan"/><text x="978" y="30" class="h">EXECUTE</text><text x="978" y="58" class="s">Agents work in their</text><text x="978" y="79" class="s">assigned lanes.</text>
-    <path d="M1155 47 H1195" class="arrow"/>
-    <rect x="1200" width="260" height="95" rx="13" class="box green"/><text x="1218" y="30" class="h" fill="#81da93">VERIFY &amp; ANSWER</text><text x="1218" y="58" class="s">Codex integrates results,</text><text x="1218" y="79" class="s">validates, and answers you.</text>
-  </g>
+<!-- 4 flow -->
+<rect x="20" y="565" width="1560" height="185" rx="18" class="box"/>
+<text x="38" y="598" class="h" fill="#58c0ff">4. HOW A PANTHEON TASK FLOWS</text>
+<g transform="translate(38 615)">
+  <rect width="190" height="105" rx="13" class="box blue"/><text x="18" y="30" class="h">INTENT</text><text x="18" y="58" class="s">You invoke Pantheon</text><text x="18" y="79" class="s">or name an agent.</text><text x="18" y="97" class="xs">Codex clarifies if needed.</text>
+  <path d="M196 52 H226" class="arrow"/>
+  <rect x="232" width="190" height="105" rx="13" class="box purple"/><text x="250" y="30" class="h">DECOMPOSE</text><text x="250" y="58" class="s">Break task into parts</text><text x="250" y="79" class="s">and decide what</text><text x="250" y="97" class="xs">to delegate.</text>
+  <path d="M428 52 H458" class="arrow"/>
+  <rect x="464" width="190" height="105" rx="13" class="box"/><text x="482" y="30" class="h">SELECT</text><text x="482" y="58" class="s">Choose minimum useful</text><text x="482" y="79" class="s">specialists.</text><text x="482" y="97" class="xs">1 normal; 2–3 parallel.</text>
+  <path d="M660 52 H690" class="arrow"/>
+  <rect x="696" width="190" height="105" rx="13" class="box blue"/><text x="714" y="30" class="h">DELEGATE</text><text x="714" y="58" class="s">Bounded scope, limits,</text><text x="714" y="79" class="s">permissions, evidence.</text>
+  <path d="M892 52 H922" class="arrow"/>
+  <rect x="928" width="190" height="105" rx="13" class="box cyan"/><text x="946" y="30" class="h">EXECUTE</text><text x="946" y="58" class="s">Agents work only</text><text x="946" y="79" class="s">inside their lane.</text>
+  <path d="M1124 52 H1154" class="arrow"/>
+  <rect x="1160" width="190" height="105" rx="13" class="box orange"/><text x="1178" y="30" class="h" fill="#ffad5d">INTEGRATE</text><text x="1178" y="58" class="s">Codex reconciles</text><text x="1178" y="79" class="s">results &amp; conflicts.</text>
+  <path d="M1356 52 H1386" class="arrow"/>
+  <rect x="1392" width="130" height="105" rx="13" class="box green"/><text x="1405" y="30" class="h" fill="#81da93">VERIFY</text><text x="1405" y="58" class="s">Validate</text><text x="1405" y="79" class="s">and answer.</text>
+</g>
 
-  <rect x="28" y="790" width="500" height="170" rx="18" class="box blue"/>
-  <text x="52" y="825" class="h" fill="#65baff">5. DIRECT INVOCATION</text>
-  <text x="52" y="860" class="s">“Ask Oracle whether this architecture makes sense.”</text><text x="52" y="884" class="b">→ Oracle only</text>
-  <text x="52" y="918" class="s">“Use Explorer and Librarian.”</text><text x="52" y="942" class="b">→ only those two</text>
+<!-- 5 examples -->
+<rect x="20" y="770" width="575" height="205" rx="18" class="box blue"/>
+<text x="38" y="803" class="h" fill="#58c0ff">5. EXAMPLES</text>
+<text x="45" y="838" class="s">“Ask Oracle whether this architecture makes sense.”</text><text x="430" y="838" class="b" fill="#ffad54">→ Oracle only</text>
+<line x1="38" y1="850" x2="575" y2="850" stroke="#303441"/>
+<text x="45" y="875" class="s">“Have Explorer trace workspace ownership.”</text><text x="430" y="875" class="b">→ Explorer only</text>
+<line x1="38" y1="887" x2="575" y2="887" stroke="#303441"/>
+<text x="45" y="912" class="s">“Use Reviewer on the current diff.”</text><text x="430" y="912" class="b">→ Reviewer only</text>
+<line x1="38" y1="924" x2="575" y2="924" stroke="#303441"/>
+<text x="45" y="949" class="s">“Use Explorer and Librarian.”</text><text x="430" y="949" class="b">→ only those two</text>
 
-  <rect x="550" y="790" width="470" height="170" rx="18" class="box orange"/>
-  <text x="574" y="825" class="h" fill="#ffad5d">6. EFFORT LEVELS</text>
-  <text x="574" y="862" class="b" fill="#65baff">FAST</text><text x="660" y="862" class="s">strongly minimize delegation</text>
-  <text x="574" y="900" class="b" fill="#ffad5d">NORMAL</text><text x="660" y="900" class="s">balanced specialization + verification</text>
-  <text x="574" y="938" class="b" fill="#7bd989">DEEP</text><text x="660" y="938" class="s">more research, still bounded</text>
+<!-- 6 effort -->
+<rect x="610" y="770" width="385" height="205" rx="18" class="box purple"/>
+<text x="628" y="803" class="h" fill="#58c0ff">6. EFFORT LEVELS — DEPTH, NOT ROSTER</text>
+<text x="638" y="842" class="h" fill="#58c0ff">FAST</text><text x="735" y="842" class="s">Minimum delegation, least fan-out.</text>
+<line x1="628" y1="858" x2="976" y2="858" stroke="#303441"/>
+<text x="638" y="890" class="h" fill="#ffad54">NORMAL</text><text x="735" y="890" class="s">Balanced specialization + verification.</text>
+<line x1="628" y1="906" x2="976" y2="906" stroke="#303441"/>
+<text x="638" y="938" class="h" fill="#7bd989">DEEP</text><text x="735" y="938" class="s">More research, still bounded.</text>
 
-  <rect x="1042" y="790" width="530" height="170" rx="18" class="box green"/>
-  <text x="1066" y="825" class="h" fill="#81da93">7. KEY PRINCIPLES</text>
-  <text x="1066" y="858" class="b">✓ Pantheon is opt-in.</text>
-  <text x="1066" y="887" class="b">✓ Parent Codex is always in charge.</text>
-  <text x="1066" y="916" class="b">✓ No child agent spawns subagents.</text>
-  <text x="1066" y="945" class="b">✓ Enhance Codex. Don’t replace it.</text>
+<!-- 7 principles -->
+<rect x="1010" y="770" width="570" height="205" rx="18" class="box green"/>
+<text x="1028" y="803" class="h">7. KEY PRINCIPLES</text>
+<text x="1035" y="842" class="b">✓ Pantheon is opt-in.</text>
+<text x="1035" y="873" class="b">✓ Codex is always in charge.</text>
+<text x="1035" y="904" class="b">✓ Delegate narrowly. Verify independently.</text>
+<text x="1035" y="935" class="b">✓ No child agent spawns subagents.</text>
+<text x="1035" y="960" class="b">✓ Enhance Codex. Don’t replace it.</text>
+
+<!-- 8 environment -->
+<rect x="20" y="995" width="1560" height="65" rx="16" class="box"/>
+<text x="38" y="1025" class="h" fill="#58c0ff">8. HOW IT FITS YOUR ENVIRONMENT</text>
+<text x="360" y="1020" class="s">Installed locally in ~/.codex/agents and ~/.agents/skills</text>
+<text x="760" y="1020" class="s">AGENTS.md contains a managed Pantheon block</text>
+<text x="1090" y="1020" class="s">Doctor verifies install + policy integrity</text>
+<text x="360" y="1046" class="xs">Regression tests keep lifecycle behavior healthy</text>
+<text x="760" y="1046" class="xs">All seven roles pin explicit model defaults</text>
+<text x="1090" y="1046" class="tag" fill="#c58cff">SOLO BY DEFAULT. PANTHEON ONLY WHEN YOU ASK.</text>
 </svg>
