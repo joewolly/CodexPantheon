@@ -17,7 +17,11 @@
 ### Changed
 
 - Pantheon explicitly codifies solo-by-default and user-controlled activation as project invariants.
-- Explorer and Librarian now default to GPT-5.6 Luna with medium reasoning; Fixer defaults to GPT-5.6 Luna with max reasoning.
+- All seven Pantheon roles now pin explicit model and reasoning defaults.
+- Explorer and Librarian use GPT-5.6 Luna with medium reasoning.
+- Fixer uses GPT-5.6 Luna with max reasoning.
+- Oracle, Designer, and Reviewer use GPT-5.6 Sol with high reasoning.
+- Verifier uses GPT-5.6 Terra with medium reasoning.
 
 ### Not included
 
