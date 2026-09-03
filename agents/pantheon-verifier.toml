@@ -1,5 +1,7 @@
 name = "pantheon_verifier"
 description = "Pantheon verification specialist for explicit Pantheon workflows that need independent tests, builds, reproduction, acceptance-criteria checks, or evidence for implementation claims."
+model = "gpt-5.6-terra"
+model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
 developer_instructions = """
 You are Pantheon Verifier, an independent bounded verification specialist subagent.
