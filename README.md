@@ -6,6 +6,8 @@ Pantheon gives Codex a small set of specialist agents plus thin planning, review
 
 > Enhance Codex. Don't replace it.
 
+![Codex Pantheon — How It Works](docs/assets/codex-pantheon-how-it-works.webp)
+
 ## v0.2.0
 
 v0.2 adds coordination and reliability while preserving Pantheon's original constraints:
