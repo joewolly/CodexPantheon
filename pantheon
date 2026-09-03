@@ -1,0 +1,396 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VERSION="0.2.0"
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+CODEX_HOME_DIR="${CODEX_HOME:-${HOME}/.codex}"
+AGENT_DEST_DIR="${CODEX_HOME_DIR}/agents"
+SKILLS_DEST_ROOT="${PANTHEON_SKILLS_HOME:-${HOME}/.agents/skills}"
+AGENTS_FILE="${CODEX_HOME_DIR}/AGENTS.md"
+VERSION_FILE="${CODEX_HOME_DIR}/.pantheon-version"
+BLOCK_FILE="${SCRIPT_DIR}/policy/managed-block.md"
+START_MARKER='<!-- PANTHEON:START -->'
+END_MARKER='<!-- PANTHEON:END -->'
+
+AGENT_FILES=(
+  pantheon-explorer.toml
+  pantheon-librarian.toml
+  pantheon-oracle.toml
+  pantheon-fixer.toml
+  pantheon-designer.toml
+  pantheon-reviewer.toml
+  pantheon-verifier.toml
+)
+
+SKILL_DIRS=(
+  pantheon
+  pantheon-plan
+  pantheon-review
+  pantheon-team
+)
+
+say() { printf '%s\n' "$*"; }
+ok() { printf '✓ %s\n' "$*"; }
+warn() { printf '! %s\n' "$*" >&2; }
+fail() { printf '✗ %s\n' "$*" >&2; exit 1; }
+
+usage() {
+  cat <<EOF_USAGE
+Codex Pantheon ${VERSION}
+
+Usage:
+  ./pantheon bootstrap
+  ./pantheon install
+  ./pantheon update
+  ./pantheon doctor
+  ./pantheon uninstall
+  ./pantheon version
+  ./pantheon help
+
+Environment:
+  CODEX_HOME              Codex home (default: \$HOME/.codex)
+  PANTHEON_SKILLS_HOME    Skill root (default: \$HOME/.agents/skills)
+EOF_USAGE
+}
+
+require_source_tree() {
+  [ -f "${SCRIPT_DIR}/VERSION" ] || fail "Missing source VERSION file."
+  [ "$(tr -d '[:space:]' < "${SCRIPT_DIR}/VERSION")" = "$VERSION" ] || fail "Source VERSION does not match CLI version ${VERSION}."
+  [ -f "$BLOCK_FILE" ] || fail "Missing policy/managed-block.md."
+
+  local f
+  for f in "${AGENT_FILES[@]}"; do
+    [ -f "${SCRIPT_DIR}/agents/${f}" ] || fail "Missing source agent: agents/${f}"
+    [ ! -L "${SCRIPT_DIR}/agents/${f}" ] || fail "Source agent must be a regular file, not a symlink: agents/${f}"
+    grep -q '^name[[:space:]]*=' "${SCRIPT_DIR}/agents/${f}" || fail "Agent missing name: agents/${f}"
+    grep -q '^description[[:space:]]*=' "${SCRIPT_DIR}/agents/${f}" || fail "Agent missing description: agents/${f}"
+    grep -q '^developer_instructions[[:space:]]*=' "${SCRIPT_DIR}/agents/${f}" || fail "Agent missing developer_instructions: agents/${f}"
+  done
+
+  for f in "${SKILL_DIRS[@]}"; do
+    [ -f "${SCRIPT_DIR}/skills/${f}/SKILL.md" ] || fail "Missing source skill: skills/${f}/SKILL.md"
+    grep -q '^name:' "${SCRIPT_DIR}/skills/${f}/SKILL.md" || fail "Skill missing name metadata: skills/${f}/SKILL.md"
+    grep -q '^description:' "${SCRIPT_DIR}/skills/${f}/SKILL.md" || fail "Skill missing description metadata: skills/${f}/SKILL.md"
+  done
+}
+
+marker_count() {
+  local marker="$1"
+  local file="$2"
+  if [ ! -f "$file" ]; then
+    printf '0\n'
+    return
+  fi
+  grep -Fxc "$marker" "$file" 2>/dev/null || true
+}
+
+validate_marker_state() {
+  [ -e "$AGENTS_FILE" ] || return 0
+  [ -f "$AGENTS_FILE" ] || fail "${AGENTS_FILE} exists but is not a regular file. Refusing to modify it."
+  [ ! -L "$AGENTS_FILE" ] || fail "${AGENTS_FILE} is a symlink. Refusing to modify it."
+
+  local starts ends
+  starts="$(marker_count "$START_MARKER" "$AGENTS_FILE")"
+  ends="$(marker_count "$END_MARKER" "$AGENTS_FILE")"
+
+  if [ "$starts" -ne "$ends" ] || [ "$starts" -gt 1 ]; then
+    fail "Malformed or duplicate Pantheon markers in ${AGENTS_FILE}. Fix them manually before install/update/uninstall."
+  fi
+}
+
+replace_or_append_block() {
+  validate_marker_state
+  mkdir -p "$CODEX_HOME_DIR"
+
+  if [ ! -e "$AGENTS_FILE" ]; then
+    cp "$BLOCK_FILE" "$AGENTS_FILE"
+    chmod 0644 "$AGENTS_FILE" 2>/dev/null || true
+    return
+  fi
+
+  local starts tmp
+  starts="$(marker_count "$START_MARKER" "$AGENTS_FILE")"
+  tmp="$(mktemp "${CODEX_HOME_DIR}/.pantheon-agents.XXXXXX")"
+  trap 'rm -f "$tmp"' RETURN
+
+  if [ "$starts" -eq 0 ]; then
+    cat "$AGENTS_FILE" > "$tmp"
+    if [ -s "$AGENTS_FILE" ]; then
+      printf '\n' >> "$tmp"
+    fi
+    cat "$BLOCK_FILE" >> "$tmp"
+    printf '\n' >> "$tmp"
+  else
+    awk -v start="$START_MARKER" -v end="$END_MARKER" -v block="$BLOCK_FILE" '
+      function emit_block( line) {
+        while ((getline line < block) > 0) print line
+        close(block)
+      }
+      $0 == start { emit_block(); in_block=1; next }
+      in_block && $0 == end { in_block=0; next }
+      !in_block { print }
+    ' "$AGENTS_FILE" > "$tmp"
+  fi
+
+  mv "$tmp" "$AGENTS_FILE"
+  trap - RETURN
+}
+
+remove_block() {
+  validate_marker_state
+  [ -f "$AGENTS_FILE" ] || return 0
+
+  local starts tmp
+  starts="$(marker_count "$START_MARKER" "$AGENTS_FILE")"
+  [ "$starts" -eq 1 ] || return 0
+
+  tmp="$(mktemp "${CODEX_HOME_DIR}/.pantheon-agents.XXXXXX")"
+  trap 'rm -f "$tmp"' RETURN
+
+  awk -v start="$START_MARKER" -v end="$END_MARKER" '
+    $0 == start { in_block=1; next }
+    in_block && $0 == end { in_block=0; next }
+    !in_block { print }
+  ' "$AGENTS_FILE" > "$tmp"
+
+  if grep -q '[^[:space:]]' "$tmp"; then
+    mv "$tmp" "$AGENTS_FILE"
+  else
+    rm -f "$tmp" "$AGENTS_FILE"
+  fi
+  trap - RETURN
+}
+
+copy_regular_file() {
+  local src="$1"
+  local dst="$2"
+  rm -f "$dst"
+  cp "$src" "$dst"
+  chmod 0644 "$dst" 2>/dev/null || true
+}
+
+install_payload() {
+  require_source_tree
+  validate_marker_state
+  mkdir -p "$AGENT_DEST_DIR" "$SKILLS_DEST_ROOT"
+
+  local f dest
+  for f in "${AGENT_FILES[@]}"; do
+    copy_regular_file "${SCRIPT_DIR}/agents/${f}" "${AGENT_DEST_DIR}/${f}"
+  done
+
+  for f in "${SKILL_DIRS[@]}"; do
+    dest="${SKILLS_DEST_ROOT}/${f}"
+    rm -rf "$dest"
+    mkdir -p "$dest"
+    cp -R "${SCRIPT_DIR}/skills/${f}/." "$dest/"
+    chmod 0644 "${dest}/SKILL.md" 2>/dev/null || true
+  done
+
+  replace_or_append_block
+  printf '%s\n' "$VERSION" > "$VERSION_FILE"
+  chmod 0644 "$VERSION_FILE" 2>/dev/null || true
+}
+
+cmd_install() {
+  install_payload
+  say "Codex Pantheon ${VERSION} installed."
+  say "Run: ./pantheon doctor"
+}
+
+cmd_update() {
+  install_payload
+  say "Codex Pantheon updated to ${VERSION}."
+  say "Run: ./pantheon doctor"
+}
+
+cmd_bootstrap() {
+  local prior_state="new installation"
+  if [ -e "$VERSION_FILE" ] || [ -e "$AGENTS_FILE" ]; then
+    if [ -f "$VERSION_FILE" ] || [ "$(marker_count "$START_MARKER" "$AGENTS_FILE")" -gt 0 ]; then
+      prior_state="existing/partial installation"
+    fi
+  fi
+
+  say "Codex Pantheon bootstrap (${prior_state})"
+  install_payload
+  say "Pantheon-owned files synchronized to v${VERSION}."
+  say ""
+  cmd_doctor
+}
+
+extract_installed_block() {
+  local out="$1"
+  awk -v start="$START_MARKER" -v end="$END_MARKER" '
+    $0 == start { in_block=1 }
+    in_block { print }
+    $0 == end && in_block { exit }
+  ' "$AGENTS_FILE" > "$out"
+}
+
+outside_block_contains_pantheon() {
+  [ -f "$AGENTS_FILE" ] || return 1
+  awk -v start="$START_MARKER" -v end="$END_MARKER" '
+    $0 == start { in_block=1; next }
+    $0 == end { in_block=0; next }
+    !in_block { print }
+  ' "$AGENTS_FILE" | grep -Eqi 'codex[[:space:]]+pantheon|\$pantheon|pantheon_(explorer|librarian|oracle|fixer|designer|reviewer|verifier)'
+}
+
+find_codex() {
+  if command -v codex >/dev/null 2>&1; then
+    command -v codex
+    return 0
+  fi
+  if [ -x "/Applications/ChatGPT.app/Contents/Resources/codex" ]; then
+    printf '%s\n' "/Applications/ChatGPT.app/Contents/Resources/codex"
+    return 0
+  fi
+  return 1
+}
+
+cmd_doctor() {
+  require_source_tree
+
+  local errors=0 warnings=0 f src dst tmp starts ends codex_bin codex_version
+  say "Codex Pantheon Doctor"
+  say "Version: ${VERSION}"
+  say ""
+
+  say "Core"
+  if [ -f "$VERSION_FILE" ] && [ "$(tr -d '[:space:]' < "$VERSION_FILE")" = "$VERSION" ]; then
+    ok "Installed version marker: ${VERSION}"
+  else
+    printf '✗ Installed version marker missing or not ${VERSION}\n' >&2
+    errors=$((errors + 1))
+  fi
+
+  if codex_bin="$(find_codex 2>/dev/null)"; then
+    codex_version="$($codex_bin --version 2>/dev/null | head -n 1 || true)"
+    ok "Codex executable: ${codex_bin}${codex_version:+ (${codex_version})}"
+  else
+    warn "Codex executable not found on PATH or in the standard macOS ChatGPT app bundle; static Pantheon checks can still run."
+    warnings=$((warnings + 1))
+  fi
+
+  say ""
+  say "Agents"
+  for f in "${AGENT_FILES[@]}"; do
+    src="${SCRIPT_DIR}/agents/${f}"
+    dst="${AGENT_DEST_DIR}/${f}"
+    if [ -L "$dst" ]; then
+      printf '✗ %s is a symlink; Pantheon custom agents must be regular files\n' "$f" >&2
+      errors=$((errors + 1))
+    elif [ ! -f "$dst" ]; then
+      printf '✗ %s is missing\n' "$f" >&2
+      errors=$((errors + 1))
+    elif cmp -s "$src" "$dst"; then
+      ok "$f"
+    else
+      printf '✗ %s differs from the v%s source package\n' "$f" "$VERSION" >&2
+      errors=$((errors + 1))
+    fi
+  done
+
+  say ""
+  say "Skills"
+  for f in "${SKILL_DIRS[@]}"; do
+    src="${SCRIPT_DIR}/skills/${f}/SKILL.md"
+    dst="${SKILLS_DEST_ROOT}/${f}/SKILL.md"
+    if [ -L "$dst" ]; then
+      printf '✗ %s/SKILL.md is a symlink\n' "$f" >&2
+      errors=$((errors + 1))
+    elif [ ! -f "$dst" ]; then
+      printf '✗ %s is missing\n' "$f" >&2
+      errors=$((errors + 1))
+    elif cmp -s "$src" "$dst"; then
+      ok "$f"
+    else
+      printf '✗ %s differs from the v%s source package\n' "$f" "$VERSION" >&2
+      errors=$((errors + 1))
+    fi
+  done
+
+  say ""
+  say "Policy"
+  if [ ! -f "$AGENTS_FILE" ]; then
+    printf '✗ %s is missing\n' "$AGENTS_FILE" >&2
+    errors=$((errors + 1))
+  elif [ -L "$AGENTS_FILE" ]; then
+    printf '✗ %s is a symlink; Pantheon refuses to manage it\n' "$AGENTS_FILE" >&2
+    errors=$((errors + 1))
+  else
+    starts="$(marker_count "$START_MARKER" "$AGENTS_FILE")"
+    ends="$(marker_count "$END_MARKER" "$AGENTS_FILE")"
+    if [ "$starts" -ne 1 ] || [ "$ends" -ne 1 ]; then
+      printf '✗ Managed Pantheon marker pair is missing, malformed, or duplicated\n' >&2
+      errors=$((errors + 1))
+    else
+      tmp="$(mktemp "${CODEX_HOME_DIR}/.pantheon-doctor.XXXXXX")"
+      extract_installed_block "$tmp"
+      if cmp -s "$BLOCK_FILE" "$tmp"; then
+        ok "Managed AGENTS.md block matches v${VERSION}"
+      else
+        printf '✗ Managed AGENTS.md block differs from v%s\n' "$VERSION" >&2
+        errors=$((errors + 1))
+      fi
+      rm -f "$tmp"
+
+      if outside_block_contains_pantheon; then
+        warn "Possible legacy/unmanaged Pantheon instructions exist outside the managed block; review them manually before deleting anything."
+        warnings=$((warnings + 1))
+      fi
+    fi
+  fi
+
+  say ""
+  if [ "$errors" -eq 0 ] && [ "$warnings" -eq 0 ]; then
+    say "Status: HEALTHY"
+    return 0
+  fi
+  if [ "$errors" -eq 0 ]; then
+    say "Status: HEALTHY WITH WARNINGS (${warnings})"
+    return 0
+  fi
+
+  say "Status: UNHEALTHY (${errors} error(s), ${warnings} warning(s))"
+  say "Repair Pantheon-owned files with: ./pantheon update"
+  return 1
+}
+
+cmd_uninstall() {
+  validate_marker_state
+
+  local f
+  for f in "${AGENT_FILES[@]}"; do
+    rm -f "${AGENT_DEST_DIR}/${f}"
+  done
+
+  for f in "${SKILL_DIRS[@]}"; do
+    rm -rf "${SKILLS_DEST_ROOT}/${f}"
+  done
+
+  remove_block
+  rm -f "$VERSION_FILE"
+
+  say "Codex Pantheon ${VERSION} uninstalled."
+  say "Other Codex configuration and non-Pantheon skills were preserved."
+}
+
+main() {
+  local command="${1:-help}"
+  shift || true
+
+  case "$command" in
+    bootstrap) cmd_bootstrap "$@" ;;
+    install) cmd_install "$@" ;;
+    update) cmd_update "$@" ;;
+    doctor) cmd_doctor "$@" ;;
+    uninstall) cmd_uninstall "$@" ;;
+    version|--version|-v) say "Codex Pantheon ${VERSION}" ;;
+    help|--help|-h) usage ;;
+    *) usage >&2; exit 2 ;;
+  esac
+}
+
+main "$@"
