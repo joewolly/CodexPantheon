@@ -17,6 +17,7 @@
 ### Changed
 
 - Pantheon explicitly codifies solo-by-default and user-controlled activation as project invariants.
+- Explorer and Librarian now default to GPT-5.6 Luna with medium reasoning; Fixer defaults to GPT-5.6 Luna with max reasoning.
 
 ### Not included
 
