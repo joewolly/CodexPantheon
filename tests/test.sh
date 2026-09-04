@@ -17,13 +17,172 @@ fail() {
 
 assert_file() { [ -f "$1" ] || fail "expected file: $1"; }
 assert_not_file() { [ ! -e "$1" ] || fail "expected missing path: $1"; }
-assert_contains() { grep -Fq "$2" "$1" || fail "expected '$2' in $1"; }
-assert_not_contains() { ! grep -Fq "$2" "$1" || fail "did not expect '$2' in $1"; }
+assert_contains() { grep -Fq -- "$2" "$1" || fail "expected '$2' in $1"; }
+assert_not_contains() { ! grep -Fq -- "$2" "$1" || fail "did not expect '$2' in $1"; }
 assert_regular_not_symlink() { [ -f "$1" ] && [ ! -L "$1" ] || fail "expected regular non-symlink file: $1"; }
 assert_equal_files() { cmp -s "$1" "$2" || fail "files differ: $1 $2"; }
 
 bash -n "$PANTHEON" "$ROOT/install.sh" "$0"
 pass "shell syntax"
+
+assert_contains "$ROOT/VERSION" "0.3.0"
+assert_contains "$PANTHEON" 'VERSION="0.3.0"'
+pass "release version is v0.3.0"
+
+POLICY="$ROOT/policy/managed-block.md"
+POLICY_WORDS="$(wc -w < "$POLICY" | tr -d '[:space:]')"
+POLICY_BYTES="$(wc -c < "$POLICY" | tr -d '[:space:]')"
+POLICY_LINES="$(wc -l < "$POLICY" | tr -d '[:space:]')"
+# v0.2 baseline: 750 words, 5,488 bytes, 62 lines. Leave margin for concise policy maintenance.
+[ "$POLICY_WORDS" -lt 375 ] || fail "managed policy was not materially slimmed (${POLICY_WORDS} words)"
+[ "$POLICY_BYTES" -lt 3000 ] || fail "managed policy was not materially slimmed (${POLICY_BYTES} bytes)"
+[ "$POLICY_LINES" -lt 35 ] || fail "managed policy was not materially slimmed (${POLICY_LINES} lines)"
+for obsolete in "### Parent ownership" "### Pantheon agents" "### Bounded delegation" "### Integration and verification" "### Effort" "Default fan-out"; do
+  assert_not_contains "$POLICY" "$obsolete"
+done
+for marker in \
+  "Every new thread starts inactive" \
+  '$pantheon' \
+  "clear request to use, enable, or enter Pantheon orchestration" \
+  "Ordinary follow-ups remain in Pantheon" \
+  "clears effort" \
+  "reactivation starts at normal" \
+  "never carries into another thread" \
+  "request-scoped workflows, not sticky submodes" \
+  "A named-agent request is valid" \
+  "does not activate orchestration" \
+  "Difficulty, quoted text, and vague discussion" \
+  "Do not create persistent activation state" \
+  "follow the relevant Pantheon workflow skill" \
+  "First decide whether delegation materially helps" \
+  "select one best-fit specialist" \
+  "Stop specialist escalation when that result is sufficient" \
+  "specific unresolved need" \
+  "independent workstream" \
+  "material verification requirement" \
+  "Do not fan out merely because a task looks complex" \
+  "Repository tests prove packaged policy/configuration" \
+  "not the live Codex backend"; do
+  assert_contains "$POLICY" "$marker"
+done
+for detailed in \
+  'pantheon_fixer' \
+  'pantheon_explorer' \
+  'pantheon_librarian' \
+  'pantheon_oracle' \
+  'pantheon_designer' \
+  'pantheon_reviewer' \
+  'pantheon_verifier' \
+  'fork_turns: "none"' \
+  'Explorer is not a Fixer preflight' \
+  'choose Reviewer or Verifier based on risk'; do
+  assert_not_contains "$POLICY" "$detailed"
+done
+pass "managed policy is compact activation/state/dispatch guidance without detailed skill duplication"
+
+for skill in pantheon pantheon-plan pantheon-review pantheon-team; do
+  skill_file="$ROOT/skills/$skill/SKILL.md"
+  assert_file "$skill_file"
+  assert_contains "$skill_file" 'fork_turns: "none"'
+  assert_contains "$skill_file" "self-contained"
+  assert_contains "$skill_file" "bounded"
+  assert_contains "$skill_file" "Do not inherit context merely because it is available"
+  assert_contains "$skill_file" "minimum supported inheritance"
+  assert_contains "$skill_file" "required dynamic tool unavailable"
+  assert_contains "$skill_file" "Never use full-history inheritance by default"
+  assert_contains "$skill_file" "objective"
+  assert_contains "$skill_file" "stopping condition"
+  assert_contains "$skill_file" "not to spawn subagents"
+  assert_contains "$skill_file" "request"
+  assert_contains "$skill_file" "Repository tests prove packaged policy/configuration"
+done
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "Every new thread begins inactive"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" 'Once active, ordinary follow-ups stay in Pantheon'
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "Deactivation clears the selected effort"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "Activation and effort never carry into a new or unrelated thread"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "does not by itself activate orchestration"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" 'specialized `$pantheon-plan`, `$pantheon-review`, and `$pantheon-team` workflows apply only to the request'
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "A named-agent request is valid for that request only"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "The parent first decides whether delegation adds material value"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "select one best specialist first"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "Add a second only for a specific unresolved need"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "Do not create a complexity swarm"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "Explorer is not a Fixer preflight"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "Fixer can inspect it directly"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "Use Oracle only when architecture"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "Team mode is the independent-workstream exception"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "independent check defaults to Reviewer or Verifier based on risk"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "Use both only when material risk requires both static and runtime evidence"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "never make Fixer → Reviewer → Verifier the default sequence"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "minimum supported inheritance only when a genuine parent dependency requires it"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "sole special exception"
+assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "planning-only workflow"
+assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "Never invoke Fixer merely to make a plan concrete"
+assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "one actionable plan with sequencing, ownership boundaries, validation criteria"
+assert_contains "$ROOT/skills/pantheon-review/SKILL.md" '`pantheon_reviewer` is required'
+assert_contains "$ROOT/skills/pantheon-review/SKILL.md" '`pantheon_verifier` is optional'
+assert_contains "$ROOT/skills/pantheon-review/SKILL.md" "runtime tests, builds, reproduction, or acceptance evidence materially improve confidence"
+assert_contains "$ROOT/skills/pantheon-team/SKILL.md" "independent-workstream exception"
+assert_contains "$ROOT/skills/pantheon-team/SKILL.md" "at least two genuinely independent workstreams"
+assert_contains "$ROOT/skills/pantheon-team/SKILL.md" "Use 2-3 concurrent agents by default"
+assert_contains "$ROOT/skills/pantheon-team/SKILL.md" "use 4+ only when the user explicitly requests broader fan-out"
+pass "all four skills define native child defaults, bounded assignments, escalation, and static/runtime evidence boundaries"
+
+AGENT_FILES=(
+  pantheon-explorer.toml
+  pantheon-librarian.toml
+  pantheon-oracle.toml
+  pantheon-fixer.toml
+  pantheon-designer.toml
+  pantheon-reviewer.toml
+  pantheon-verifier.toml
+)
+for agent in "${AGENT_FILES[@]}"; do
+  agent_file="$ROOT/agents/$agent"
+  assert_file "$agent_file"
+  assert_contains "$agent_file" "Do not restate the assignment."
+  assert_contains "$agent_file" "Do not summarize unchanged code or context the parent already supplied."
+  assert_contains "$agent_file" "Return only new findings, changes, evidence, blockers, unknowns, and verdicts that the parent needs."
+  assert_contains "$agent_file" "Once the assigned objective is answered with sufficient evidence, stop."
+  assert_contains "$agent_file" "Do not continue exploring adjacent code or generating extra recommendations merely for completeness."
+  assert_contains "$agent_file" "Preserve concrete evidence where it matters."
+  assert_not_contains "$agent_file" "Recommended next action"
+done
+assert_contains "$ROOT/agents/pantheon-explorer.toml" "- Findings"
+assert_contains "$ROOT/agents/pantheon-explorer.toml" "- Evidence"
+assert_contains "$ROOT/agents/pantheon-explorer.toml" "- Unknowns/blockers only if material"
+assert_contains "$ROOT/agents/pantheon-librarian.toml" "- Answer/findings"
+assert_contains "$ROOT/agents/pantheon-librarian.toml" "- Source/reference evidence"
+assert_contains "$ROOT/agents/pantheon-librarian.toml" "- Unknowns only if material"
+assert_contains "$ROOT/agents/pantheon-oracle.toml" "- Recommendation/decision"
+assert_contains "$ROOT/agents/pantheon-oracle.toml" "- Material tradeoffs/constraints"
+assert_contains "$ROOT/agents/pantheon-oracle.toml" "- Risks/unknowns only if material"
+assert_contains "$ROOT/agents/pantheon-fixer.toml" "- Changes made"
+assert_contains "$ROOT/agents/pantheon-fixer.toml" "- Validation"
+assert_contains "$ROOT/agents/pantheon-fixer.toml" "- Remaining issue only if it exists"
+assert_contains "$ROOT/agents/pantheon-designer.toml" "- Findings or changes"
+assert_contains "$ROOT/agents/pantheon-designer.toml" "- Relevant evidence/validation"
+assert_contains "$ROOT/agents/pantheon-designer.toml" "- Remaining issue only if it exists"
+assert_contains "$ROOT/agents/pantheon-reviewer.toml" "- Material findings ordered by severity, with inline evidence"
+assert_contains "$ROOT/agents/pantheon-reviewer.toml" "- Verdict"
+assert_contains "$ROOT/agents/pantheon-verifier.toml" "- Checks/results"
+assert_contains "$ROOT/agents/pantheon-verifier.toml" "- Unproven claims only if any"
+assert_contains "$ROOT/agents/pantheon-verifier.toml" "- Verdict"
+assert_contains "$ROOT/agents/pantheon-explorer.toml" 'model = "gpt-5.6-luna"'
+assert_contains "$ROOT/agents/pantheon-explorer.toml" 'model_reasoning_effort = "high"'
+assert_contains "$ROOT/agents/pantheon-librarian.toml" 'model = "gpt-5.6-luna"'
+assert_contains "$ROOT/agents/pantheon-librarian.toml" 'model_reasoning_effort = "high"'
+assert_contains "$ROOT/agents/pantheon-oracle.toml" 'model = "gpt-5.6-sol"'
+assert_contains "$ROOT/agents/pantheon-oracle.toml" 'model_reasoning_effort = "high"'
+assert_contains "$ROOT/agents/pantheon-fixer.toml" 'model = "gpt-5.6-luna"'
+assert_contains "$ROOT/agents/pantheon-fixer.toml" 'model_reasoning_effort = "max"'
+assert_contains "$ROOT/agents/pantheon-designer.toml" 'model = "gpt-5.6-luna"'
+assert_contains "$ROOT/agents/pantheon-designer.toml" 'model_reasoning_effort = "max"'
+assert_contains "$ROOT/agents/pantheon-reviewer.toml" 'model = "gpt-5.6-sol"'
+assert_contains "$ROOT/agents/pantheon-reviewer.toml" 'model_reasoning_effort = "high"'
+assert_contains "$ROOT/agents/pantheon-verifier.toml" 'model = "gpt-5.6-terra"'
+assert_contains "$ROOT/agents/pantheon-verifier.toml" 'model_reasoning_effort = "medium"'
+pass "all seven role payloads are delta-only, stop-bounded, concise, and retain model assignments"
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
@@ -48,7 +207,7 @@ assert_contains "$CODEX_HOME/AGENTS.md" "Keep this exact user-owned line."
 [ "$(grep -Fxc '<!-- PANTHEON:START -->' "$CODEX_HOME/AGENTS.md")" -eq 1 ] || fail "expected one Pantheon start marker"
 [ "$(grep -Fxc '<!-- PANTHEON:END -->' "$CODEX_HOME/AGENTS.md")" -eq 1 ] || fail "expected one Pantheon end marker"
 assert_file "$CODEX_HOME/.pantheon-version"
-assert_contains "$CODEX_HOME/.pantheon-version" "0.2.0"
+assert_contains "$CODEX_HOME/.pantheon-version" "0.3.0"
 assert_file "$CODEX_HOME/agents/user-custom.toml"
 assert_file "$PANTHEON_SKILLS_HOME/user-skill/SKILL.md"
 for f in "$ROOT"/agents/*.toml; do
@@ -59,46 +218,18 @@ done
 for d in pantheon pantheon-plan pantheon-review pantheon-team; do
   assert_equal_files "$ROOT/skills/$d/SKILL.md" "$PANTHEON_SKILLS_HOME/$d/SKILL.md"
 done
-pass "install preserves user configuration and installs all Pantheon payloads"
-
 INSTALLED_PANTHEON_SKILL="$PANTHEON_SKILLS_HOME/pantheon/SKILL.md"
-assert_contains "$INSTALLED_PANTHEON_SKILL" "Every new thread begins with Pantheon inactive"
-assert_contains "$INSTALLED_PANTHEON_SKILL" 'When Pantheon is inactive, activating without an effort instruction selects `normal`.'
-assert_contains "$INSTALLED_PANTHEON_SKILL" 'The user does not need to repeat `$pantheon`.'
-assert_contains "$INSTALLED_PANTHEON_SKILL" "Activation may happen on the first message or at any later point."
-assert_contains "$INSTALLED_PANTHEON_SKILL" "The selected effort remains in effect for later requests while Pantheon is active"
-assert_contains "$INSTALLED_PANTHEON_SKILL" 'Ordinary follow-ups and a repeated bare `$pantheon` do not reset it.'
-assert_contains "$INSTALLED_PANTHEON_SKILL" "Use deep orchestration for this task."
-assert_contains "$INSTALLED_PANTHEON_SKILL" "switch Pantheon to fast"
-assert_contains "$INSTALLED_PANTHEON_SKILL" "use normal Pantheon effort"
-assert_contains "$INSTALLED_PANTHEON_SKILL" "switch Pantheon to deep"
-assert_contains "$INSTALLED_PANTHEON_SKILL" "A clear request to disable Pantheon returns the thread to normal non-Pantheon behavior."
-assert_contains "$INSTALLED_PANTHEON_SKILL" 'Reactivating without an effort instruction selects `normal`'
-assert_contains "$INSTALLED_PANTHEON_SKILL" "Never activate or deactivate Pantheon merely because a request is difficult"
-assert_contains "$INSTALLED_PANTHEON_SKILL" "Never carry it into a new or unrelated thread"
-assert_contains "$INSTALLED_PANTHEON_SKILL" 'Activate on $pantheon or a clear request to use, enable, or enter Pantheon orchestration.'
-assert_contains "$INSTALLED_PANTHEON_SKILL" 'Do not activate merely because Pantheon is mentioned or is the subject or target of lifecycle, configuration, documentation, or repository work.'
-assert_contains "$INSTALLED_PANTHEON_SKILL" "## Subject versus orchestrator"
-assert_contains "$INSTALLED_PANTHEON_SKILL" "does not by itself activate Pantheon orchestration"
-assert_contains "$INSTALLED_PANTHEON_SKILL" "Install Codex Pantheon for me."
-assert_contains "$INSTALLED_PANTHEON_SKILL" "Run Pantheon doctor."
-assert_contains "$INSTALLED_PANTHEON_SKILL" "Use Pantheon for this."
-assert_contains "$INSTALLED_PANTHEON_SKILL" "Enable Pantheon mode."
-assert_contains "$INSTALLED_PANTHEON_SKILL" "Use Pantheon to update the Pantheon installer."
-assert_contains "$CODEX_HOME/AGENTS.md" "Once activated, continue using Pantheon for ordinary follow-up requests in that thread"
-assert_contains "$CODEX_HOME/AGENTS.md" "Deactivation clears the effort"
-assert_contains "$CODEX_HOME/AGENTS.md" "A product or subject mention is not an activation signal"
-assert_contains "$CODEX_HOME/AGENTS.md" "lifecycle operations such as \`./pantheon bootstrap\`"
-assert_contains "$CODEX_HOME/AGENTS.md" 'Only `$pantheon` or separate clear intent to use, enable, or enter Pantheon'
-for unsupported in '$pantheon fast' '$pantheon normal' '$pantheon deep'; do
-  assert_not_contains "$INSTALLED_PANTHEON_SKILL" "$unsupported"
-  assert_not_contains "$CODEX_HOME/AGENTS.md" "$unsupported"
-  assert_not_contains "$ROOT/README.md" "$unsupported"
-done
+assert_contains "$INSTALLED_PANTHEON_SKILL" "Every new thread begins inactive"
+assert_contains "$INSTALLED_PANTHEON_SKILL" "Once active, ordinary follow-ups stay in Pantheon"
+assert_contains "$INSTALLED_PANTHEON_SKILL" "Deactivation clears the selected effort"
+assert_contains "$INSTALLED_PANTHEON_SKILL" "does not by itself activate orchestration"
+assert_contains "$INSTALLED_PANTHEON_SKILL" 'fork_turns: "none"'
 for d in pantheon-plan pantheon-review pantheon-team; do
-  assert_contains "$PANTHEON_SKILLS_HOME/$d/SKILL.md" "does not become a sticky"
+  assert_contains "$PANTHEON_SKILLS_HOME/$d/SKILL.md" "request-scoped"
 done
-pass "installed policy and skill contain the canonical thread-persistence contract"
+assert_contains "$CODEX_HOME/AGENTS.md" "follow the relevant Pantheon workflow skill"
+assert_contains "$CODEX_HOME/AGENTS.md" "Repository tests prove packaged policy/configuration"
+pass "install preserves user configuration and installs all v0.3 payloads"
 
 BEFORE="$(cksum "$CODEX_HOME/AGENTS.md")"
 "$PANTHEON" install >/dev/null
@@ -178,7 +309,7 @@ mkdir -p "$HOME"
 BOOT_OUT="$BOOT/bootstrap.out"
 mkdir -p "$BOOT"
 "$PANTHEON" bootstrap >"$BOOT_OUT" 2>&1
-assert_contains "$BOOT_OUT" "Pantheon-owned files synchronized to v0.2.0."
+assert_contains "$BOOT_OUT" "Pantheon-owned files synchronized to v0.3.0."
 assert_contains "$BOOT_OUT" "Status: HEALTHY"
 assert_file "$CODEX_HOME/.pantheon-version"
 printf 'drift\n' >> "$CODEX_HOME/agents/pantheon-fixer.toml"
@@ -192,8 +323,13 @@ assert_contains "$ROOT/AGENTS.md" 'run `./pantheon bootstrap`'
 assert_contains "$ROOT/AGENTS.md" 'Install Codex Pantheon for me.'
 assert_contains "$ROOT/AGENTS.md" 'MUST NOT by itself activate Pantheon orchestration.'
 assert_contains "$ROOT/README.md" 'operates on Pantheon and leaves Pantheon mode OFF.'
+assert_contains "$ROOT/README.md" 'fork_turns: "none"'
 assert_contains "$ROOT/docs/CODEX_INSTALL.md" 'Install Codex Pantheon for me.'
 assert_contains "$ROOT/docs/CODEX_INSTALL.md" 'does not activate Pantheon orchestration.'
-pass "repository instructions define Codex-assisted install behavior"
+assert_contains "$ROOT/docs/CODEX_INSTALL.md" 'packaged policy/configuration and lifecycle safeguards'
+assert_contains "$ROOT/docs/USER_GUIDE.md" 'Native child spawns default to `fork_turns: "none"`'
+assert_contains "$ROOT/docs/DESIGN_DOCTRINE.md" 'context is a cost'
+assert_contains "$ROOT/docs/V0.3.0.md" 'Token & Context Efficiency'
+pass "repository instructions and v0.3 documentation define lifecycle, efficiency, and evidence boundaries"
 
 printf '1..%d\n' "$PASS"

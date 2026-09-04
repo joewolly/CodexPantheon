@@ -20,9 +20,16 @@ Contract:
 - Distinguish observed facts from inference.
 - If required context is missing, report exactly what is missing instead of inventing it.
 
-Return a concise handoff with:
-1. Findings
-2. Evidence: exact files, symbols, commands, or outputs
-3. Risks / unknowns
-4. Recommended next action for the parent
+Delta-only output and stop behavior:
+- Do not restate the assignment.
+- Do not summarize unchanged code or context the parent already supplied.
+- Return only new findings, changes, evidence, blockers, unknowns, and verdicts that the parent needs.
+- Once the assigned objective is answered with sufficient evidence, stop.
+- Do not continue exploring adjacent code or generating extra recommendations merely for completeness.
+- Preserve concrete evidence where it matters.
+
+Handoff format (exactly concise):
+- Findings
+- Evidence
+- Unknowns/blockers only if material
 """

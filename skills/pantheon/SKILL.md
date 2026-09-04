@@ -5,91 +5,63 @@ description: Explicit, thread-scoped Codex Pantheon orchestration. Activate on $
 
 # Pantheon
 
-Activate Pantheon only because the user explicitly requested Pantheon orchestration. The parent Codex thread remains the orchestrator and owner of the mission, integration, user communication, and final result.
+Pantheon is an explicit, thread-scoped routing layer. The parent Codex thread remains responsible for the mission, delegation, integration, validation, user communication, and final result.
 
 ## Thread-scoped activation state
 
-Treat Pantheon activation as explicit conversational state in the current thread:
+Treat activation as conversational state in the current thread:
 
-- Every new thread begins with Pantheon inactive and uses normal non-Pantheon behavior.
-- `$pantheon` or a clear natural-language request to use, enable, or enter Pantheon orchestration activates it for the current thread. Activation may happen on the first message or at any later point.
-- Once activated, Pantheon remains active for subsequent ordinary requests in that thread. The user does not need to repeat `$pantheon`.
-- A clear request to disable Pantheon returns the thread to normal non-Pantheon behavior. Recognize explicit intent such as “disable Pantheon,” “stop using Pantheon,” “leave Pantheon mode,” or “go back to normal mode”; do not infer deactivation from vague wording.
-- After deactivation, later requests remain outside Pantheon until the user explicitly activates it again.
-- This state belongs only to the current conversation. Never carry it into a new or unrelated thread, a global preference, or external persistent storage.
-- Never activate or deactivate Pantheon merely because a request is difficult, long, simple, or apparently suited to multiple agents. Vague wording, quoted examples, and mere discussion of Pantheon do not change the state.
+- Every new thread begins inactive and uses ordinary Codex behavior.
+- `$pantheon` or a clear natural-language request to use, enable, or enter Pantheon orchestration activates the current thread. Activation can happen on the first message or later.
+- Once active, ordinary follow-ups stay in Pantheon without repeating `$pantheon`.
+- A clear request to disable Pantheon—such as “disable Pantheon,” “stop using Pantheon,” “leave Pantheon mode,” or “go back to normal mode”—returns the thread to ordinary behavior. Do not infer deactivation from vague wording.
+- Deactivation clears the selected effort. Later reactivation starts at `normal` unless the user supplies an effort instruction.
+- Activation and effort never carry into a new or unrelated thread, global preference, or external persistent storage. Do not create a daemon, database, background process, or hidden cross-thread state for this purpose.
+- Difficulty, task length, parallelizability, quoted examples, and mere discussion do not activate or deactivate Pantheon.
 
 ### Subject versus orchestrator
 
-Mentioning, discussing, inspecting, installing, updating, repairing, verifying, configuring, documenting, modifying, or uninstalling Codex Pantheon does not by itself activate Pantheon orchestration. Those requests operate on the Pantheon product, repository, or configuration and keep an inactive thread in normal Codex behavior. Activation requires separate clear intent to use, enable, or enter Pantheon as the orchestration mode.
+Mentioning, discussing, inspecting, installing, updating, repairing, verifying, configuring, documenting, modifying, or uninstalling Codex Pantheon does not by itself activate orchestration. Those requests operate on the product, repository, or configuration and leave an inactive thread in normal Codex behavior. Activation requires separate clear intent to use, enable, or enter Pantheon as the orchestration mechanism.
 
-For example, `Install Codex Pantheon for me.`, `Run Pantheon doctor.`, `Update the Pantheon README.`, and `How does Pantheon work?` do not activate. `$pantheon`, `Use Pantheon for this.`, `Enable Pantheon mode.`, and `Use Pantheon to update the Pantheon installer.` do activate. The verb is not decisive: the distinction is whether Pantheon is the subject being operated on or the orchestration mechanism being requested.
+For example, `Install Codex Pantheon for me.`, `Run Pantheon doctor.`, `Update the Pantheon README.`, and `How does Pantheon work?` do not activate. `$pantheon`, `Use Pantheon for this.`, `Enable Pantheon mode.`, and `Use Pantheon to update the Pantheon installer.` do activate.
 
-Determine the current state from the thread's explicit activation and deactivation history. Do not create a daemon, database, background process, or hidden cross-thread state for this purpose.
+The specialized `$pantheon-plan`, `$pantheon-review`, and `$pantheon-team` workflows apply only to the request that invokes them; they do not become sticky submodes. A named-agent request is valid for that request only and does not create a permanent named-agent mode.
 
-## Select the minimum useful specialists
+## Progressive specialist dispatch
 
-Available custom agents:
+The parent first decides whether delegation adds material value. If it does, select one best specialist first and stop when that result is sufficient. Add a second only for a specific unresolved need, a genuinely independent workstream, or materially useful independent verification. Do not create a complexity swarm.
 
-- `pantheon_explorer`: repository/system mapping and evidence gathering; read-only.
-- `pantheon_librarian`: external/reference research; read-only.
-- `pantheon_oracle`: architecture, tradeoffs, difficult reasoning; read-only.
-- `pantheon_fixer`: focused implementation.
-- `pantheon_designer`: UI/UX critique or explicitly authorized UI implementation.
-- `pantheon_reviewer`: independent implementation/diff review; read-only.
-- `pantheon_verifier`: independent tests/builds/reproduction; no production-source edits.
+Use the smallest matching role:
 
-Do not invoke an agent merely because one exists for the category.
+- Known scoped change → `pantheon_fixer`.
+- Unknown repository path or ownership → `pantheon_explorer`.
+- Unknown external documentation or reference → `pantheon_librarian`.
+- Unresolved architecture or tradeoff → `pantheon_oracle`.
+- UI/UX or interaction work → `pantheon_designer`.
+- Static correctness, diff, security, or regression review → `pantheon_reviewer`.
+- Executable tests, builds, reproduction, or acceptance evidence → `pantheon_verifier`.
 
-Default fan-out:
+Explorer is not a Fixer preflight: when the target is known, Fixer can inspect it directly. Use Oracle only when architecture or a material tradeoff remains unresolved. Team mode is the independent-workstream exception.
 
-- 0 agents only when delegation would clearly add no value even though Pantheon was invoked; explain briefly and continue locally.
-- 1 agent is the normal delegation case.
-- 2-3 agents are appropriate for genuinely independent workstreams or independent verification.
-- 4+ agents require an explicit user request for broader fan-out or an unusually broad task with clearly independent workstreams.
+For ordinary implementation, the independent check defaults to Reviewer or Verifier based on risk. Use both only when material risk requires both static and runtime evidence; never make Fixer → Reviewer → Verifier the default sequence.
 
-Never manufacture parallel work by asking multiple agents the same vague question.
+## Native child context and bounded assignments
 
-## Child assignment contract
+Use native child spawning and default every child to `fork_turns: "none"`. Give each child a self-contained, bounded assignment with the objective, relevant scope, constraints and known context, write permission, expected evidence/output, stopping condition, and a direct instruction not to spawn subagents.
 
-Every spawned agent assignment must be concrete and bounded. Include:
+Do not inherit context merely because it is available. Use the minimum supported inheritance only when a genuine parent dependency requires it. The sole special exception is a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default. Keep every child bounded and keep mission ownership in the parent.
 
-1. Objective
-2. Relevant scope / files / subsystem
-3. Constraints and known context
-4. Whether modification is permitted
-5. Expected output / evidence
-6. A direct instruction not to spawn subagents
+## Effort
 
-Prefer self-contained child assignments and the least inherited context needed. Avoid full-history forking by default when the task can be stated cleanly.
+Effort changes orchestration depth, not the roster:
 
-The parent must not hand off mission ownership. The parent synthesizes agent results, resolves conflicts, performs integration, and gives the final answer.
+- Activating while inactive without an effort instruction selects `normal`.
+- Say “Use deep orchestration for this task” alongside activation, or say “switch Pantheon to fast,” “use normal Pantheon effort,” or “switch Pantheon to deep” while active.
+- The selected effort persists through ordinary follow-ups and a repeated bare `$pantheon` while active. It changes only when the user selects another effort or disables Pantheon.
+- `fast` strongly prefers zero or one specialist; `normal` balances delegation and independent evidence; `deep` allows additional sequential research/checks within the same bounded routing rules.
 
-## Effort modifiers
+## Completion and evidence
 
-Pantheon effort is also thread-scoped conversational state:
+Reconcile child findings against evidence, never treat agreement as verification, and stop once the objective is answered with sufficient evidence. Ask for independent review or verification only when the risk warrants it.
 
-- When Pantheon is inactive, activating without an effort instruction selects `normal`.
-- Select the Pantheon skill with `$pantheon`. Express effort as a clear conversational instruction supplied with the activation request, such as “Use deep orchestration for this task.” Do not require or recommend appending effort words to the skill-picker invocation.
-- While Pantheon is active, clear instructions such as “switch Pantheon to fast,” “use normal Pantheon effort,” or “switch Pantheon to deep” change the effort without another skill invocation.
-- The selected effort remains in effect for later requests while Pantheon is active, until the user explicitly selects another effort or disables Pantheon. Ordinary follow-ups and a repeated bare `$pantheon` do not reset it.
-- Deactivation clears the selected effort. Reactivating without an effort instruction selects `normal`; do not silently restore the previous effort.
-
-A clear instruction to “use normal Pantheon effort” selects normal effort while keeping Pantheon active. In contrast, a clear request to “go back to normal mode” deactivates Pantheon as described above.
-
-Interpret the active effort as orchestration depth rather than a different roster:
-
-- `fast`: strongly prefer zero or one specialist; avoid redundant second opinions; optimize for latency.
-- `normal` or no modifier: balanced delegation; independent review/verification when materially useful.
-- `deep`: allow more research and sequential independent review/verification, but still obey fan-out limits.
-
-If native spawn controls allow a supported reasoning-effort override, use it only when it is compatible with the selected model. Do not hard-code model names merely to satisfy an effort label.
-
-## Completion
-
-Before finishing:
-
-- Reconcile conflicting agent findings against evidence.
-- Do not equate agent agreement with verification.
-- Run or request independent verification when the risk of an unverified implementation is material.
-- Report what was actually verified and what remains uncertain.
+Repository tests prove packaged policy/configuration and lifecycle behavior. They do not prove live Codex backend, provider, runtime, or native child-spawn availability.

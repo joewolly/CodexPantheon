@@ -73,7 +73,15 @@ Use normal Pantheon effort.
 
 The selected effort persists within the active thread. Disabling Pantheon clears it.
 
-## 4. Use the specialized workflows
+## 4. Dispatch progressively and keep context small
+
+The parent decides whether delegation adds material value, then selects one best specialist first and stops when its result is sufficient. Add a second only for a specific unresolved need, a genuinely independent workstream, or materially useful independent verification. Do not create a complexity swarm.
+
+Use the smallest matching role: known scoped change → Fixer; unknown repository path or ownership → Explorer; unknown external documentation or reference → Librarian; unresolved architecture → Oracle; UI/UX → Designer; static correctness/diff/security/regression → Reviewer; executable tests/builds/reproduction/acceptance → Verifier. Explorer is not a Fixer preflight, Fixer can inspect a known target, Oracle is only for unresolved architecture, and team mode is the independent-workstream exception.
+
+Native child spawns default to `fork_turns: "none"` with a self-contained assignment and minimal context. Inherit only the minimum supported context when a genuine parent dependency requires it, with an inherited-fork exception only when no inheritance would make a required dynamic tool unavailable. Never use full-history inheritance by default. For ordinary implementation, choose Reviewer or Verifier based on risk; use both only when material risk requires static and runtime evidence.
+
+## 5. Use the specialized workflows
 
 The focused workflow skills apply only to the request that invokes them. They do not create sticky planning, review, or team submodes.
 
@@ -101,7 +109,7 @@ $pantheon-team Split the API migration and client migration into separate workst
 
 Team mode is for work that truly separates. The parent thread still owns integration and conflict resolution; child agents do not create further agents.
 
-## 5. Ask for a named specialist
+## 6. Ask for a named specialist
 
 You can request a particular role when you know which perspective you need:
 
@@ -123,7 +131,7 @@ Use Pantheon Explorer to map where authorization decisions are made. Do not chan
 
 Named-agent requests are bounded to that request; they do not create a permanent named-agent mode.
 
-## 6. Write effective requests
+## 7. Write effective requests
 
 Pantheon works best when the task states the outcome and the important boundaries. Include the target, constraints, authorized mutations, expected evidence, and stopping point when they matter.
 
@@ -135,7 +143,7 @@ Fix the retry regression in the API client. Preserve the public API, modify only
 
 You do not need to design the agent team yourself. The parent Codex thread chooses the minimum useful specialists and remains accountable for the final result.
 
-## 7. Understand the evidence
+## 8. Understand the evidence
 
 Pantheon distinguishes different kinds of proof:
 
@@ -146,7 +154,7 @@ Pantheon distinguishes different kinds of proof:
 
 Ask for the specific lane you need: unit tests, a build, a rendered UI, hosted CI, live-provider behavior, or packaged-artifact verification are separate claims.
 
-## 8. Update, repair, or remove Pantheon
+## 9. Update, repair, or remove Pantheon
 
 Run the bootstrap flow after updating the source package:
 

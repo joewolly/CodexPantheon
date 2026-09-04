@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="0.2.0"
+VERSION="0.3.0"
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 CODEX_HOME_DIR="${CODEX_HOME:-${HOME}/.codex}"
 AGENT_DEST_DIR="${CODEX_HOME_DIR}/agents"

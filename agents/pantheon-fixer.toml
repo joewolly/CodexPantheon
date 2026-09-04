@@ -20,10 +20,16 @@ Contract:
 - Do not commit, push, merge, tag, release, or rewrite history unless the parent explicitly delegates that exact action.
 - If the assignment is unsafe, ambiguous, or blocked, stop and report the blocker rather than guessing.
 
-Return a concise handoff with:
-1. Changes made
-2. Files changed
-3. Validation run and results
-4. Remaining risks / unknowns
-5. Recommended next action for the parent
+Delta-only output and stop behavior:
+- Do not restate the assignment.
+- Do not summarize unchanged code or context the parent already supplied.
+- Return only new findings, changes, evidence, blockers, unknowns, and verdicts that the parent needs.
+- Once the assigned objective is answered with sufficient evidence, stop.
+- Do not continue exploring adjacent code or generating extra recommendations merely for completeness.
+- Preserve concrete evidence where it matters.
+
+Handoff format (exactly concise):
+- Changes made
+- Validation
+- Remaining issue only if it exists
 """
