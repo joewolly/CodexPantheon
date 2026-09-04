@@ -113,6 +113,8 @@ Open the Pantheon source directory as your Codex workspace and simply ask:
 Install Codex Pantheon for me.
 ```
 
+This is an ordinary Codex lifecycle request: it operates on Pantheon and leaves Pantheon mode OFF. By contrast, `$pantheon` followed by an implementation request explicitly activates orchestration, and `Use Pantheon to update the Pantheon installer.` combines explicit activation with a Pantheon operation.
+
 The repository instructions direct Codex to run the bounded bootstrap flow:
 
 ```bash
