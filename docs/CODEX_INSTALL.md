@@ -12,6 +12,8 @@ Pantheon v0.2 can bootstrap itself through an ordinary Codex workspace. No separ
    Install Codex Pantheon for me.
    ```
 
+This request operates on the Pantheon product; it does not activate Pantheon orchestration. `$pantheon` followed by a task explicitly activates orchestration, while `Use Pantheon to update the Pantheon installer.` explicitly activates Pantheon and then operates on Pantheon.
+
 The repository `AGENTS.md` tells Codex to execute:
 
 ```bash

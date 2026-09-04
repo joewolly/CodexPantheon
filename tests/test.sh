@@ -76,8 +76,20 @@ assert_contains "$INSTALLED_PANTHEON_SKILL" "A clear request to disable Pantheon
 assert_contains "$INSTALLED_PANTHEON_SKILL" 'Reactivating without an effort instruction selects `normal`'
 assert_contains "$INSTALLED_PANTHEON_SKILL" "Never activate or deactivate Pantheon merely because a request is difficult"
 assert_contains "$INSTALLED_PANTHEON_SKILL" "Never carry it into a new or unrelated thread"
+assert_contains "$INSTALLED_PANTHEON_SKILL" 'Activate on $pantheon or a clear request to use, enable, or enter Pantheon orchestration.'
+assert_contains "$INSTALLED_PANTHEON_SKILL" 'Do not activate merely because Pantheon is mentioned or is the subject or target of lifecycle, configuration, documentation, or repository work.'
+assert_contains "$INSTALLED_PANTHEON_SKILL" "## Subject versus orchestrator"
+assert_contains "$INSTALLED_PANTHEON_SKILL" "does not by itself activate Pantheon orchestration"
+assert_contains "$INSTALLED_PANTHEON_SKILL" "Install Codex Pantheon for me."
+assert_contains "$INSTALLED_PANTHEON_SKILL" "Run Pantheon doctor."
+assert_contains "$INSTALLED_PANTHEON_SKILL" "Use Pantheon for this."
+assert_contains "$INSTALLED_PANTHEON_SKILL" "Enable Pantheon mode."
+assert_contains "$INSTALLED_PANTHEON_SKILL" "Use Pantheon to update the Pantheon installer."
 assert_contains "$CODEX_HOME/AGENTS.md" "Once activated, continue using Pantheon for ordinary follow-up requests in that thread"
 assert_contains "$CODEX_HOME/AGENTS.md" "Deactivation clears the effort"
+assert_contains "$CODEX_HOME/AGENTS.md" "A product or subject mention is not an activation signal"
+assert_contains "$CODEX_HOME/AGENTS.md" "lifecycle operations such as \`./pantheon bootstrap\`"
+assert_contains "$CODEX_HOME/AGENTS.md" 'Only `$pantheon` or separate clear intent to use, enable, or enter Pantheon'
 for unsupported in '$pantheon fast' '$pantheon normal' '$pantheon deep'; do
   assert_not_contains "$INSTALLED_PANTHEON_SKILL" "$unsupported"
   assert_not_contains "$CODEX_HOME/AGENTS.md" "$unsupported"
@@ -177,7 +189,11 @@ assert_contains "$BOOT_OUT" "Status: HEALTHY"
 pass "bootstrap performs install-or-update plus doctor idempotently"
 
 assert_contains "$ROOT/AGENTS.md" 'run `./pantheon bootstrap`'
+assert_contains "$ROOT/AGENTS.md" 'Install Codex Pantheon for me.'
+assert_contains "$ROOT/AGENTS.md" 'MUST NOT by itself activate Pantheon orchestration.'
+assert_contains "$ROOT/README.md" 'operates on Pantheon and leaves Pantheon mode OFF.'
 assert_contains "$ROOT/docs/CODEX_INSTALL.md" 'Install Codex Pantheon for me.'
+assert_contains "$ROOT/docs/CODEX_INSTALL.md" 'does not activate Pantheon orchestration.'
 pass "repository instructions define Codex-assisted install behavior"
 
 printf '1..%d\n' "$PASS"

@@ -1,23 +1,29 @@
 ---
 name: pantheon
-description: Explicit, thread-scoped Codex Pantheon orchestration. Activate only when the user invokes $pantheon or explicitly asks to use Pantheon, then keep it active in that thread until explicitly disabled. Never trigger from task complexity alone.
+description: Explicit, thread-scoped Codex Pantheon orchestration. Activate on $pantheon or a clear request to use, enable, or enter Pantheon orchestration. Do not activate merely because Pantheon is mentioned or is the subject or target of lifecycle, configuration, documentation, or repository work. Complexity alone never activates it.
 ---
 
 # Pantheon
 
-Activate Pantheon only because the user explicitly requested it. The parent Codex thread remains the orchestrator and owner of the mission, integration, user communication, and final result.
+Activate Pantheon only because the user explicitly requested Pantheon orchestration. The parent Codex thread remains the orchestrator and owner of the mission, integration, user communication, and final result.
 
 ## Thread-scoped activation state
 
 Treat Pantheon activation as explicit conversational state in the current thread:
 
 - Every new thread begins with Pantheon inactive and uses normal non-Pantheon behavior.
-- `$pantheon` or a clear natural-language request to use or enter Pantheon activates it for the current thread. Activation may happen on the first message or at any later point.
+- `$pantheon` or a clear natural-language request to use, enable, or enter Pantheon orchestration activates it for the current thread. Activation may happen on the first message or at any later point.
 - Once activated, Pantheon remains active for subsequent ordinary requests in that thread. The user does not need to repeat `$pantheon`.
 - A clear request to disable Pantheon returns the thread to normal non-Pantheon behavior. Recognize explicit intent such as “disable Pantheon,” “stop using Pantheon,” “leave Pantheon mode,” or “go back to normal mode”; do not infer deactivation from vague wording.
 - After deactivation, later requests remain outside Pantheon until the user explicitly activates it again.
 - This state belongs only to the current conversation. Never carry it into a new or unrelated thread, a global preference, or external persistent storage.
 - Never activate or deactivate Pantheon merely because a request is difficult, long, simple, or apparently suited to multiple agents. Vague wording, quoted examples, and mere discussion of Pantheon do not change the state.
+
+### Subject versus orchestrator
+
+Mentioning, discussing, inspecting, installing, updating, repairing, verifying, configuring, documenting, modifying, or uninstalling Codex Pantheon does not by itself activate Pantheon orchestration. Those requests operate on the Pantheon product, repository, or configuration and keep an inactive thread in normal Codex behavior. Activation requires separate clear intent to use, enable, or enter Pantheon as the orchestration mode.
+
+For example, `Install Codex Pantheon for me.`, `Run Pantheon doctor.`, `Update the Pantheon README.`, and `How does Pantheon work?` do not activate. `$pantheon`, `Use Pantheon for this.`, `Enable Pantheon mode.`, and `Use Pantheon to update the Pantheon installer.` do activate. The verb is not decisive: the distinction is whether Pantheon is the subject being operated on or the orchestration mechanism being requested.
 
 Determine the current state from the thread's explicit activation and deactivation history. Do not create a daemon, database, background process, or hidden cross-thread state for this purpose.
 

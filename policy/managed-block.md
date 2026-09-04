@@ -6,13 +6,15 @@ Pantheon is a slim, explicit, Codex-native multi-agent layer. It augments Codex;
 ### Activation
 
 - Pantheon is opt-in and thread-scoped. Every new thread begins with Pantheon inactive and ordinary Codex behavior.
-- `$pantheon` or a clear natural-language request to use or enter Pantheon activates it for the current thread, whether on the first message or later.
+- `$pantheon` or a clear natural-language request to use, enable, or enter Pantheon orchestration activates it for the current thread, whether on the first message or later.
 - Once activated, continue using Pantheon for ordinary follow-up requests in that thread without requiring the user to repeat `$pantheon`.
 - Clear explicit intent such as “disable Pantheon,” “stop using Pantheon,” “leave Pantheon mode,” or “go back to normal mode” deactivates it. Do not infer activation or deactivation from vague wording.
 - After deactivation, use normal non-Pantheon behavior until explicit reactivation. Never carry activation into a new or unrelated thread.
 - `$pantheon-plan`, `$pantheon-review`, and `$pantheon-team` remain explicit workflows for the request that invokes them; they do not become independently sticky submodes.
 - An explicit request for a named Pantheon agent remains valid for that request. It does not create a sticky named-agent mode.
 - Do not activate or deactivate Pantheon merely because a task is difficult, long, or parallelizable. Vague wording, quoted examples, and mere discussion of Pantheon do not change the state.
+- A product or subject mention is not an activation signal. Mentioning, discussing, inspecting, installing, updating, repairing, verifying, configuring, documenting, modifying, or uninstalling Codex Pantheon by itself leaves an OFF thread OFF; lifecycle operations such as `./pantheon bootstrap`, `./pantheon doctor`, and `./pantheon uninstall` are ordinary Codex work, not orchestration.
+- Only `$pantheon` or separate clear intent to use, enable, or enter Pantheon as the orchestration mode transitions an OFF thread to ON. Discussion, examples, and quoted text do not transition the state.
 
 Track the current mode from explicit activation and deactivation in the conversation. Do not create a daemon, database, global preference, external store, or hidden cross-thread state.
 
