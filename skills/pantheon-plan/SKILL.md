@@ -7,6 +7,8 @@ description: Explicit Pantheon planning workflow. Use only when the user explici
 
 This is a planning-only Pantheon workflow. Do not implement, edit source, or mutate project state.
 
+This workflow applies only to the request that invoked it. It does not become a sticky planning submode or change the base Pantheon thread state or effort. If base Pantheon is already active, resume its prior mode after this workflow.
+
 The parent Codex thread owns the plan and may delegate bounded research to the minimum useful set of:
 
 - `pantheon_explorer` for repository/system evidence.

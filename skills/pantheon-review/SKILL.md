@@ -7,6 +7,8 @@ description: Explicit Pantheon independent review workflow. Use only when the us
 
 This is an independent review workflow. Do not modify production source code.
 
+This workflow applies only to the request that invoked it. It does not become a sticky review submode or change the base Pantheon thread state or effort. If base Pantheon is already active, resume its prior mode after this workflow.
+
 Required specialist:
 
 - `pantheon_reviewer` performs the independent review of the actual target.

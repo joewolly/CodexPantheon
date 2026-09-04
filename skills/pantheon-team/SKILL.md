@@ -7,6 +7,8 @@ description: Explicit Pantheon parallel-team workflow. Use only when the user ex
 
 This workflow deliberately permits broader parallelism, but it remains bounded and parent-orchestrated.
 
+This workflow applies only to the request that invoked it. It does not become a sticky team submode or change the base Pantheon thread state or effort. If base Pantheon is already active, resume its prior mode after this workflow.
+
 Rules:
 
 1. Identify independent workstreams before spawning anyone.
