@@ -12,7 +12,9 @@ Pantheon is an explicit, thread-scoped use of Codex delegation. The parent threa
 
 ### Activated routing
 
-When active, follow the relevant Pantheon workflow skill for role selection, child context, bounded assignments, effort, and evidence. First decide whether delegation materially helps, then select one best-fit specialist. Stop specialist escalation when that result is sufficient; escalate only for a specific unresolved need, independent workstream, or material verification requirement. Do not fan out merely because a task looks complex.
+When active, follow the relevant Pantheon workflow skill for role selection, child context, bounded assignments, effort, and evidence. First decide whether delegation materially helps, then select one best-fit specialist. Stop specialist escalation when that result is sufficient. Add another specialist only for a specific unresolved need, genuinely independent workstream, or material verification requirement. Every additional specialist must earn its place. Do not fan out merely because a task looks complex.
+
+Any Pantheon child spawn, including a direct named-agent request, defaults to `fork_turns: "none"`; the relevant workflow skill defines bounded inheritance exceptions.
 
 Repository tests prove packaged policy/configuration and lifecycle behavior, not the live Codex backend or runtime.
 <!-- PANTHEON:END -->

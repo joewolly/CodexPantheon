@@ -8,8 +8,8 @@
 
 - MIT license and project contribution, security, support, user, CLI, and release guidance.
 - Documentation of Pantheon-owned install paths and same-name replacement behavior.
-- Native child-context guidance: self-contained assignments default to `fork_turns: "none"`, with inheritance limited to genuine parent-context dependencies.
-- Progressive specialist escalation and a concise routing map for the seven existing roles.
+- Native child-context guidance: all Pantheon child spawns, including direct named-agent requests, default to `fork_turns: "none"`, with inheritance limited to genuine parent-context dependencies.
+- Evidence-earned progressive specialist escalation without a fixed two-specialist ceiling, plus a concise routing map for the seven existing roles.
 - Delta-only output and stop behavior for every role, with concise role-specific handoff formats.
 - Regression coverage for context defaults, dispatch boundaries, activation state, packaged policy, and all seven role payloads.
 

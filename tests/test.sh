@@ -57,10 +57,15 @@ for marker in \
   "First decide whether delegation materially helps" \
   "select one best-fit specialist" \
   "Stop specialist escalation when that result is sufficient" \
+  "Add another specialist only" \
   "specific unresolved need" \
-  "independent workstream" \
+  "genuinely independent workstream" \
   "material verification requirement" \
+  "Every additional specialist must earn its place" \
   "Do not fan out merely because a task looks complex" \
+  "Any Pantheon child spawn, including a direct named-agent request" \
+  'defaults to `fork_turns: "none"`' \
+  "the relevant workflow skill defines bounded inheritance exceptions" \
   "Repository tests prove packaged policy/configuration" \
   "not the live Codex backend"; do
   assert_contains "$POLICY" "$marker"
@@ -73,7 +78,6 @@ for detailed in \
   'pantheon_designer' \
   'pantheon_reviewer' \
   'pantheon_verifier' \
-  'fork_turns: "none"' \
   'Explorer is not a Fixer preflight' \
   'choose Reviewer or Verifier based on risk'; do
   assert_not_contains "$POLICY" "$detailed"
@@ -105,7 +109,8 @@ assert_contains "$ROOT/skills/pantheon/SKILL.md" 'specialized `$pantheon-plan`, 
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "A named-agent request is valid for that request only"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "The parent first decides whether delegation adds material value"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "select one best specialist first"
-assert_contains "$ROOT/skills/pantheon/SKILL.md" "Add a second only for a specific unresolved need"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "Add another specialist only for a specific unresolved need"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "Every additional specialist must earn its place"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "Do not create a complexity swarm"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "Explorer is not a Fixer preflight"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "Fixer can inspect it directly"
@@ -117,15 +122,37 @@ assert_contains "$ROOT/skills/pantheon/SKILL.md" "never make Fixer → Reviewer 
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "minimum supported inheritance only when a genuine parent dependency requires it"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "sole special exception"
 assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "planning-only workflow"
+assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "Add another specialist only for a specific unresolved need"
+assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "Every additional specialist must earn its place"
 assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "Never invoke Fixer merely to make a plan concrete"
 assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "one actionable plan with sequencing, ownership boundaries, validation criteria"
 assert_contains "$ROOT/skills/pantheon-review/SKILL.md" '`pantheon_reviewer` is required'
 assert_contains "$ROOT/skills/pantheon-review/SKILL.md" '`pantheon_verifier` is optional'
+assert_contains "$ROOT/skills/pantheon-review/SKILL.md" "Add another specialist only for a specific unresolved need"
+assert_contains "$ROOT/skills/pantheon-review/SKILL.md" "Every additional specialist must earn its place"
 assert_contains "$ROOT/skills/pantheon-review/SKILL.md" "runtime tests, builds, reproduction, or acceptance evidence materially improve confidence"
 assert_contains "$ROOT/skills/pantheon-team/SKILL.md" "independent-workstream exception"
 assert_contains "$ROOT/skills/pantheon-team/SKILL.md" "at least two genuinely independent workstreams"
 assert_contains "$ROOT/skills/pantheon-team/SKILL.md" "Use 2-3 concurrent agents by default"
 assert_contains "$ROOT/skills/pantheon-team/SKILL.md" "use 4+ only when the user explicitly requests broader fan-out"
+assert_contains "$ROOT/skills/pantheon-team/SKILL.md" "Add another specialist only for a specific unresolved need"
+assert_contains "$ROOT/skills/pantheon-team/SKILL.md" "Every additional team member must earn its place"
+assert_contains "$ROOT/skills/pantheon-team/SKILL.md" "distinct substantial workstream or materially useful verification lane"
+for surface in \
+  "$POLICY" \
+  "$ROOT/skills/pantheon/SKILL.md" \
+  "$ROOT/skills/pantheon-plan/SKILL.md" \
+  "$ROOT/skills/pantheon-review/SKILL.md" \
+  "$ROOT/skills/pantheon-team/SKILL.md" \
+  "$ROOT/README.md" \
+  "$ROOT/docs/USER_GUIDE.md" \
+  "$ROOT/docs/DESIGN_DOCTRINE.md" \
+  "$ROOT/docs/V0.3.0.md"; do
+  assert_not_contains "$surface" "Add a second"
+  assert_not_contains "$surface" "add a second"
+  assert_not_contains "$surface" "A second specialist"
+  assert_not_contains "$surface" "a second specialist"
+done
 pass "all four skills define native child defaults, bounded assignments, escalation, and static/runtime evidence boundaries"
 
 AGENT_FILES=(
@@ -228,6 +255,7 @@ for d in pantheon-plan pantheon-review pantheon-team; do
   assert_contains "$PANTHEON_SKILLS_HOME/$d/SKILL.md" "request-scoped"
 done
 assert_contains "$CODEX_HOME/AGENTS.md" "follow the relevant Pantheon workflow skill"
+assert_contains "$CODEX_HOME/AGENTS.md" 'Any Pantheon child spawn, including a direct named-agent request, defaults to `fork_turns: "none"`'
 assert_contains "$CODEX_HOME/AGENTS.md" "Repository tests prove packaged policy/configuration"
 pass "install preserves user configuration and installs all v0.3 payloads"
 
@@ -324,10 +352,11 @@ assert_contains "$ROOT/AGENTS.md" 'Install Codex Pantheon for me.'
 assert_contains "$ROOT/AGENTS.md" 'MUST NOT by itself activate Pantheon orchestration.'
 assert_contains "$ROOT/README.md" 'operates on Pantheon and leaves Pantheon mode OFF.'
 assert_contains "$ROOT/README.md" 'fork_turns: "none"'
+assert_contains "$ROOT/README.md" "including direct named-agent requests"
 assert_contains "$ROOT/docs/CODEX_INSTALL.md" 'Install Codex Pantheon for me.'
 assert_contains "$ROOT/docs/CODEX_INSTALL.md" 'does not activate Pantheon orchestration.'
 assert_contains "$ROOT/docs/CODEX_INSTALL.md" 'packaged policy/configuration and lifecycle safeguards'
-assert_contains "$ROOT/docs/USER_GUIDE.md" 'Native child spawns default to `fork_turns: "none"`'
+assert_contains "$ROOT/docs/USER_GUIDE.md" 'Native child spawns, including direct named-agent requests, default to `fork_turns: "none"`'
 assert_contains "$ROOT/docs/DESIGN_DOCTRINE.md" 'context is a cost'
 assert_contains "$ROOT/docs/V0.3.0.md" 'Token & Context Efficiency'
 pass "repository instructions and v0.3 documentation define lifecycle, efficiency, and evidence boundaries"

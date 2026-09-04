@@ -11,7 +11,7 @@ This workflow is request-scoped: it does not become a sticky planning submode or
 
 ## Bounded planning delegation
 
-The parent decides whether research adds material value, then selects one best specialist first. Stop when the plan has sufficient evidence; add another only for a specific unresolved question, independent workstream, or materially useful independent check. Do not create a complexity swarm.
+The parent decides whether research adds material value, then selects one best specialist first. Stop when the plan has sufficient evidence. Add another specialist only for a specific unresolved need, genuinely independent workstream, or material verification requirement. Every additional specialist must earn its place. Do not create a complexity swarm.
 
 Use the relevant specialist: Explorer for unknown repository paths/ownership, Librarian for unknown external references, Oracle only for unresolved architecture/tradeoffs, and Designer for UI/UX planning. Never invoke Fixer merely to make a plan concrete.
 

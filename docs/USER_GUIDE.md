@@ -75,11 +75,11 @@ The selected effort persists within the active thread. Disabling Pantheon clears
 
 ## 4. Dispatch progressively and keep context small
 
-The parent decides whether delegation adds material value, then selects one best specialist first and stops when its result is sufficient. Add a second only for a specific unresolved need, a genuinely independent workstream, or materially useful independent verification. Do not create a complexity swarm.
+The parent decides whether delegation adds material value, then selects one best specialist first and stops when its result is sufficient. Add another specialist only for a specific unresolved need, genuinely independent workstream, or material verification requirement. Every additional specialist must earn its place. Do not create a complexity swarm.
 
 Use the smallest matching role: known scoped change → Fixer; unknown repository path or ownership → Explorer; unknown external documentation or reference → Librarian; unresolved architecture → Oracle; UI/UX → Designer; static correctness/diff/security/regression → Reviewer; executable tests/builds/reproduction/acceptance → Verifier. Explorer is not a Fixer preflight, Fixer can inspect a known target, Oracle is only for unresolved architecture, and team mode is the independent-workstream exception.
 
-Native child spawns default to `fork_turns: "none"` with a self-contained assignment and minimal context. Inherit only the minimum supported context when a genuine parent dependency requires it, with an inherited-fork exception only when no inheritance would make a required dynamic tool unavailable. Never use full-history inheritance by default. For ordinary implementation, choose Reviewer or Verifier based on risk; use both only when material risk requires static and runtime evidence.
+Native child spawns, including direct named-agent requests, default to `fork_turns: "none"` with a self-contained assignment and minimal context. Inherit only the minimum supported context when a genuine parent dependency requires it, with an inherited-fork exception only when no inheritance would make a required dynamic tool unavailable. Never use full-history inheritance by default. For ordinary implementation, choose Reviewer or Verifier based on risk; use both only when material risk requires static and runtime evidence.
 
 ## 5. Use the specialized workflows
 

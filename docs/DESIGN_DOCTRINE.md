@@ -10,7 +10,7 @@ Codex Pantheon is a slim, explicit, Codex-native multi-agent layer. Its purpose 
 4. **Parent owns the mission** — the parent thread owns decomposition, integration, validation, and the final answer.
 5. **Bounded agents** — every agent gets a concrete assignment and stopping condition; child agents do not recursively delegate.
 6. **Small roster** — add capabilities before adding characters. Core roles are Explorer, Librarian, Oracle, Fixer, Designer, Reviewer, and Verifier.
-7. **Progressive escalation** — the parent decides whether delegation adds material value, selects one best specialist first, and adds another only for a specific unresolved need, an independent workstream, or material verification. Team mode is the independent-workstream exception; complexity alone never creates a swarm.
+7. **Progressive escalation** — the parent decides whether delegation adds material value and selects one best specialist first. Add another specialist only for a specific unresolved need, genuinely independent workstream, or material verification requirement; every additional specialist must earn its place. Team mode is the independent-workstream exception, with 2-3 agents as its normal range; complexity alone never creates a swarm.
 8. **Verification is first-class** — confidence comes from evidence, not agreement between agents.
 9. **Thin workflows** — `$pantheon*` skills are routing recipes, not a custom workflow runtime.
 10. **Risk-matched verification** — ordinary implementation uses Reviewer or Verifier based on risk; both are used only when static and runtime evidence are materially necessary. There is no default Fixer → Reviewer → Verifier chain.
@@ -23,7 +23,7 @@ Codex Pantheon is a slim, explicit, Codex-native multi-agent layer. Its purpose 
 
 The concise routing map is: known scoped change → Fixer; unknown repository path/ownership → Explorer; unknown external reference → Librarian; unresolved architecture → Oracle; UI/UX → Designer; static correctness/diff/security/regression → Reviewer; executable tests/builds/reproduction/acceptance → Verifier. Explorer is not a Fixer preflight, Fixer can inspect a known target, and Oracle is only for unresolved architecture.
 
-Native child spawns default to `fork_turns: "none"` and self-contained assignments. Use only the minimum supported inherited context for a genuine parent dependency, with a special inherited-fork exception only when no inheritance would make a required dynamic tool unavailable; full-history inheritance is never the default. Child handoffs are delta-only and stop when sufficient evidence answers the objective.
+Native child spawns, including direct named-agent requests, default to `fork_turns: "none"` and self-contained assignments. Use only the minimum supported inherited context for a genuine parent dependency, with a special inherited-fork exception only when no inheritance would make a required dynamic tool unavailable; full-history inheritance is never the default. Child handoffs are delta-only and stop when sufficient evidence answers the objective.
 
 ## The slim test
 

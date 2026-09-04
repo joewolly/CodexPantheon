@@ -29,7 +29,7 @@ The specialized `$pantheon-plan`, `$pantheon-review`, and `$pantheon-team` workf
 
 ## Progressive specialist dispatch
 
-The parent first decides whether delegation adds material value. If it does, select one best specialist first and stop when that result is sufficient. Add a second only for a specific unresolved need, a genuinely independent workstream, or materially useful independent verification. Do not create a complexity swarm.
+The parent first decides whether delegation adds material value. If it does, select one best specialist first and stop when that result is sufficient. Add another specialist only for a specific unresolved need, genuinely independent workstream, or material verification requirement. Every additional specialist must earn its place. Do not create a complexity swarm.
 
 Use the smallest matching role:
 

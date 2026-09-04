@@ -15,9 +15,9 @@ v0.3 is the token-and-context efficiency release. It keeps Pantheon native, expl
 - ordinary Codex stays solo by default;
 - Pantheon activates only when you explicitly request it, then remains active for that thread until you explicitly disable it;
 - the parent Codex thread remains the orchestrator;
-- child agents default to native `fork_turns: "none"` with self-contained minimal context;
+- all Pantheon child spawns, including direct named-agent requests, default to native `fork_turns: "none"` with self-contained minimal context;
 - delta-only role handoffs stop once the assigned objective has sufficient evidence;
-- one best specialist is selected first; a second is added only for a specific unresolved need, independent workstream, or material verification;
+- one best specialist is selected first; another is added only for a specific unresolved need, genuinely independent workstream, or material verification requirement, and every additional specialist must earn its place;
 - ordinary implementation uses Reviewer or Verifier based on risk, and both only when static and runtime evidence are materially necessary;
 - repository tests cover packaged policy/configuration and lifecycle behavior, not the live backend, provider, or runtime;
 - no daemon, task database, scheduler, HUD, or custom orchestration runtime is introduced.
@@ -121,9 +121,9 @@ Pantheon does not activate merely because a task looks difficult. Thread persist
 
 ### Progressive dispatch and context efficiency
 
-The parent decides whether delegation adds material value, then chooses one best specialist first and stops when the result is sufficient. A second specialist is for a specific unresolved need, a genuinely independent workstream, or materially useful independent verification; complexity alone never creates a swarm. The concise routing map is: known scoped change → Fixer; unknown repository path/ownership → Explorer; unknown external reference → Librarian; unresolved architecture → Oracle; UI/UX → Designer; static correctness/diff/security/regression → Reviewer; executable tests/builds/reproduction/acceptance → Verifier. Explorer is not a Fixer preflight, Fixer can inspect a known target, Oracle is only for unresolved architecture, and team mode is the independent-workstream exception.
+The parent decides whether delegation adds material value, then chooses one best specialist first and stops when the result is sufficient. Add another specialist only for a specific unresolved need, genuinely independent workstream, or material verification requirement. Every additional specialist must earn its place; complexity alone never creates a swarm. The concise routing map is: known scoped change → Fixer; unknown repository path/ownership → Explorer; unknown external reference → Librarian; unresolved architecture → Oracle; UI/UX → Designer; static correctness/diff/security/regression → Reviewer; executable tests/builds/reproduction/acceptance → Verifier. Explorer is not a Fixer preflight, Fixer can inspect a known target, Oracle is only for unresolved architecture, and team mode is the independent-workstream exception.
 
-Native child spawns default to `fork_turns: "none"` and self-contained minimal context. Inherit only the minimum supported context for a genuine parent dependency, with an inherited-fork exception only when no inheritance would make a required dynamic tool unavailable. Full-history inheritance is never the default. Every child remains bounded and cannot spawn another child.
+Native child spawns, including direct named-agent requests, default to `fork_turns: "none"` and self-contained minimal context. Inherit only the minimum supported context for a genuine parent dependency, with an inherited-fork exception only when no inheritance would make a required dynamic tool unavailable. Full-history inheritance is never the default. Every child remains bounded and cannot spawn another child.
 
 ## Install with Codex (recommended)
 
