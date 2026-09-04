@@ -22,6 +22,18 @@ v0.2 adds coordination and reliability while preserving Pantheon's original cons
 
 See `docs/DESIGN_DOCTRINE.md` and `docs/V0.2.0.md`.
 
+## Documentation
+
+- [User guide](docs/USER_GUIDE.md) — activation, effort levels, workflows, specialists, examples, and evidence boundaries.
+- [Codex-assisted install guide](docs/CODEX_INSTALL.md) — installation, update, repair, verification, and removal.
+- [CLI reference](docs/CLI_REFERENCE.md) — commands, environment variables, owned paths, outcomes, and safeguards.
+- [Design doctrine](docs/DESIGN_DOCTRINE.md) — the principles and slim-test that govern the project.
+- [Contributing](CONTRIBUTING.md) — development setup, change constraints, validation, and pull-request expectations.
+- [Release checklist](docs/RELEASING.md) — version synchronization, validation, and publication boundaries.
+- [Support](SUPPORT.md) — diagnostics and useful bug-report details.
+- [Security policy](SECURITY.md) — private vulnerability reporting and security-sensitive boundaries.
+- [Changelog](CHANGELOG.md) — release history.
+
 ## Core agents
 
 | Agent | Purpose | Default model | Reasoning | Default write posture |
@@ -141,9 +153,11 @@ The v0.1-compatible entry point still works:
 Pantheon installs:
 
 - custom agent TOMLs into `${CODEX_HOME:-~/.codex}/agents/`;
-- workflow skills into `~/.agents/skills/`;
+- workflow skills into `${PANTHEON_SKILLS_HOME:-~/.agents/skills}`;
 - one managed policy block into `${CODEX_HOME:-~/.codex}/AGENTS.md`;
 - a small version marker at `${CODEX_HOME:-~/.codex}/.pantheon-version`.
+
+Those exact Pantheon-named agent files and skill directories are Pantheon-owned: install/update replaces them and uninstall removes them without making backups. Move unrelated content using the same names before installing. Other agent names, other skills, and text outside Pantheon's managed `AGENTS.md` markers remain user-owned. See the [CLI reference](docs/CLI_REFERENCE.md#owned-paths).
 
 Agent files are copied as regular files. Pantheon does not install custom agent roles as symlinks.
 
@@ -249,3 +263,7 @@ Core Pantheon has no:
 - custom MCP orchestration server.
 
 If a future feature requires Pantheon to become its own agent platform rather than improving native Codex delegation, it fails the project's slim test by default.
+
+## License
+
+Codex Pantheon is available under the [MIT License](LICENSE).

@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- MIT license and project contribution, security, support, user, CLI, and release guidance.
+- Documentation of Pantheon-owned install paths and same-name replacement behavior.
+
 ## 0.2.0 — 2026-09-03
 
 ### Added
