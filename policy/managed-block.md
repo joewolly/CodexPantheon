@@ -5,10 +5,16 @@ Pantheon is a slim, explicit, Codex-native multi-agent layer. It augments Codex;
 
 ### Activation
 
-- Pantheon is opt-in.
-- Use Pantheon only when the user explicitly invokes `$pantheon`, `$pantheon-plan`, `$pantheon-review`, `$pantheon-team`, explicitly asks to use Pantheon, or explicitly names a Pantheon agent.
-- Do not activate Pantheon merely because a task is difficult, long, or parallelizable.
-- Ordinary Codex work stays solo by default.
+- Pantheon is opt-in and thread-scoped. Every new thread begins with Pantheon inactive and ordinary Codex behavior.
+- `$pantheon` or a clear natural-language request to use or enter Pantheon activates it for the current thread, whether on the first message or later.
+- Once activated, continue using Pantheon for ordinary follow-up requests in that thread without requiring the user to repeat `$pantheon`.
+- Clear explicit intent such as “disable Pantheon,” “stop using Pantheon,” “leave Pantheon mode,” or “go back to normal mode” deactivates it. Do not infer activation or deactivation from vague wording.
+- After deactivation, use normal non-Pantheon behavior until explicit reactivation. Never carry activation into a new or unrelated thread.
+- `$pantheon-plan`, `$pantheon-review`, and `$pantheon-team` remain explicit workflows for the request that invokes them; they do not become independently sticky submodes.
+- An explicit request for a named Pantheon agent remains valid for that request. It does not create a sticky named-agent mode.
+- Do not activate or deactivate Pantheon merely because a task is difficult, long, or parallelizable. Vague wording, quoted examples, and mere discussion of Pantheon do not change the state.
+
+Track the current mode from explicit activation and deactivation in the conversation. Do not create a daemon, database, global preference, external store, or hidden cross-thread state.
 
 ### Parent ownership
 
@@ -45,6 +51,8 @@ Every child assignment should state the objective, scope, constraints, write per
 - Parent Codex reconciles all results and reports what was actually verified.
 
 ### Effort
+
+When Pantheon is inactive, activation uses `normal` effort unless it supplies `fast`, `normal`, or `deep`. The selected effort persists for subsequent requests while Pantheon is active. A later `$pantheon fast`, `$pantheon normal`, or `$pantheon deep` changes it; ordinary follow-ups and a repeated bare `$pantheon` do not. Deactivation clears the effort, so reactivation without a modifier uses `normal` rather than restoring an earlier selection. `$pantheon normal` selects normal Pantheon effort, while a clear natural-language request to “go back to normal mode” deactivates Pantheon.
 
 `fast`, `normal`, and `deep` modify orchestration depth, not the agent roster. Fast strongly minimizes delegation; normal balances specialization and verification; deep allows more research and independent checking while still obeying fan-out limits.
 

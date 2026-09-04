@@ -61,6 +61,25 @@ for d in pantheon pantheon-plan pantheon-review pantheon-team; do
 done
 pass "install preserves user configuration and installs all Pantheon payloads"
 
+INSTALLED_PANTHEON_SKILL="$PANTHEON_SKILLS_HOME/pantheon/SKILL.md"
+assert_contains "$INSTALLED_PANTHEON_SKILL" "Every new thread begins with Pantheon inactive"
+assert_contains "$INSTALLED_PANTHEON_SKILL" 'When Pantheon is inactive, activating with no modifier selects `normal`.'
+assert_contains "$INSTALLED_PANTHEON_SKILL" 'The user does not need to repeat `$pantheon`.'
+assert_contains "$INSTALLED_PANTHEON_SKILL" "Activation may happen on the first message or at any later point."
+assert_contains "$INSTALLED_PANTHEON_SKILL" "The selected effort remains in effect for later requests while Pantheon is active"
+assert_contains "$INSTALLED_PANTHEON_SKILL" 'Ordinary follow-ups and a repeated bare `$pantheon` do not reset it.'
+assert_contains "$INSTALLED_PANTHEON_SKILL" '`$pantheon fast`, `$pantheon normal`, or `$pantheon deep` activates Pantheon when inactive or changes the effort of an already-active thread.'
+assert_contains "$INSTALLED_PANTHEON_SKILL" "A clear request to disable Pantheon returns the thread to normal non-Pantheon behavior."
+assert_contains "$INSTALLED_PANTHEON_SKILL" 'Reactivating without a modifier selects `normal`'
+assert_contains "$INSTALLED_PANTHEON_SKILL" "Never activate or deactivate Pantheon merely because a request is difficult"
+assert_contains "$INSTALLED_PANTHEON_SKILL" "Never carry it into a new or unrelated thread"
+assert_contains "$CODEX_HOME/AGENTS.md" "Once activated, continue using Pantheon for ordinary follow-up requests in that thread"
+assert_contains "$CODEX_HOME/AGENTS.md" "Deactivation clears the effort"
+for d in pantheon-plan pantheon-review pantheon-team; do
+  assert_contains "$PANTHEON_SKILLS_HOME/$d/SKILL.md" "does not become a sticky"
+done
+pass "installed policy and skill contain the canonical thread-persistence contract"
+
 BEFORE="$(cksum "$CODEX_HOME/AGENTS.md")"
 "$PANTHEON" install >/dev/null
 AFTER="$(cksum "$CODEX_HOME/AGENTS.md")"

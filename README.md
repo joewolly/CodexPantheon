@@ -13,7 +13,7 @@ Pantheon gives Codex a small set of specialist agents plus thin planning, review
 v0.2 adds coordination and reliability while preserving Pantheon's original constraints:
 
 - ordinary Codex stays solo by default;
-- Pantheon activates only when you explicitly request it;
+- Pantheon activates only when you explicitly request it, then remains active for that thread until you explicitly disable it;
 - the parent Codex thread remains the orchestrator;
 - child agents receive bounded assignments and cannot recursively spawn Pantheon agents;
 - one specialist is preferred over unnecessary fan-out;
@@ -38,12 +38,38 @@ All seven v0.2 agent roles pin explicit model and reasoning defaults.
 
 ## Workflow skills
 
-Invoke Pantheon explicitly:
+Invoke Pantheon explicitly. The invocation activates a thread-scoped mode, so later messages in the same thread remain in Pantheon without repeating `$pantheon`:
 
 ```text
-$pantheon investigate and fix this race
-$pantheon fast map where this setting is persisted
-$pantheon deep redesign this subsystem and verify the change
+$pantheon implement this feature
+fix the failing tests
+review the implementation
+address the review findings
+```
+
+Activation can also happen midway through a thread:
+
+```text
+Explain how this subsystem works.
+$pantheon now implement the refactor
+verify the implementation
+```
+
+The first request uses ordinary Codex behavior. Pantheon becomes active at `$pantheon` and remains active for the following request. A clear natural-language request such as `use Pantheon for this` also activates the current thread.
+
+Effort is sticky while Pantheon is active. When Pantheon is inactive, `$pantheon` selects `normal`; `$pantheon fast`, `$pantheon normal`, and `$pantheon deep` select or change the active effort for later requests. A repeated bare `$pantheon` while active preserves the current effort. Disabling Pantheon clears that selection, so a later `$pantheon` starts again at `normal`.
+
+To leave Pantheon mode, state that intent clearly:
+
+```text
+stop using Pantheon
+```
+
+Subsequent messages use normal non-Pantheon behavior until Pantheon is explicitly activated again. Activation and effort never carry into a new thread.
+
+The specialized workflows remain available for an explicit request without becoming sticky submodes:
+
+```text
 $pantheon-plan plan the multi-workspace migration without implementing it
 $pantheon-review review this branch against main
 $pantheon-team split this migration into independent workstreams
@@ -56,7 +82,7 @@ Use Pantheon Explorer to map the authentication flow.
 Use Pantheon Reviewer to independently inspect the current diff.
 ```
 
-Pantheon does not activate merely because a task looks difficult.
+Pantheon does not activate merely because a task looks difficult. Thread persistence is a conversational contract interpreted from explicit activation and deactivation in that thread; Pantheon does not add a daemon, database, global preference, or cross-thread state store.
 
 ## Install with Codex (recommended)
 

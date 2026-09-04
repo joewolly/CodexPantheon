@@ -1,11 +1,25 @@
 ---
 name: pantheon
-description: Explicit Codex Pantheon orchestration. Use only when the user explicitly invokes $pantheon or explicitly asks to use Pantheon. Never trigger from task complexity alone.
+description: Explicit, thread-scoped Codex Pantheon orchestration. Activate only when the user invokes $pantheon or explicitly asks to use Pantheon, then keep it active in that thread until explicitly disabled. Never trigger from task complexity alone.
 ---
 
 # Pantheon
 
 Activate Pantheon only because the user explicitly requested it. The parent Codex thread remains the orchestrator and owner of the mission, integration, user communication, and final result.
+
+## Thread-scoped activation state
+
+Treat Pantheon activation as explicit conversational state in the current thread:
+
+- Every new thread begins with Pantheon inactive and uses normal non-Pantheon behavior.
+- `$pantheon` or a clear natural-language request to use or enter Pantheon activates it for the current thread. Activation may happen on the first message or at any later point.
+- Once activated, Pantheon remains active for subsequent ordinary requests in that thread. The user does not need to repeat `$pantheon`.
+- A clear request to disable Pantheon returns the thread to normal non-Pantheon behavior. Recognize explicit intent such as “disable Pantheon,” “stop using Pantheon,” “leave Pantheon mode,” or “go back to normal mode”; do not infer deactivation from vague wording.
+- After deactivation, later requests remain outside Pantheon until the user explicitly activates it again.
+- This state belongs only to the current conversation. Never carry it into a new or unrelated thread, a global preference, or external persistent storage.
+- Never activate or deactivate Pantheon merely because a request is difficult, long, simple, or apparently suited to multiple agents. Vague wording, quoted examples, and mere discussion of Pantheon do not change the state.
+
+Determine the current state from the thread's explicit activation and deactivation history. Do not create a daemon, database, background process, or hidden cross-thread state for this purpose.
 
 ## Select the minimum useful specialists
 
@@ -47,7 +61,16 @@ The parent must not hand off mission ownership. The parent synthesizes agent res
 
 ## Effort modifiers
 
-If the user invokes Pantheon with an effort modifier, interpret it as orchestration depth rather than a different roster:
+Pantheon effort is also thread-scoped conversational state:
+
+- When Pantheon is inactive, activating with no modifier selects `normal`.
+- `$pantheon fast`, `$pantheon normal`, or `$pantheon deep` activates Pantheon when inactive or changes the effort of an already-active thread.
+- The selected effort remains in effect for later requests while Pantheon is active, until the user explicitly selects another effort or disables Pantheon. Ordinary follow-ups and a repeated bare `$pantheon` do not reset it.
+- Deactivation clears the selected effort. Reactivating without a modifier selects `normal`; do not silently restore the previous effort.
+
+`$pantheon normal` explicitly selects normal Pantheon effort. In contrast, a clear natural-language request to “go back to normal mode” deactivates Pantheon as described above.
+
+Interpret the active effort as orchestration depth rather than a different roster:
 
 - `fast`: strongly prefer zero or one specialist; avoid redundant second opinions; optimize for latency.
 - `normal` or no modifier: balanced delegation; independent review/verification when materially useful.
