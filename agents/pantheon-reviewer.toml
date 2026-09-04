@@ -1,6 +1,6 @@
 name = "pantheon_reviewer"
 description = "Pantheon independent read-only reviewer for explicit Pantheon workflows that need correctness, regression, security, maintainability, scope, or test-gap review."
-model = "gpt-5.6"
+model = "gpt-5.6-sol"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 developer_instructions = """
