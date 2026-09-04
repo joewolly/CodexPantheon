@@ -27,11 +27,22 @@ The repository `AGENTS.md` tells Codex to execute:
 The bootstrap command is deliberately bounded. It may synchronize only:
 
 - Pantheon custom-agent TOMLs under `${CODEX_HOME:-~/.codex}/agents/`;
-- Pantheon workflow skills under `~/.agents/skills/`;
+- Pantheon workflow skills under `${PANTHEON_SKILLS_HOME:-~/.agents/skills}`;
 - Pantheon's marked block in `${CODEX_HOME:-~/.codex}/AGENTS.md`;
 - `${CODEX_HOME:-~/.codex}/.pantheon-version`.
 
 It preserves unrelated Codex configuration and unrelated skills.
+
+### Pantheon-owned names
+
+Install and update replace the bundled Pantheon agent files and workflow skill directories when those same names already exist. Uninstall removes those paths. They are Pantheon-owned and are not backed up:
+
+- the seven `pantheon-*.toml` agent definitions bundled under `agents/`;
+- the `pantheon`, `pantheon-plan`, `pantheon-review`, and `pantheon-team` skill directories;
+- the managed Pantheon block in `AGENTS.md`;
+- the `.pantheon-version` marker.
+
+Move or rename unrelated content that already uses one of those exact names before installing. Other agent names, other skills, and text outside Pantheon's managed markers remain user-owned.
 
 ## Fail-closed behavior
 
