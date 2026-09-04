@@ -41,7 +41,9 @@ All seven v0.2 agent roles pin explicit model and reasoning defaults.
 Invoke Pantheon explicitly. The invocation activates a thread-scoped mode, so later messages in the same thread remain in Pantheon without repeating `$pantheon`:
 
 ```text
-$pantheon implement this feature
+$pantheon
+
+Implement this feature.
 fix the failing tests
 review the implementation
 address the review findings
@@ -51,13 +53,32 @@ Activation can also happen midway through a thread:
 
 ```text
 Explain how this subsystem works.
-$pantheon now implement the refactor
+
+$pantheon
+
+Now implement the refactor.
 verify the implementation
 ```
 
 The first request uses ordinary Codex behavior. Pantheon becomes active at `$pantheon` and remains active for the following request. A clear natural-language request such as `use Pantheon for this` also activates the current thread.
 
-Effort is sticky while Pantheon is active. When Pantheon is inactive, `$pantheon` selects `normal`; `$pantheon fast`, `$pantheon normal`, and `$pantheon deep` select or change the active effort for later requests. A repeated bare `$pantheon` while active preserves the current effort. Disabling Pantheon clears that selection, so a later `$pantheon` starts again at `normal`.
+Effort is sticky while Pantheon is active. Select the skill with `$pantheon`, then express the effort as ordinary language:
+
+```text
+$pantheon
+
+Use deep orchestration for this task.
+```
+
+Once Pantheon is active, change its effort without invoking the skill again:
+
+```text
+switch Pantheon to fast
+use normal Pantheon effort
+switch Pantheon to deep
+```
+
+Activation without an effort instruction starts at `normal`. A repeated bare `$pantheon` while active preserves the current effort. Disabling Pantheon clears that selection, so a later bare `$pantheon` starts again at `normal`.
 
 To leave Pantheon mode, state that intent clearly:
 

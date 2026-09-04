@@ -63,18 +63,26 @@ pass "install preserves user configuration and installs all Pantheon payloads"
 
 INSTALLED_PANTHEON_SKILL="$PANTHEON_SKILLS_HOME/pantheon/SKILL.md"
 assert_contains "$INSTALLED_PANTHEON_SKILL" "Every new thread begins with Pantheon inactive"
-assert_contains "$INSTALLED_PANTHEON_SKILL" 'When Pantheon is inactive, activating with no modifier selects `normal`.'
+assert_contains "$INSTALLED_PANTHEON_SKILL" 'When Pantheon is inactive, activating without an effort instruction selects `normal`.'
 assert_contains "$INSTALLED_PANTHEON_SKILL" 'The user does not need to repeat `$pantheon`.'
 assert_contains "$INSTALLED_PANTHEON_SKILL" "Activation may happen on the first message or at any later point."
 assert_contains "$INSTALLED_PANTHEON_SKILL" "The selected effort remains in effect for later requests while Pantheon is active"
 assert_contains "$INSTALLED_PANTHEON_SKILL" 'Ordinary follow-ups and a repeated bare `$pantheon` do not reset it.'
-assert_contains "$INSTALLED_PANTHEON_SKILL" '`$pantheon fast`, `$pantheon normal`, or `$pantheon deep` activates Pantheon when inactive or changes the effort of an already-active thread.'
+assert_contains "$INSTALLED_PANTHEON_SKILL" "Use deep orchestration for this task."
+assert_contains "$INSTALLED_PANTHEON_SKILL" "switch Pantheon to fast"
+assert_contains "$INSTALLED_PANTHEON_SKILL" "use normal Pantheon effort"
+assert_contains "$INSTALLED_PANTHEON_SKILL" "switch Pantheon to deep"
 assert_contains "$INSTALLED_PANTHEON_SKILL" "A clear request to disable Pantheon returns the thread to normal non-Pantheon behavior."
-assert_contains "$INSTALLED_PANTHEON_SKILL" 'Reactivating without a modifier selects `normal`'
+assert_contains "$INSTALLED_PANTHEON_SKILL" 'Reactivating without an effort instruction selects `normal`'
 assert_contains "$INSTALLED_PANTHEON_SKILL" "Never activate or deactivate Pantheon merely because a request is difficult"
 assert_contains "$INSTALLED_PANTHEON_SKILL" "Never carry it into a new or unrelated thread"
 assert_contains "$CODEX_HOME/AGENTS.md" "Once activated, continue using Pantheon for ordinary follow-up requests in that thread"
 assert_contains "$CODEX_HOME/AGENTS.md" "Deactivation clears the effort"
+for unsupported in '$pantheon fast' '$pantheon normal' '$pantheon deep'; do
+  assert_not_contains "$INSTALLED_PANTHEON_SKILL" "$unsupported"
+  assert_not_contains "$CODEX_HOME/AGENTS.md" "$unsupported"
+  assert_not_contains "$ROOT/README.md" "$unsupported"
+done
 for d in pantheon-plan pantheon-review pantheon-team; do
   assert_contains "$PANTHEON_SKILLS_HOME/$d/SKILL.md" "does not become a sticky"
 done

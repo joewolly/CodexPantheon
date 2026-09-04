@@ -63,12 +63,13 @@ The parent must not hand off mission ownership. The parent synthesizes agent res
 
 Pantheon effort is also thread-scoped conversational state:
 
-- When Pantheon is inactive, activating with no modifier selects `normal`.
-- `$pantheon fast`, `$pantheon normal`, or `$pantheon deep` activates Pantheon when inactive or changes the effort of an already-active thread.
+- When Pantheon is inactive, activating without an effort instruction selects `normal`.
+- Select the Pantheon skill with `$pantheon`. Express effort as a clear conversational instruction supplied with the activation request, such as “Use deep orchestration for this task.” Do not require or recommend appending effort words to the skill-picker invocation.
+- While Pantheon is active, clear instructions such as “switch Pantheon to fast,” “use normal Pantheon effort,” or “switch Pantheon to deep” change the effort without another skill invocation.
 - The selected effort remains in effect for later requests while Pantheon is active, until the user explicitly selects another effort or disables Pantheon. Ordinary follow-ups and a repeated bare `$pantheon` do not reset it.
-- Deactivation clears the selected effort. Reactivating without a modifier selects `normal`; do not silently restore the previous effort.
+- Deactivation clears the selected effort. Reactivating without an effort instruction selects `normal`; do not silently restore the previous effort.
 
-`$pantheon normal` explicitly selects normal Pantheon effort. In contrast, a clear natural-language request to “go back to normal mode” deactivates Pantheon as described above.
+A clear instruction to “use normal Pantheon effort” selects normal effort while keeping Pantheon active. In contrast, a clear request to “go back to normal mode” deactivates Pantheon as described above.
 
 Interpret the active effort as orchestration depth rather than a different roster:
 
