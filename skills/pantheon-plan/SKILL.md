@@ -5,24 +5,18 @@ description: Explicit Pantheon planning workflow. Use only when the user explici
 
 # Pantheon Plan
 
-This is a planning-only Pantheon workflow. Do not implement, edit source, or mutate project state.
+This is a planning-only workflow. Do not implement, edit source, or mutate project state. The parent Codex thread owns the plan and the final answer.
 
-This workflow applies only to the request that invoked it. It does not become a sticky planning submode or change the base Pantheon thread state or effort. If base Pantheon is already active, resume its prior mode after this workflow.
+This workflow is request-scoped: it does not become a sticky planning submode or change the base Pantheon state or effort. If base Pantheon is active, resume its prior state after this request.
 
-The parent Codex thread owns the plan and may delegate bounded research to the minimum useful set of:
+## Bounded planning delegation
 
-- `pantheon_explorer` for repository/system evidence.
-- `pantheon_librarian` for documentation, APIs, standards, or upstream behavior.
-- `pantheon_oracle` for architecture, tradeoffs, sequencing, and risk analysis.
-- `pantheon_designer` for UI/UX or interaction planning, explicitly read-only in this workflow.
+The parent decides whether research adds material value, then selects one best specialist first. Stop when the plan has sufficient evidence. Add another specialist only for a specific unresolved need, genuinely independent workstream, or material verification requirement. Every additional specialist must earn its place. Do not create a complexity swarm.
 
-Rules:
+Use the relevant specialist: Explorer for unknown repository paths/ownership, Librarian for unknown external references, Oracle only for unresolved architecture/tradeoffs, and Designer for UI/UX planning. Never invoke Fixer merely to make a plan concrete.
 
-1. Never spawn an implementer merely to make the plan more concrete.
-2. Do not ask multiple agents the same question unless independent disagreement is itself useful.
-3. Each child gets a bounded, self-contained assignment and must not spawn subagents.
-4. Prefer 1 specialist; use 2-3 only for independent questions.
-5. The parent reconciles evidence and produces one coherent plan rather than concatenating agent reports.
-6. Call out assumptions, migrations, validation gates, rollback/compatibility concerns, and explicit out-of-scope work when material.
+For every native child spawn, default to `fork_turns: "none"` and provide a self-contained, bounded assignment: objective, scope, constraints/known context, write permission (read-only in this workflow), expected evidence/output, stopping condition, and a direct instruction not to spawn subagents. Do not inherit context merely because it is available. Use the minimum supported inheritance only when genuine parent context is required, with the sole special exception of a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default.
 
-The final output should be an actionable implementation plan with sequencing, ownership boundaries, validation criteria, risks, and unresolved decisions. No implementation occurs in this workflow.
+Each child remains bounded; the parent reconciles evidence, calls out assumptions, migrations, validation gates, rollback/compatibility concerns, and out-of-scope work only when material. Return one actionable plan with sequencing, ownership boundaries, validation criteria, material risks, and unresolved decisions.
+
+Repository tests prove packaged policy/configuration and lifecycle behavior, not live backend, provider, runtime, or native child-spawn behavior.

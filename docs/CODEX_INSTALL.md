@@ -1,6 +1,6 @@
 # Install Codex Pantheon with Codex
 
-Pantheon v0.2 can bootstrap itself through an ordinary Codex workspace. No separate orchestration runtime is required.
+Pantheon v0.3.0 can bootstrap itself through an ordinary Codex workspace. No separate orchestration runtime is required.
 
 ## Recommended flow
 
@@ -21,6 +21,8 @@ The repository `AGENTS.md` tells Codex to execute:
 ```
 
 `bootstrap` performs the Pantheon-owned install/update and immediately runs `doctor`.
+
+The repository tests validate packaged policy/configuration and lifecycle safeguards; they do not prove live Codex backend, provider, runtime, or child-spawn availability.
 
 ## What Codex is allowed to change
 

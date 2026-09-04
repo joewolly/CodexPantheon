@@ -8,19 +8,21 @@ Pantheon gives Codex a small set of specialist agents plus thin planning, review
 
 ![Codex Pantheon — How It Works](docs/assets/codex-pantheon-how-it-works.png)
 
-## v0.2.0
+## v0.3.0
 
-v0.2 adds coordination and reliability while preserving Pantheon's original constraints:
+v0.3 is the token-and-context efficiency release. It keeps Pantheon native, explicit, and slim while making delegation progressive and child context deliberate:
 
 - ordinary Codex stays solo by default;
 - Pantheon activates only when you explicitly request it, then remains active for that thread until you explicitly disable it;
 - the parent Codex thread remains the orchestrator;
-- child agents receive bounded assignments and cannot recursively spawn Pantheon agents;
-- one specialist is preferred over unnecessary fan-out;
-- independent review/verification is available when it materially improves confidence;
+- all Pantheon child spawns, including direct named-agent requests, default to native `fork_turns: "none"` with self-contained minimal context;
+- delta-only role handoffs stop once the assigned objective has sufficient evidence;
+- one best specialist is selected first; another is added only for a specific unresolved need, genuinely independent workstream, or material verification requirement, and every additional specialist must earn its place;
+- ordinary implementation uses Reviewer or Verifier based on risk, and both only when static and runtime evidence are materially necessary;
+- repository tests cover packaged policy/configuration and lifecycle behavior, not the live backend, provider, or runtime;
 - no daemon, task database, scheduler, HUD, or custom orchestration runtime is introduced.
 
-See `docs/DESIGN_DOCTRINE.md` and `docs/V0.2.0.md`.
+See `docs/DESIGN_DOCTRINE.md` and `docs/V0.3.0.md`.
 
 ## Documentation
 
@@ -46,7 +48,7 @@ See `docs/DESIGN_DOCTRINE.md` and `docs/V0.2.0.md`.
 | `pantheon_reviewer` | Independent correctness/regression/security review | `gpt-5.6-sol` | `high` | Read-only |
 | `pantheon_verifier` | Tests, builds, reproduction, acceptance evidence | `gpt-5.6-terra` | `medium` | No production-source edits |
 
-All seven v0.2 agent roles pin explicit model and reasoning defaults.
+All seven v0.3 agent roles retain explicit model and reasoning defaults; v0.3 changes their output contract, not their assignments.
 
 ## Workflow skills
 
@@ -116,6 +118,12 @@ Use Pantheon Reviewer to independently inspect the current diff.
 ```
 
 Pantheon does not activate merely because a task looks difficult. Thread persistence is a conversational contract interpreted from explicit activation and deactivation in that thread; Pantheon does not add a daemon, database, global preference, or cross-thread state store.
+
+### Progressive dispatch and context efficiency
+
+The parent decides whether delegation adds material value, then chooses one best specialist first and stops when the result is sufficient. Add another specialist only for a specific unresolved need, genuinely independent workstream, or material verification requirement. Every additional specialist must earn its place; complexity alone never creates a swarm. The concise routing map is: known scoped change → Fixer; unknown repository path/ownership → Explorer; unknown external reference → Librarian; unresolved architecture → Oracle; UI/UX → Designer; static correctness/diff/security/regression → Reviewer; executable tests/builds/reproduction/acceptance → Verifier. Explorer is not a Fixer preflight, Fixer can inspect a known target, Oracle is only for unresolved architecture, and team mode is the independent-workstream exception.
+
+Native child spawns, including direct named-agent requests, default to `fork_turns: "none"` and self-contained minimal context. Inherit only the minimum supported context for a genuine parent dependency, with an inherited-fork exception only when no inheritance would make a required dynamic tool unavailable. Full-history inheritance is never the default. Every child remains bounded and cannot spawn another child.
 
 ## Install with Codex (recommended)
 
@@ -221,7 +229,7 @@ If the markers are malformed or duplicated, install/update/uninstall refuses to 
 
 ### Upgrading from v0.1
 
-If v0.1 left unmarked Pantheon instructions in `~/.codex/AGENTS.md`, v0.2 intentionally does not delete them because they are indistinguishable from user-owned text. Install v0.2, run `./pantheon doctor`, then review any legacy-warning text manually once the managed block is present.
+If v0.1 left unmarked Pantheon instructions in `~/.codex/AGENTS.md`, v0.3.0 intentionally does not delete them because they are indistinguishable from user-owned text. Install v0.3.0, run `./pantheon doctor`, then review any legacy-warning text manually once the managed block is present.
 
 ## Configuration locations
 

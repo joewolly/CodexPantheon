@@ -5,21 +5,16 @@ description: Explicit Pantheon parallel-team workflow. Use only when the user ex
 
 # Pantheon Team
 
-This workflow deliberately permits broader parallelism, but it remains bounded and parent-orchestrated.
+This request-scoped workflow is the independent-workstream exception. It remains parent-orchestrated and does not become a sticky team submode or change base Pantheon state or effort. The parent integrates results, resolves conflicts, validates the outcome, and owns the final answer.
 
-This workflow applies only to the request that invoked it. It does not become a sticky team submode or change the base Pantheon thread state or effort. If base Pantheon is already active, resume its prior mode after this workflow.
+## Independent workstreams only
 
-Rules:
+Identify at least two genuinely independent workstreams before parallelizing. Use 2-3 concurrent agents by default; use 4+ only when the user explicitly requests broader fan-out or the task clearly contains that many substantial independent workstreams. If the work does not separate materially, use one best specialist instead of manufacturing a team. Complexity alone is not a reason to fan out. Keep workstreams exclusive or clearly separated and stop each when its assigned result is sufficient.
 
-1. Identify independent workstreams before spawning anyone.
-2. Use 2-3 concurrent Pantheon agents by default.
-3. Use 4+ only when the user explicitly asks for broader fan-out or the task clearly contains that many independent substantial workstreams.
-4. If the task does not contain at least two useful independent workstreams, fall back to one specialist rather than manufacturing duplicate work.
-5. Give each agent exclusive or clearly separated scope when writes are possible.
-6. Avoid parallel write-heavy work against the same files or subsystem unless the user explicitly accepts the coordination cost.
-7. Every child receives a concrete bounded assignment and an instruction not to spawn subagents.
-8. The parent stays active: perform local integration/planning work while agents run when useful, then wait for required results and reconcile them.
-9. Agent agreement is not verification. Use `pantheon_reviewer` or `pantheon_verifier` independently when the risk warrants it.
-10. The parent owns final integration, conflict resolution, validation, and the user-facing result.
+Add another specialist only for a specific unresolved need, genuinely independent workstream, or material verification requirement. Every additional team member must earn its place by owning a distinct substantial workstream or materially useful verification lane. Team mode permits concurrent independent workstreams, but it does not justify a complexity swarm or a default chain of Fixer → Reviewer → Verifier.
 
-Prefer parallel read-heavy exploration/research/verification over a swarm of simultaneous editors.
+For every native child spawn, default to `fork_turns: "none"` and provide a self-contained, bounded assignment with objective, exclusive scope, constraints and known context, write permission, expected evidence/output, stopping condition, and a direct instruction not to spawn subagents. Do not inherit context merely because it is available. Use the minimum supported inheritance only when genuine parent context is required, with the sole special exception of a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default.
+
+Keep all child work bounded and preserve unrelated changes. Independent agreement is not verification; add Reviewer or Verifier only when the material risk calls for static or runtime evidence.
+
+Repository tests prove packaged policy/configuration and lifecycle behavior, not live backend, provider, runtime, or native child-spawn behavior.

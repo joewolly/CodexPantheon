@@ -2,10 +2,26 @@
 
 ## Unreleased
 
+## 0.3.0 — 2026-09-04
+
 ### Added
 
 - MIT license and project contribution, security, support, user, CLI, and release guidance.
 - Documentation of Pantheon-owned install paths and same-name replacement behavior.
+- Native child-context guidance: all Pantheon child spawns, including direct named-agent requests, default to `fork_turns: "none"`, with inheritance limited to genuine parent-context dependencies.
+- Evidence-earned progressive specialist escalation without a fixed two-specialist ceiling, plus a concise routing map for the seven existing roles.
+- Delta-only output and stop behavior for every role, with concise role-specific handoff formats.
+- Regression coverage for context defaults, dispatch boundaries, activation state, packaged policy, and all seven role payloads.
+
+### Changed
+
+- Compact managed policy retains activation/state semantics while routing activated work to the relevant skills.
+- Ordinary implementation checks now choose Reviewer or Verifier by risk; both are reserved for cases needing material static and runtime evidence.
+- Documentation now distinguishes packaged configuration/lifecycle tests from live backend, provider, and runtime behavior.
+
+### Not included
+
+- No new agent, skill, runtime, persistence, scheduler, dashboard, token accounting, or quantitative token/billing claim.
 
 ## 0.2.0 — 2026-09-03
 
