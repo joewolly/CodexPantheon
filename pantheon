@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="0.3.0"
+VERSION="0.4.0"
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 CODEX_HOME_DIR="${CODEX_HOME:-${HOME}/.codex}"
 AGENT_DEST_DIR="${CODEX_HOME_DIR}/agents"
@@ -24,6 +24,7 @@ AGENT_FILES=(
 
 SKILL_DIRS=(
   pantheon
+  pantheon-daily
   pantheon-plan
   pantheon-review
   pantheon-team

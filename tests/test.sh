@@ -25,9 +25,9 @@ assert_equal_files() { cmp -s "$1" "$2" || fail "files differ: $1 $2"; }
 bash -n "$PANTHEON" "$ROOT/install.sh" "$0"
 pass "shell syntax"
 
-assert_contains "$ROOT/VERSION" "0.3.0"
-assert_contains "$PANTHEON" 'VERSION="0.3.0"'
-pass "release version is v0.3.0"
+assert_contains "$ROOT/VERSION" "0.4.0"
+assert_contains "$PANTHEON" 'VERSION="0.4.0"'
+pass "release version is v0.4.0"
 
 POLICY="$ROOT/policy/managed-block.md"
 POLICY_WORDS="$(wc -w < "$POLICY" | tr -d '[:space:]')"
@@ -43,12 +43,16 @@ done
 for marker in \
   "Every new thread starts inactive" \
   '$pantheon' \
+  '$pantheon-daily' \
   "clear request to use, enable, or enter Pantheon orchestration" \
+  "Pantheon Daily" \
   "Ordinary follow-ups remain in Pantheon" \
+  "Explicitly invoking the other profile switches profiles" \
   "clears effort" \
-  "reactivation starts at normal" \
+  "starts at normal" \
   "never carries into another thread" \
   "request-scoped workflows, not sticky submodes" \
+  "do not replace the selected profile" \
   "A named-agent request is valid" \
   "does not activate orchestration" \
   "Difficulty, quoted text, and vague discussion" \
@@ -63,6 +67,9 @@ for marker in \
   "material verification requirement" \
   "Every additional specialist must earn its place" \
   "Do not fan out merely because a task looks complex" \
+  "Daily follows its stricter quota-conscious routing ceiling" \
+  "never silently escalates into full Pantheon or team mode" \
+  "Full Pantheon has no Daily numeric ceiling" \
   "Any Pantheon child spawn, including a direct named-agent request" \
   'defaults to `fork_turns: "none"`' \
   "the relevant workflow skill defines bounded inheritance exceptions" \
@@ -82,9 +89,9 @@ for detailed in \
   'choose Reviewer or Verifier based on risk'; do
   assert_not_contains "$POLICY" "$detailed"
 done
-pass "managed policy is compact activation/state/dispatch guidance without detailed skill duplication"
+pass "managed policy is compact profile/state/dispatch guidance without detailed skill duplication"
 
-for skill in pantheon pantheon-plan pantheon-review pantheon-team; do
+for skill in pantheon pantheon-daily pantheon-plan pantheon-review pantheon-team; do
   skill_file="$ROOT/skills/$skill/SKILL.md"
   assert_file "$skill_file"
   assert_contains "$skill_file" 'fork_turns: "none"'
@@ -112,6 +119,7 @@ assert_contains "$ROOT/skills/pantheon/SKILL.md" "select one best specialist fir
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "Add another specialist only for a specific unresolved need"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "Every additional specialist must earn its place"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "Do not create a complexity swarm"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" "Full Pantheon has no Daily-style numeric specialist ceiling"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "Explorer is not a Fixer preflight"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "Fixer can inspect it directly"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "Use Oracle only when architecture"
@@ -121,6 +129,18 @@ assert_contains "$ROOT/skills/pantheon/SKILL.md" "Use both only when material ri
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "never make Fixer → Reviewer → Verifier the default sequence"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "minimum supported inheritance only when a genuine parent dependency requires it"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "sole special exception"
+assert_contains "$ROOT/skills/pantheon/SKILL.md" 'Pantheon Daily is a separate routing profile rather than an effort level'
+assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "quota-conscious Pantheon operating profile"
+assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "Zero specialists is a valid and often preferred Daily result"
+assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "Normally use no more than two specialist calls for one user request"
+assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "A third specialist call is allowed only"
+assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "Never use four or more specialist calls for one Daily request"
+assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "Never silently switch Daily into full Pantheon or team mode"
+assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "parent handles it directly when practical"
+assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "Prefer Explorer or Librarian rather than both"
+assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "prefer at most one independent check—Reviewer or Verifier"
+assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "Do not default to Fixer → Reviewer → Verifier"
+assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "Daily changes routing behavior, not the seven agent model/reasoning definitions"
 assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "planning-only workflow"
 assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "Add another specialist only for a specific unresolved need"
 assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "Every additional specialist must earn its place"
@@ -141,19 +161,21 @@ assert_contains "$ROOT/skills/pantheon-team/SKILL.md" "distinct substantial work
 for surface in \
   "$POLICY" \
   "$ROOT/skills/pantheon/SKILL.md" \
+  "$ROOT/skills/pantheon-daily/SKILL.md" \
   "$ROOT/skills/pantheon-plan/SKILL.md" \
   "$ROOT/skills/pantheon-review/SKILL.md" \
   "$ROOT/skills/pantheon-team/SKILL.md" \
   "$ROOT/README.md" \
   "$ROOT/docs/USER_GUIDE.md" \
   "$ROOT/docs/DESIGN_DOCTRINE.md" \
-  "$ROOT/docs/V0.3.0.md"; do
+  "$ROOT/docs/V0.3.0.md" \
+  "$ROOT/docs/V0.4.0.md"; do
   assert_not_contains "$surface" "Add a second"
   assert_not_contains "$surface" "add a second"
   assert_not_contains "$surface" "A second specialist"
   assert_not_contains "$surface" "a second specialist"
 done
-pass "all four skills define native child defaults, bounded assignments, escalation, and static/runtime evidence boundaries"
+pass "all five skills define native child defaults, bounded assignments, escalation, and static/runtime evidence boundaries"
 
 AGENT_FILES=(
   pantheon-explorer.toml
@@ -234,7 +256,7 @@ assert_contains "$CODEX_HOME/AGENTS.md" "Keep this exact user-owned line."
 [ "$(grep -Fxc '<!-- PANTHEON:START -->' "$CODEX_HOME/AGENTS.md")" -eq 1 ] || fail "expected one Pantheon start marker"
 [ "$(grep -Fxc '<!-- PANTHEON:END -->' "$CODEX_HOME/AGENTS.md")" -eq 1 ] || fail "expected one Pantheon end marker"
 assert_file "$CODEX_HOME/.pantheon-version"
-assert_contains "$CODEX_HOME/.pantheon-version" "0.3.0"
+assert_contains "$CODEX_HOME/.pantheon-version" "0.4.0"
 assert_file "$CODEX_HOME/agents/user-custom.toml"
 assert_file "$PANTHEON_SKILLS_HOME/user-skill/SKILL.md"
 for f in "$ROOT"/agents/*.toml; do
@@ -242,22 +264,30 @@ for f in "$ROOT"/agents/*.toml; do
   assert_regular_not_symlink "$CODEX_HOME/agents/$base"
   assert_equal_files "$f" "$CODEX_HOME/agents/$base"
 done
-for d in pantheon pantheon-plan pantheon-review pantheon-team; do
+for d in pantheon pantheon-daily pantheon-plan pantheon-review pantheon-team; do
   assert_equal_files "$ROOT/skills/$d/SKILL.md" "$PANTHEON_SKILLS_HOME/$d/SKILL.md"
 done
 INSTALLED_PANTHEON_SKILL="$PANTHEON_SKILLS_HOME/pantheon/SKILL.md"
+INSTALLED_DAILY_SKILL="$PANTHEON_SKILLS_HOME/pantheon-daily/SKILL.md"
 assert_contains "$INSTALLED_PANTHEON_SKILL" "Every new thread begins inactive"
 assert_contains "$INSTALLED_PANTHEON_SKILL" "Once active, ordinary follow-ups stay in Pantheon"
 assert_contains "$INSTALLED_PANTHEON_SKILL" "Deactivation clears the selected effort"
 assert_contains "$INSTALLED_PANTHEON_SKILL" "does not by itself activate orchestration"
 assert_contains "$INSTALLED_PANTHEON_SKILL" 'fork_turns: "none"'
+assert_contains "$INSTALLED_DAILY_SKILL" "Every new thread begins inactive"
+assert_contains "$INSTALLED_DAILY_SKILL" "Once Daily is active, ordinary follow-ups stay in Daily"
+assert_contains "$INSTALLED_DAILY_SKILL" "Normally use no more than two specialist calls for one user request"
+assert_contains "$INSTALLED_DAILY_SKILL" "Never use four or more specialist calls for one Daily request"
+assert_contains "$INSTALLED_DAILY_SKILL" 'fork_turns: "none"'
 for d in pantheon-plan pantheon-review pantheon-team; do
   assert_contains "$PANTHEON_SKILLS_HOME/$d/SKILL.md" "request-scoped"
 done
 assert_contains "$CODEX_HOME/AGENTS.md" "follow the relevant Pantheon workflow skill"
+assert_contains "$CODEX_HOME/AGENTS.md" '$pantheon-daily'
+assert_contains "$CODEX_HOME/AGENTS.md" "Daily follows its stricter quota-conscious routing ceiling"
 assert_contains "$CODEX_HOME/AGENTS.md" 'Any Pantheon child spawn, including a direct named-agent request, defaults to `fork_turns: "none"`'
 assert_contains "$CODEX_HOME/AGENTS.md" "Repository tests prove packaged policy/configuration"
-pass "install preserves user configuration and installs all v0.3 payloads"
+pass "install preserves user configuration and installs all v0.4 payloads"
 
 BEFORE="$(cksum "$CODEX_HOME/AGENTS.md")"
 "$PANTHEON" install >/dev/null
@@ -274,6 +304,15 @@ fi
 assert_equal_files "$ROOT/agents/pantheon-explorer.toml" "$CODEX_HOME/agents/pantheon-explorer.toml"
 "$PANTHEON" doctor >/dev/null
 pass "doctor detects drift and update repairs Pantheon-owned files"
+
+printf 'drift\n' >> "$PANTHEON_SKILLS_HOME/pantheon-daily/SKILL.md"
+if "$PANTHEON" doctor >/dev/null 2>&1; then
+  fail "doctor should fail on drifted Daily skill"
+fi
+"$PANTHEON" update >/dev/null
+assert_equal_files "$ROOT/skills/pantheon-daily/SKILL.md" "$PANTHEON_SKILLS_HOME/pantheon-daily/SKILL.md"
+"$PANTHEON" doctor >/dev/null
+pass "doctor detects Daily skill drift and update repairs it"
 
 SENTINEL="$TMP/symlink-target"
 printf 'SENTINEL-UNCHANGED\n' > "$SENTINEL"
@@ -313,7 +352,7 @@ assert_not_file "$CODEX_HOME/.pantheon-version"
 for f in "$ROOT"/agents/*.toml; do
   assert_not_file "$CODEX_HOME/agents/$(basename "$f")"
 done
-for d in pantheon pantheon-plan pantheon-review pantheon-team; do
+for d in pantheon pantheon-daily pantheon-plan pantheon-review pantheon-team; do
   assert_not_file "$PANTHEON_SKILLS_HOME/$d"
 done
 pass "uninstall removes only Pantheon-owned state"
@@ -337,9 +376,10 @@ mkdir -p "$HOME"
 BOOT_OUT="$BOOT/bootstrap.out"
 mkdir -p "$BOOT"
 "$PANTHEON" bootstrap >"$BOOT_OUT" 2>&1
-assert_contains "$BOOT_OUT" "Pantheon-owned files synchronized to v0.3.0."
+assert_contains "$BOOT_OUT" "Pantheon-owned files synchronized to v0.4.0."
 assert_contains "$BOOT_OUT" "Status: HEALTHY"
 assert_file "$CODEX_HOME/.pantheon-version"
+assert_file "$PANTHEON_SKILLS_HOME/pantheon-daily/SKILL.md"
 printf 'drift\n' >> "$CODEX_HOME/agents/pantheon-fixer.toml"
 "$PANTHEON" bootstrap >"$BOOT_OUT" 2>&1
 assert_equal_files "$ROOT/agents/pantheon-fixer.toml" "$CODEX_HOME/agents/pantheon-fixer.toml"
@@ -353,12 +393,18 @@ assert_contains "$ROOT/AGENTS.md" 'MUST NOT by itself activate Pantheon orchestr
 assert_contains "$ROOT/README.md" 'operates on Pantheon and leaves Pantheon mode OFF.'
 assert_contains "$ROOT/README.md" 'fork_turns: "none"'
 assert_contains "$ROOT/README.md" "including direct named-agent requests"
+assert_contains "$ROOT/README.md" '$pantheon-daily'
+assert_contains "$ROOT/README.md" "normally uses 0-2 specialist calls"
 assert_contains "$ROOT/docs/CODEX_INSTALL.md" 'Install Codex Pantheon for me.'
 assert_contains "$ROOT/docs/CODEX_INSTALL.md" 'does not activate Pantheon orchestration.'
 assert_contains "$ROOT/docs/CODEX_INSTALL.md" 'packaged policy/configuration and lifecycle safeguards'
+assert_contains "$ROOT/docs/CODEX_INSTALL.md" 'pantheon-daily'
 assert_contains "$ROOT/docs/USER_GUIDE.md" 'Native child spawns, including direct named-agent requests, default to `fork_turns: "none"`'
+assert_contains "$ROOT/docs/USER_GUIDE.md" 'Pantheon Daily'
 assert_contains "$ROOT/docs/DESIGN_DOCTRINE.md" 'context is a cost'
-assert_contains "$ROOT/docs/V0.3.0.md" 'Token & Context Efficiency'
-pass "repository instructions and v0.3 documentation define lifecycle, efficiency, and evidence boundaries"
+assert_contains "$ROOT/docs/DESIGN_DOCTRINE.md" 'Distinct operating profiles'
+assert_contains "$ROOT/docs/V0.4.0.md" 'Daily Mode'
+assert_contains "$ROOT/docs/V0.4.0.md" 'normally uses no more than two specialist calls'
+pass "repository instructions and v0.4 documentation define lifecycle, Daily routing, efficiency, and evidence boundaries"
 
 printf '1..%d\n' "$PASS"
