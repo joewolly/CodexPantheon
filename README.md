@@ -11,17 +11,7 @@ Pantheon v0.5 has two roles:
 
 Astra is not installed as a Pantheon subagent. It remains your selected main Codex model. Pantheon installs exactly one custom child-agent definition: `pantheon_worker`.
 
-```mermaid
-flowchart TD
-    U[You] --> S{Pantheon selected?}
-    S -->|No| N[Ordinary Codex<br/>Astra works solo]
-    S -->|$pantheon-daily| D[GPT-6 Astra<br/>orchestrator]
-    S -->|$pantheon| F[GPT-6 Astra<br/>orchestrator]
-    D -->|delegate sparingly<br/>0-1 Luna call normally| L1[GPT-5.6 Luna<br/>pantheon_worker]
-    F -->|delegate when useful<br/>parallel only if independent| L2[GPT-5.6 Luna<br/>pantheon_worker]
-    L1 --> D
-    L2 --> F
-```
+![Codex Pantheon v0.5 — Astra + Luna Slim architecture](docs/assets/codex-pantheon-v0.5-architecture.svg)
 
 ## v0.5.0 — Astra + Luna Slim
 
