@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Codex Pantheon v0.5 — Astra + Luna Slim</title>
+  <desc id="desc">A visual overview of Codex Pantheon v0.5 showing Astra as orchestrator, Luna as the universal worker, and the difference between normal Codex, Pantheon Daily, and full Pantheon.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#030711"/><stop offset="0.62" stop-color="#071526"/><stop offset="1" stop-color="#02050b"/></linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1728" stop-opacity=".96"/><stop offset="1" stop-color="#07111e" stop-opacity=".92"/></linearGradient>
+    <linearGradient id="daily" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#063c34" stop-opacity=".86"/><stop offset="1" stop-color="#071421" stop-opacity=".95"/></linearGradient>
+    <linearGradient id="full" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#241044" stop-opacity=".92"/><stop offset="1" stop-color="#0d1024" stop-opacity=".96"/></linearGradient>
+    <radialGradient id="astra" cx="43%" cy="37%"><stop offset="0" stop-color="#fff7c1"/><stop offset=".18" stop-color="#ffd766"/><stop offset=".58" stop-color="#f5a623"/><stop offset=".84" stop-color="#8a4b0d"/><stop offset="1" stop-color="#2b1604"/></radialGradient>
+    <radialGradient id="luna" cx="40%" cy="35%"><stop offset="0" stop-color="#d8f3ff"/><stop offset=".22" stop-color="#7fd3ff"/><stop offset=".62" stop-color="#2587e8"/><stop offset=".88" stop-color="#12366f"/><stop offset="1" stop-color="#07152d"/></radialGradient>
+    <radialGradient id="sunset" cx="50%" cy="0"><stop offset="0" stop-color="#ffd16b" stop-opacity=".9"/><stop offset=".25" stop-color="#f49b3b" stop-opacity=".45"/><stop offset="1" stop-color="#07111e" stop-opacity="0"/></radialGradient>
+    <pattern id="stars" width="180" height="140" patternUnits="userSpaceOnUse">
+      <circle cx="24" cy="31" r="1.3" fill="#88c7ff" opacity=".55"/><circle cx="121" cy="19" r=".9" fill="#fff" opacity=".65"/><circle cx="68" cy="93" r="1" fill="#7aa6ff" opacity=".5"/><circle cx="158" cy="108" r="1.4" fill="#fff" opacity=".35"/><circle cx="12" cy="124" r=".8" fill="#b79cff" opacity=".6"/>
+    </pattern>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#57a8ff"/></marker>
+    <marker id="arrowGold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#ffe6a2"/></marker>
+    <style>
+      .serif{font-family:Georgia,'Times New Roman',serif}.sans{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif}.white{fill:#f6f8ff}.muted{fill:#c6d1e6}.tiny{font-size:14px}.small{font-size:17px}.body{font-size:18px}.h2{font-size:31px;font-weight:700}.h3{font-size:26px;font-weight:700}.caps{letter-spacing:4px}.stroke{stroke:#38526f;stroke-width:1.2}.check{fill:none;stroke:#72f2d1;stroke-width:2}.purple{fill:#ad7cff}.teal{fill:#67f1d2}.gold{fill:#ffd46d}
+    </style>
+  </defs>
+
+  <rect width="1536" height="1024" fill="url(#bg)"/>
+  <rect width="1536" height="880" fill="url(#stars)" opacity=".72"/>
+  <ellipse cx="768" cy="905" rx="520" ry="120" fill="url(#sunset)"/>
+
+  <!-- header -->
+  <text x="48" y="70" class="serif white" font-size="58" font-weight="700">Codex Pantheon <tspan fill="#9d76ff">v0.5</tspan></text>
+  <text x="48" y="112" class="serif muted" font-size="38">Astra + Luna Slim</text>
+  <text x="48" y="145" class="serif muted" font-size="23">Two agents. Infinite leverage. When you want it.</text>
+  <line x1="838" y1="45" x2="838" y2="118" stroke="#355274"/>
+  <circle cx="838" cy="42" r="3.3" fill="none" stroke="#668bb5"/>
+  <text x="860" y="58" class="serif white" font-size="24" font-style="italic">“Astra thinks. Luna does.</text>
+  <text x="860" y="86" class="serif white" font-size="24" font-style="italic">Pantheon decides how much Luna</text>
+  <text x="860" y="114" class="serif white" font-size="24" font-style="italic">gets used.”</text>
+  <line x1="1275" y1="61" x2="1336" y2="61" stroke="#6380aa"/>
+  <text x="1348" y="66" class="sans muted caps tiny">CODEX PANTHEON</text>
+  <text x="1328" y="91" class="sans" fill="#748aad" font-size="11" letter-spacing="4">YOUR WORK. FURTHER.</text>
+
+  <!-- left: normal -->
+  <rect x="32" y="165" width="394" height="566" rx="24" fill="url(#panel)" class="stroke"/>
+  <text x="56" y="208" class="serif white h2">Normal Codex</text>
+  <text x="56" y="239" class="sans muted" font-size="21">Just you and Astra</text>
+  <g class="sans body white">
+    <g transform="translate(58 284)"><circle r="11" fill="#0c1c2e" stroke="#7a94b8"/><path d="M-5 0l4 4 8-9" fill="none" stroke="#fff" stroke-width="2"/><text x="29" y="6">No Pantheon behavior</text></g>
+    <g transform="translate(58 325)"><circle r="11" fill="#0c1c2e" stroke="#7a94b8"/><path d="M-5 0l4 4 8-9" fill="none" stroke="#fff" stroke-width="2"/><text x="29" y="6">Astra works on everything</text></g>
+    <g transform="translate(58 366)"><circle r="11" fill="#0c1c2e" stroke="#7a94b8"/><path d="M-5 0l4 4 8-9" fill="none" stroke="#fff" stroke-width="2"/><text x="29" y="6">Simple and familiar</text></g>
+    <g transform="translate(58 407)"><circle r="11" fill="#0c1c2e" stroke="#7a94b8"/><path d="M-5 0l4 4 8-9" fill="none" stroke="#fff" stroke-width="2"/><text x="29" y="6">Zero extra agents</text></g>
+  </g>
+  <ellipse cx="228" cy="585" rx="145" ry="38" fill="none" stroke="#244a74" opacity=".7"/>
+  <circle cx="228" cy="560" r="55" fill="url(#astra)" stroke="#ffd46d" stroke-width="2" filter="url(#glow)"/>
+  <text x="228" y="646" text-anchor="middle" class="sans white" font-size="23" font-weight="700">ASTRA</text>
+  <text x="228" y="676" text-anchor="middle" class="sans muted" font-size="20">You + Astra</text>
+
+  <!-- center architecture -->
+  <rect x="442" y="165" width="591" height="566" rx="24" fill="url(#panel)" class="stroke"/>
+  <text x="738" y="204" text-anchor="middle" class="serif white h2">The Pantheon Architecture <tspan fill="#aa78ff">(v0.5)</tspan></text>
+  <text x="738" y="237" text-anchor="middle" class="sans muted" font-size="21">Simple. Focused. Powerful.</text>
+  <ellipse cx="738" cy="450" rx="257" ry="195" fill="none" stroke="#183a62"/>
+  <ellipse cx="738" cy="450" rx="222" ry="165" fill="none" stroke="#173152" opacity=".8"/>
+  <circle cx="738" cy="355" r="79" fill="url(#astra)" stroke="#ffda7a" stroke-width="2" filter="url(#glow)"/>
+  <text x="738" y="369" text-anchor="middle" class="sans white" font-size="29" font-weight="700">ASTRA</text>
+  <text x="738" y="400" text-anchor="middle" class="sans white" font-size="20">Orchestrator</text>
+  <text x="738" y="430" text-anchor="middle" class="sans muted small">Plans  •  Decides  •  Delegates</text>
+  <text x="738" y="453" text-anchor="middle" class="sans muted small">Integrates  •  Reviews  •  Delivers</text>
+
+  <circle cx="738" cy="576" r="59" fill="url(#luna)" stroke="#7fd3ff" stroke-width="2" filter="url(#glow)"/>
+  <text x="738" y="657" text-anchor="middle" class="sans white" font-size="28" font-weight="700">LUNA</text>
+  <text x="738" y="688" text-anchor="middle" class="sans white" font-size="20">Worker</text>
+  <text x="738" y="716" text-anchor="middle" class="sans muted small">Researches • Explores • Implements • Fixes • Tests</text>
+
+  <path d="M532 438 C525 495 565 548 634 565" fill="none" stroke="#57a8ff" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <path d="M943 439 C950 390 925 352 874 339" fill="none" stroke="#ffe6a2" stroke-width="3" marker-end="url(#arrowGold)"/>
+  <text x="488" y="478" class="sans white small">Delegates</text><text x="488" y="500" class="sans white small">clear tasks</text>
+  <text x="887" y="480" class="sans white small">Returns</text><text x="887" y="502" class="sans white small">results &amp; evidence</text>
+
+  <!-- daily -->
+  <rect x="1048" y="165" width="456" height="289" rx="24" fill="url(#daily)" stroke="#16896f" stroke-width="1.2"/>
+  <text x="1072" y="205" class="serif teal h2">$pantheon-daily</text>
+  <text x="1072" y="236" class="sans teal" font-size="20">Conservative delegation</text>
+  <g class="sans white" font-size="16">
+    <g transform="translate(1080 270)"><circle r="10" class="check"/><path d="M-5 0l4 4 8-9" class="check"/><text x="24" y="5">Same Astra + Luna architecture</text></g>
+    <g transform="translate(1080 301)"><circle r="10" class="check"/><path d="M-5 0l4 4 8-9" class="check"/><text x="24" y="5">Usually 0–1 Luna calls</text></g>
+    <g transform="translate(1080 332)"><circle r="10" class="check"/><path d="M-5 0l4 4 8-9" class="check"/><text x="24" y="5">Never parallel</text></g>
+    <g transform="translate(1080 363)"><circle r="10" class="check"/><path d="M-5 0l4 4 8-9" class="check"/><text x="24" y="5">Second call only for a real unresolved gap</text></g>
+    <g transform="translate(1080 394)"><circle r="10" class="check"/><path d="M-5 0l4 4 8-9" class="check"/><text x="24" y="5">Optimized to stretch Pro usage</text></g>
+  </g>
+  <circle cx="1422" cy="235" r="27" fill="url(#astra)" stroke="#ffd46d"/><circle cx="1422" cy="337" r="23" fill="url(#luna)" stroke="#7fd3ff"/>
+  <path d="M1422 266v43" stroke="#ffd46d" stroke-width="2.5" marker-end="url(#arrowGold)"/><path d="M1437 310v-35" stroke="#6fd8ff" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+  <text x="1422" y="284" text-anchor="middle" class="sans white" font-size="15" font-weight="700">ASTRA</text><text x="1422" y="384" text-anchor="middle" class="sans white" font-size="15" font-weight="700">LUNA</text>
+  <rect x="1368" y="397" width="111" height="42" rx="10" fill="#0b2630" stroke="#337e78"/><text x="1423" y="421" text-anchor="middle" class="sans white" font-size="18" font-weight="700">0–1×</text><text x="1423" y="437" text-anchor="middle" class="sans muted" font-size="11">Luna (sequential)</text>
+
+  <!-- full -->
+  <rect x="1048" y="468" width="456" height="263" rx="24" fill="url(#full)" stroke="#8b4ee8" stroke-width="1.2"/>
+  <text x="1072" y="508" class="serif" fill="#e58cff" font-size="31" font-weight="700">$pantheon</text>
+  <text x="1072" y="539" class="sans" fill="#c391ff" font-size="20">Full power, when you want it</text>
+  <g class="sans white" font-size="16">
+    <g transform="translate(1080 574)"><circle r="10" fill="none" stroke="#c77dff" stroke-width="2"/><path d="M-5 0l4 4 8-9" fill="none" stroke="#e4b9ff" stroke-width="2"/><text x="24" y="5">Same Astra + Luna architecture</text></g>
+    <g transform="translate(1080 606)"><circle r="10" fill="none" stroke="#c77dff" stroke-width="2"/><path d="M-5 0l4 4 8-9" fill="none" stroke="#e4b9ff" stroke-width="2"/><text x="24" y="5">Multiple Luna workers allowed</text></g>
+    <g transform="translate(1080 638)"><circle r="10" fill="none" stroke="#c77dff" stroke-width="2"/><path d="M-5 0l4 4 8-9" fill="none" stroke="#e4b9ff" stroke-width="2"/><text x="24" y="5">Parallelize genuinely independent work</text></g>
+    <g transform="translate(1080 670)"><circle r="10" fill="none" stroke="#c77dff" stroke-width="2"/><path d="M-5 0l4 4 8-9" fill="none" stroke="#e4b9ff" stroke-width="2"/><text x="24" y="5">Tackle bigger, more complex tasks</text></g>
+    <g transform="translate(1080 702)"><circle r="10" fill="none" stroke="#c77dff" stroke-width="2"/><path d="M-5 0l4 4 8-9" fill="none" stroke="#e4b9ff" stroke-width="2"/><text x="24" y="5">Use it when you want the full firepower</text></g>
+  </g>
+  <circle cx="1422" cy="521" r="25" fill="url(#astra)" stroke="#ffd46d"/>
+  <path d="M1422 550v31M1422 566l-45 27M1422 566l45 27" fill="none" stroke="#f5ab3e" stroke-width="2.2"/>
+  <circle cx="1378" cy="602" r="16" fill="url(#luna)" stroke="#7fd3ff"/><circle cx="1422" cy="602" r="16" fill="url(#luna)" stroke="#7fd3ff"/><circle cx="1466" cy="602" r="16" fill="url(#luna)" stroke="#7fd3ff"/>
+  <rect x="1370" y="668" width="109" height="48" rx="10" fill="#241348" stroke="#9c57eb"/><text x="1424" y="694" text-anchor="middle" class="sans white" font-size="18" font-weight="700">1–N×</text><text x="1424" y="711" text-anchor="middle" class="sans" fill="#d5b6ff" font-size="11">Luna (parallel)</text>
+
+  <!-- feature strip -->
+  <rect x="36" y="748" width="1464" height="124" rx="22" fill="#08131f" fill-opacity=".95" stroke="#37506c"/>
+  <g class="sans">
+    <g transform="translate(74 781)"><text x="0" y="22" font-size="38" fill="#8fc7ff">✦</text><text x="50" y="15" class="white" font-size="17" font-weight="700">Opt-in only</text><text x="50" y="42" class="muted" font-size="14">Pantheon activates when</text><text x="50" y="62" class="muted" font-size="14">you choose it.</text></g>
+    <line x1="318" y1="764" x2="318" y2="853" stroke="#31465d"/>
+    <g transform="translate(352 781)"><path d="M0 16C8 1 24-2 32-4c-3 14-9 28-25 33 6-7 12-13 19-18-8 3-15 9-22 17z" fill="#5ce2be"/><text x="52" y="15" class="white" font-size="17" font-weight="700">Stays lightweight</text><text x="52" y="42" class="muted" font-size="14">Two agents. No role bloat.</text></g>
+    <line x1="596" y1="764" x2="596" y2="853" stroke="#31465d"/>
+    <g transform="translate(630 781)"><rect x="0" y="15" width="8" height="14" fill="#9d89ff"/><rect x="12" y="7" width="8" height="22" fill="#8797ff"/><rect x="24" y="-2" width="8" height="31" fill="#6e8cff"/><text x="50" y="15" class="white" font-size="17" font-weight="700">Flexible intensity</text><text x="50" y="42" class="muted" font-size="14">Daily for efficiency.</text><text x="50" y="62" class="muted" font-size="14">Full for big challenges.</text></g>
+    <line x1="889" y1="764" x2="889" y2="853" stroke="#31465d"/>
+    <g transform="translate(922 781)"><path d="M15-2l15 5v12c0 11-6 19-15 25C6 34 0 26 0 15V3z" fill="none" stroke="#63d8ff" stroke-width="3"/><text x="51" y="15" class="white" font-size="17" font-weight="700">Cleaner and simpler</text><text x="51" y="42" class="muted" font-size="14">No seven-agent complexity.</text><text x="51" y="62" class="muted" font-size="14">Just what you need.</text></g>
+    <line x1="1190" y1="764" x2="1190" y2="853" stroke="#31465d"/>
+    <g transform="translate(1222 781)"><text x="0" y="27" fill="#d57cff" font-size="44">∞</text><text x="62" y="15" class="white" font-size="17" font-weight="700">Your work, further</text><text x="62" y="42" class="muted" font-size="14">More capability.</text><text x="62" y="60" class="muted" font-size="14">More focus. More possibilities.</text></g>
+  </g>
+
+  <!-- footer -->
+  <polygon points="0,919 90,900 142,916 210,885 268,912 330,896 405,925 482,895 544,917 607,879 674,910 736,895 806,922 871,888 943,912 1012,881 1080,913 1147,893 1215,918 1282,888 1360,916 1430,895 1536,917 1536,1024 0,1024" fill="#02050a"/>
+  <text x="48" y="964" class="serif white" font-size="21" font-style="italic">“Not more agents.</text><text x="48" y="993" class="serif white" font-size="21" font-style="italic">A brighter you.”</text>
+  <line x1="457" y1="952" x2="656" y2="952" stroke="#7b8ca8"/><text x="768" y="959" text-anchor="middle" class="sans muted caps" font-size="15">CODEX PANTHEON</text><line x1="878" y1="952" x2="1078" y2="952" stroke="#7b8ca8"/>
+  <text x="768" y="986" text-anchor="middle" class="sans" fill="#7d8eac" font-size="12" letter-spacing="5">TWO AGENTS. A BRIGHTER TOMORROW.</text>
+  <text x="1488" y="970" text-anchor="end" class="serif" fill="#aab8db" font-size="24">v0.5</text><text x="1488" y="993" text-anchor="end" class="sans" fill="#647899" font-size="10" letter-spacing="4">ASTRA + LUNA SLIM</text>
+</svg>
