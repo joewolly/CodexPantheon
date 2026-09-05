@@ -47,7 +47,7 @@ Remove the temporary directory when you no longer need the isolated installation
 Pantheon owns these installed paths:
 
 - `${CODEX_HOME:-~/.codex}/agents/pantheon-*.toml` for the seven bundled role names;
-- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon*` for the four bundled workflow names;
+- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon*` for the five bundled workflow names (`pantheon`, `pantheon-daily`, `pantheon-plan`, `pantheon-review`, and `pantheon-team`);
 - the single `<!-- PANTHEON:START -->` through `<!-- PANTHEON:END -->` block in `${CODEX_HOME:-~/.codex}/AGENTS.md`;
 - `${CODEX_HOME:-~/.codex}/.pantheon-version`.
 
@@ -65,7 +65,7 @@ After its source-package preflight passes, `doctor` reports one of three outcome
 
 Healthy and healthy-with-warning outcomes exit 0. An unhealthy outcome exits 1 and suggests `./pantheon update` for repairable Pantheon-owned drift. A missing or invalid source-package file also exits 1 immediately without printing one of these status labels.
 
-Doctor may create and remove a temporary comparison file and may invoke `codex --version`, but it does not rewrite the installed Pantheon configuration. It validates static installation integrity, not model availability, provider access, or a successful live subagent spawn.
+Doctor may create and remove a temporary comparison file and may invoke `codex --version`, but it does not rewrite the installed Pantheon configuration. It validates static installation integrity, not model availability, provider access, quota behavior, billing, or a successful live subagent spawn.
 
 ## Fail-closed safeguards
 

@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+## 0.4.0 — 2026-09-04
+
+### Added
+
+- `$pantheon-daily`, a sticky quota-conscious operating profile for routine day-to-day Codex work.
+- Explicit switching between Daily and full Pantheon within one thread without persistent cross-thread state.
+- Daily routing limits: normally 0-2 specialist calls per user request, a third only for a concrete unresolved blocker/risk/evidence gap, and never 4+.
+- v0.4 user/release documentation and lifecycle coverage for the fifth workflow skill.
+
+### Changed
+
+- Full `$pantheon` is now explicitly the quality-and-confidence-first profile and remains progressive without Daily's numeric specialist ceiling.
+- The managed policy now distinguishes ordinary Codex, Pantheon Daily, and full Pantheon while keeping plan/review/team workflows request-scoped.
+- Install, update, doctor, and uninstall manage the new `pantheon-daily` skill alongside the existing four workflow skills.
+
+### Not included
+
+- No new agent role, cheaper duplicate roster, token accounting, quota polling, billing estimation, persistent budget state, daemon, scheduler, HUD, or custom orchestration runtime.
+
 ## 0.3.0 — 2026-09-04
 
 ### Added

@@ -1,6 +1,6 @@
 # Install Codex Pantheon with Codex
 
-Pantheon v0.3.0 can bootstrap itself through an ordinary Codex workspace. No separate orchestration runtime is required.
+Pantheon v0.4.0 can bootstrap itself through an ordinary Codex workspace. No separate orchestration runtime is required.
 
 ## Recommended flow
 
@@ -12,7 +12,7 @@ Pantheon v0.3.0 can bootstrap itself through an ordinary Codex workspace. No sep
    Install Codex Pantheon for me.
    ```
 
-This request operates on the Pantheon product; it does not activate Pantheon orchestration. `$pantheon` followed by a task explicitly activates orchestration, while `Use Pantheon to update the Pantheon installer.` explicitly activates Pantheon and then operates on Pantheon.
+This request operates on the Pantheon product; it does not activate Pantheon orchestration. `$pantheon` followed by a task explicitly activates full orchestration, `$pantheon-daily` explicitly activates the quota-conscious Daily profile, and `Use Pantheon to update the Pantheon installer.` explicitly activates full Pantheon and then operates on Pantheon.
 
 The repository `AGENTS.md` tells Codex to execute:
 
@@ -22,7 +22,7 @@ The repository `AGENTS.md` tells Codex to execute:
 
 `bootstrap` performs the Pantheon-owned install/update and immediately runs `doctor`.
 
-The repository tests validate packaged policy/configuration and lifecycle safeguards; they do not prove live Codex backend, provider, runtime, or child-spawn availability.
+The repository tests validate packaged policy/configuration and lifecycle safeguards; they do not prove live Codex backend, provider, runtime, quota behavior, billing, or child-spawn availability.
 
 ## What Codex is allowed to change
 
@@ -40,7 +40,7 @@ It preserves unrelated Codex configuration and unrelated skills.
 Install and update replace the bundled Pantheon agent files and workflow skill directories when those same names already exist. Uninstall removes those paths. They are Pantheon-owned and are not backed up:
 
 - the seven `pantheon-*.toml` agent definitions bundled under `agents/`;
-- the `pantheon`, `pantheon-plan`, `pantheon-review`, and `pantheon-team` skill directories;
+- the `pantheon`, `pantheon-daily`, `pantheon-plan`, `pantheon-review`, and `pantheon-team` skill directories;
 - the managed Pantheon block in `AGENTS.md`;
 - the `.pantheon-version` marker.
 
