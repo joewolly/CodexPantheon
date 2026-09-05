@@ -1,7 +1,7 @@
-# Codex Pantheon
-
-**Codex Pantheon is a slim, explicit, Codex-native delegation layer for an Astra-led Codex session.**
-
+<p align="center">
+  <img src="docs/codex-pantheon-banner.png" alt="Codex Pantheon — Astra + Luna Slim" width="100%">
+</p>
+Codex Pantheon is a slim, explicit, Codex-native delegation layer for an Astra-led Codex session.
 Pantheon v0.5 has two roles:
 
 - **GPT-6 Astra — main thread / orchestrator.** Plans, decides, integrates, reviews, validates the final result, and talks to you.
