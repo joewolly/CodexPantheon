@@ -11,7 +11,7 @@ Pantheon v0.5 has two roles:
 
 Astra is not installed as a Pantheon subagent. It remains your selected main Codex model. Pantheon installs exactly one custom child-agent definition: `pantheon_worker`.
 
-![Codex Pantheon v0.5 — Astra + Luna Slim architecture](docs/assets/codex-pantheon-v0.5-architecture.svg)
+![Codex Pantheon v0.5 — Astra + Luna Slim architecture](docs/assets/codex-pantheon-v0.5-architecture.webp)
 
 ## v0.5.0 — Astra + Luna Slim
 
