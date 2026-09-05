@@ -1,9 +1,3 @@
-<p align="center">
-  <img src="docs/codex-pantheon-logo.png" alt="Codex Pantheon galaxy and moon emblem" width="160">
-</p>
-
-<h1 align="center">Codex Pantheon</h1>
-
 **Codex Pantheon is a slim, explicit, Codex-native delegation layer for an Astra-led Codex session.**
 
 <p align="center">
