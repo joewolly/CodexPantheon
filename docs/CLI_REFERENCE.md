@@ -6,67 +6,68 @@ Run the lifecycle CLI from a Codex Pantheon source checkout:
 ./pantheon <command>
 ```
 
-The script requires Bash and common Unix command-line utilities. The repository does not currently define a formal operating-system or minimum-Codex compatibility matrix. Agent model availability depends on the active Codex build and provider and is not established by the lifecycle CLI.
+The script requires Bash and common Unix utilities. Model availability depends on the active Codex build/provider and is not established by this CLI.
 
 ## Commands
 
 | Command | Changes local state | Purpose |
 | --- | --- | --- |
-| `bootstrap` | Yes | Install or refresh Pantheon-owned files, then run `doctor` |
-| `install` | Yes | Install the source package's Pantheon-owned files |
-| `update` | Yes | Replace installed Pantheon-owned files with the source package's versions |
-| `doctor` | No persistent changes | Check source completeness, installed files, managed policy, drift, and Codex executable discovery |
-| `uninstall` | Yes | Remove Pantheon-owned files, skills, policy block, and version marker |
+| `bootstrap` | Yes | Install or refresh Pantheon-owned files, remove owned legacy payloads, then run `doctor` |
+| `install` | Yes | Install the source package and perform v0.4 cleanup |
+| `update` | Yes | Replace Pantheon-owned files with the source package and perform v0.4 cleanup |
+| `doctor` | No persistent changes | Check source completeness, current payload, legacy absence, policy, drift, and Codex discovery |
+| `uninstall` | Yes | Remove current and legacy Pantheon-owned files, skills, policy block, and version marker |
 | `version` | No | Print the Pantheon version |
 | `help` | No | Print usage and environment-variable help |
 
-`--version` and `-v` are aliases for `version`. `--help` and `-h` are aliases for `help`. An unknown command prints usage and exits with status 2.
-
-Running `./pantheon` without a command prints help and exits successfully. Successful commands normally exit 0. Source-package or fail-closed safeguard errors exit 1; these can occur before `doctor` reaches its status summary.
+`--version`/`-v` alias `version`; `--help`/`-h` alias `help`. Unknown commands exit 2.
 
 ## Environment variables
 
 | Variable | Default | Controls |
 | --- | --- | --- |
-| `CODEX_HOME` | `~/.codex` | Agent definitions, managed `AGENTS.md` block, and version marker |
-| `PANTHEON_SKILLS_HOME` | `~/.agents/skills` | Pantheon workflow skill directories |
+| `CODEX_HOME` | `~/.codex` | Agent definition, managed `AGENTS.md` block, version marker |
+| `PANTHEON_SKILLS_HOME` | `~/.agents/skills` | Pantheon workflow skills |
 
-Example with isolated destinations:
+## Current owned paths
 
-```bash
-PANTHEON_TEST_ROOT="$(mktemp -d)"
-CODEX_HOME="$PANTHEON_TEST_ROOT/codex" \
-PANTHEON_SKILLS_HOME="$PANTHEON_TEST_ROOT/skills" \
-./pantheon bootstrap
-```
-
-Remove the temporary directory when you no longer need the isolated installation.
-
-## Owned paths
-
-Pantheon owns these installed paths:
-
-- `${CODEX_HOME:-~/.codex}/agents/pantheon-*.toml` for the seven bundled role names;
-- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon*` for the five bundled workflow names (`pantheon`, `pantheon-daily`, `pantheon-plan`, `pantheon-review`, and `pantheon-team`);
+- `${CODEX_HOME:-~/.codex}/agents/pantheon-worker.toml`;
+- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon/`;
+- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-daily/`;
+- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-plan/`;
+- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-review/`;
 - the single `<!-- PANTHEON:START -->` through `<!-- PANTHEON:END -->` block in `${CODEX_HOME:-~/.codex}/AGENTS.md`;
 - `${CODEX_HOME:-~/.codex}/.pantheon-version`.
 
-Install and update replace same-named Pantheon agent files and skill directories. Uninstall removes them. Pantheon does not back up those owned paths, so move or rename any unrelated content that currently uses a bundled Pantheon name before installing.
+Install/update replace those same-named Pantheon paths. Uninstall removes them. Text outside the managed `AGENTS.md` markers and unrelated agent/skill names remain user-owned.
 
-Text outside the managed `AGENTS.md` markers and skills or agent definitions with other names remain user-owned.
+## Legacy paths owned for migration/removal
+
+v0.5 also treats the following former Pantheon names as owned cleanup targets:
+
+- `pantheon-explorer.toml`
+- `pantheon-librarian.toml`
+- `pantheon-oracle.toml`
+- `pantheon-fixer.toml`
+- `pantheon-designer.toml`
+- `pantheon-reviewer.toml`
+- `pantheon-verifier.toml`
+- the `pantheon-team` skill directory
+
+`install`, `update`, and `bootstrap` remove those paths before installing v0.5. `doctor` reports them as unhealthy if they reappear. `uninstall` removes them too.
 
 ## Doctor outcomes
 
-After its source-package preflight passes, `doctor` reports one of three outcomes:
+After source preflight, `doctor` reports:
 
-- `HEALTHY`: all static checks passed;
-- `HEALTHY WITH WARNINGS`: checks passed, but Codex discovery or possible legacy unmanaged instructions need attention;
-- `UNHEALTHY`: one or more source, install, drift, symlink, or marker checks failed.
+- `HEALTHY` — static checks passed;
+- `HEALTHY WITH WARNINGS` — checks passed, but Codex discovery or possible unmanaged Pantheon text needs attention;
+- `UNHEALTHY` — source, install, legacy-cleanup, drift, symlink, or marker checks failed.
 
-Healthy and healthy-with-warning outcomes exit 0. An unhealthy outcome exits 1 and suggests `./pantheon update` for repairable Pantheon-owned drift. A missing or invalid source-package file also exits 1 immediately without printing one of these status labels.
+Healthy/healthy-with-warning exit 0; unhealthy exits 1. A source-package integrity failure exits 1 immediately.
 
-Doctor may create and remove a temporary comparison file and may invoke `codex --version`, but it does not rewrite the installed Pantheon configuration. It validates static installation integrity, not model availability, provider access, quota behavior, billing, or a successful live subagent spawn.
+Doctor may create/remove a temporary comparison file and may invoke `codex --version`, but it does not rewrite installed configuration. It validates static installation integrity, not model/provider availability, quota behavior, billing, or a successful live worker spawn.
 
 ## Fail-closed safeguards
 
-Lifecycle operations refuse to guess when the managed `AGENTS.md` markers are malformed or duplicated, or when that file is not a regular non-symlink file. Resolve the ownership or marker problem manually; do not bypass it by overwriting unrelated configuration.
+Lifecycle operations refuse to guess when managed `AGENTS.md` markers are malformed/duplicated or when that file is not a regular non-symlink file. Resolve the ownership/marker problem manually rather than overwriting unrelated configuration.

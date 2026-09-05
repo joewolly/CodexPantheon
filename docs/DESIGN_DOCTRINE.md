@@ -1,44 +1,42 @@
 # Codex Pantheon Design Doctrine
 
-Codex Pantheon is a slim, explicit, Codex-native multi-agent layer. Its purpose is to improve specialist delegation without replacing Codex with a second orchestration platform.
+Codex Pantheon is a slim, explicit, Codex-native delegation layer. It exists to make an Astra-led Codex session selectively more capable without turning Pantheon into its own agent platform.
+
+> **Astra thinks. Luna does. Pantheon controls how much Luna Astra is allowed to use.**
 
 ## Non-negotiable principles
 
-1. **Native first, context deliberate** — use Codex subagents, skills, configuration, tools, and normal files before adding Pantheon machinery; context is a cost, so start with self-contained minimal context and expand it only when evidence requires.
-2. **Solo by default** — installation must not cause ordinary prompts to fan out automatically.
-3. **Explicit activation** — complexity is not consent to orchestrate.
-4. **Parent owns the mission** — the parent thread owns decomposition, integration, validation, and the final answer.
-5. **Bounded agents** — every agent gets a concrete assignment and stopping condition; child agents do not recursively delegate.
-6. **Small roster** — add capabilities before adding characters. Core roles are Explorer, Librarian, Oracle, Fixer, Designer, Reviewer, and Verifier.
-7. **Progressive escalation** — the parent decides whether delegation adds material value and selects one best specialist first. Add another specialist only for a specific unresolved need, genuinely independent workstream, or material verification requirement; every additional specialist must earn its place. Team mode is the independent-workstream exception, with 2-3 agents as its normal range; complexity alone never creates a swarm.
-8. **Distinct operating profiles** — ordinary Codex minimizes orchestration overhead; Pantheon Daily is explicitly quota-conscious and keeps specialist calls tightly bounded; full Pantheon prioritizes quality/confidence and may spend additional included capacity when the marginal value is real. Never silently switch profiles.
-9. **Verification is first-class** — confidence comes from evidence, not agreement between agents.
-10. **Thin workflows** — `$pantheon*` skills are routing recipes, not a custom workflow runtime.
-11. **Risk-matched verification** — ordinary implementation uses Reviewer or Verifier based on risk; both are used only when static and runtime evidence are materially necessary. There is no default Fixer → Reviewer → Verifier chain.
-12. **Scale effort, not roster size** — fast/normal/deep change full-Pantheon orchestration depth rather than multiplying agent definitions. Daily is a separate routing profile, not another effort level.
-13. **Stateless by default** — no databases, task queues, daemons, hidden mission state, persistent quota budgets, or background schedulers in core Pantheon.
-14. **No automatic mode detection** — Pantheon never intercepts ordinary prompts to decide it should activate or switch profiles itself.
-15. **Safe lifecycle** — Pantheon owns only Pantheon files and a clearly marked block in `AGENTS.md`.
-16. **Easy removal** — uninstalling Pantheon must return the user to normal Codex without rebuilding their environment.
-17. **Low maintenance is a feature** — avoid dependencies on unstable Codex internals and do not reimplement native capabilities.
-
-The concise routing map is: known scoped change → Fixer; unknown repository path/ownership → Explorer; unknown external reference → Librarian; unresolved architecture → Oracle; UI/UX → Designer; static correctness/diff/security/regression → Reviewer; executable tests/builds/reproduction/acceptance → Verifier. Explorer is not a Fixer preflight, Fixer can inspect a known target, and Oracle is only for unresolved architecture.
-
-Pantheon Daily tightens that map further: the parent may handle low-risk implementation directly, normally uses no more than two specialist calls per user request, permits a third only for a concrete unresolved blocker/risk/evidence gap, and never uses four or more. Full Pantheon has no Daily numeric ceiling, but every additional specialist still requires material value.
-
-Native child spawns, including direct named-agent requests, default to `fork_turns: "none"` and self-contained assignments. Use only the minimum supported inherited context for a genuine parent dependency, with a special inherited-fork exception only when no inheritance would make a required dynamic tool unavailable; full-history inheritance is never the default. Child handoffs are delta-only and stop when sufficient evidence answers the objective.
+1. **Solo by default** — installing Pantheon changes no ordinary prompt behavior. Every new thread begins with zero Pantheon delegation.
+2. **Explicit activation** — complexity is not consent. Only `$pantheon`, `$pantheon-daily`, or a clear equivalent request activates a sticky Pantheon profile.
+3. **Astra is the parent, not a child** — Pantheon is designed for GPT-6 Astra as the main Codex model. Do not create a separate Astra orchestrator subagent or move mission ownership out of the parent thread.
+4. **One child role** — core Pantheon has one subagent: `pantheon_worker` on GPT-5.6 Luna. Add capabilities to the worker before adding characters.
+5. **Astra owns thinking** — planning, architecture, prioritization, integration, review, final verification judgment, merge/release verdicts, and user communication remain in the parent.
+6. **Luna owns bounded execution** — exploration, reference research, implementation, fixes, and focused validation/evidence are the worker's job when delegation helps.
+7. **No role theater** — do not reproduce Explorer → Fixer → Reviewer → Verifier pipelines with multiple copies of the same worker. One cohesive assignment is better when it can safely cover discovery through focused validation.
+8. **Two intensity controls only** — Pantheon Daily is conservative; full Pantheon permits heavier delegation and justified parallelism. There is no fast/normal/deep effort layer and no separate team mode.
+9. **Daily protects usage** — zero worker calls is healthy. Normally use 0-1 Luna calls per request, no parallel workers, and a second sequential call only for a concrete unresolved blocker/evidence gap.
+10. **Full Pantheon earns parallelism** — multiple Luna workers are allowed only when their workstreams are genuinely independent or a concrete additional execution/evidence lane is needed. Complexity alone never creates a swarm.
+11. **Context is a cost** — child spawns start with `fork_turns: "none"` and self-contained assignments. Inherit only the minimum required context.
+12. **Bounded agents** — every worker gets an objective, scope, permission boundary, expected evidence, and stopping condition. Workers never recursively delegate.
+13. **Verification is evidence, not agreement** — Astra decides what the evidence proves. A worker may run tests or reproduction, but does not replace the parent's final review judgment.
+14. **Thin workflows** — `$pantheon*` skills are routing/instruction recipes, not a custom runtime.
+15. **Stateless by default** — no databases, hidden mission state, persistent budgets, quota trackers, task queues, daemons, or background schedulers in core Pantheon.
+16. **Safe lifecycle** — Pantheon owns only its named files and a clearly marked block in `AGENTS.md`; updates may remove Pantheon-owned legacy paths from prior releases, but unrelated user configuration is preserved.
+17. **Easy removal** — uninstalling Pantheon returns the environment to normal Codex without reconstruction.
+18. **Low maintenance is a feature** — prefer native Codex capabilities, configuration, skills, and small scripts over dependencies on unstable internals.
 
 ## The slim test
 
 Before adding a feature, ask:
 
-- Does it improve the way Codex uses native agents?
-- Can configuration, a skill, or a small script solve it?
-- Does it preserve explicit user control?
-- Does it work without an always-on runtime?
-- Does it keep context and fan-out no larger than the selected profile and evidence require?
-- Does Pantheon remain understandable and easy to remove afterward?
+- Does it make Astra + Luna delegation materially better?
+- Can the capability fit inside the existing worker or a thin skill instead of a new agent?
+- Does ordinary Codex remain untouched until the user explicitly opts in?
+- Does it avoid a new orchestration layer, scheduler, database, or persistent state?
+- Does it keep context and worker calls no larger than evidence requires?
+- Does Daily remain meaningfully cheaper/lighter than full Pantheon?
+- Can a user still explain the whole architecture as “Astra thinks, Luna does”?
 
-If most answers are yes, the feature probably belongs. If it requires Pantheon to become its own agent platform, scheduler, execution environment, quota meter, or workflow engine, it probably does not.
+If the answer to the last question becomes no, Pantheon is probably getting too heavy.
 
 > Enhance Codex. Don't replace it.

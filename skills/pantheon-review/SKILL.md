@@ -1,20 +1,32 @@
 ---
 name: pantheon-review
-description: Explicit Pantheon independent review workflow. Use only when the user explicitly invokes $pantheon-review or explicitly asks Pantheon to review code, a diff, branch, PR, or implementation.
+description: Explicit Pantheon review workflow. Use only when the user explicitly invokes $pantheon-review or explicitly asks Pantheon to review code, a diff, branch, PR, or implementation.
 ---
 
 # Pantheon Review
 
-This is an independent review workflow. Do not modify production source code. It is request-scoped: it applies only to the request that invokes it and does not become a sticky review submode or change base Pantheon state or effort. If base Pantheon is active, resume its prior state afterward.
+This is a request-scoped focused review workflow. It does not activate Pantheon, replace the selected Daily/full profile, or become a sticky review mode. Do not modify production source code as part of the review.
 
-## Required and optional specialists
+The parent Codex thread performs the review and owns the verdict. Pantheon is designed for GPT-6 Astra as the main thread; Astra inspects the actual target, intended behavior, diff, risk, and available evidence directly.
 
-`pantheon_reviewer` is required and must inspect the actual target and intended behavior. `pantheon_verifier` is optional, only when runtime tests, builds, reproduction, or acceptance evidence materially improve confidence. Use Explorer or Librarian only for a specific missing repository or external-reference question; do not add a preflight for completeness. Add another specialist only for a specific unresolved need, genuinely independent workstream, or material verification requirement. Every additional specialist must earn its place.
+## Luna as an evidence worker
 
-For every native child spawn, default to `fork_turns: "none"` and give a self-contained, bounded assignment with objective, review target/scope, constraints and known context, write permission (read-only for review), expected findings/evidence, stopping condition, and a direct instruction not to spawn subagents. Do not inherit context merely because it is available. Use the minimum supported inheritance only when genuine parent context is required, with the sole special exception of a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default.
+`pantheon_worker` is optional. Use it only for a bounded evidence lane that materially improves the review, such as:
 
-The parent chooses the minimum useful review evidence, reconciles it independently, and does not invent findings or treat agreement as proof. A Verifier remains optional; there is no default Fixer → Reviewer → Verifier chain.
+- mapping a specific repository path or ownership question;
+- checking an authoritative external/reference requirement;
+- running focused tests, builds, reproduction, or acceptance checks;
+- gathering concrete evidence for a suspected regression;
+- providing a read-only second opinion on a narrowly defined question when genuinely independent inspection matters.
 
-Repository tests prove packaged policy/configuration and lifecycle behavior, not live backend, provider, runtime, or native child-spawn behavior.
+Do not delegate the final code-review judgment or merge/release verdict to Luna. Worker review-support assignments are read-only with respect to production source.
 
-For a merge or release decision, give a clear `PASS`, `PASS WITH NOTES`, or `FAIL / NO-MERGE` verdict with blocking reasons and unverified gates.
+Every child spawn defaults to `fork_turns: "none"` and receives a self-contained, bounded assignment with objective, review target/scope, known constraints/context, explicit read-only permission, expected evidence/output, stopping condition, and a direct instruction not to spawn subagents.
+
+Do not inherit context merely because it is available. Use the minimum supported inheritance only when a genuine parent dependency requires it, with the sole exception of a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default.
+
+Astra reconciles worker evidence itself. Agreement is not proof, and a passing test does not erase a static correctness issue. Use only the evidence lanes the target risk actually requires.
+
+For a merge or release decision, return a clear `PASS`, `PASS WITH NOTES`, or `FAIL / NO-MERGE` verdict with blocking reasons and any material unverified gates.
+
+Repository tests prove packaged policy/configuration, migration, and lifecycle behavior, not live backend, provider, model availability, quota behavior, or native child-spawn behavior.

@@ -36,27 +36,34 @@ Remove the temporary directory when you are finished with the isolated installat
 
 | Path | Purpose |
 | --- | --- |
-| `agents/` | Installed custom-agent definitions and their permission postures |
-| `skills/` | Explicit Pantheon activation, planning, review, and team workflows |
+| `agents/` | The single installed Luna worker definition and its permission posture |
+| `skills/` | Explicit full/Daily activation plus request-scoped planning and review workflows |
 | `policy/managed-block.md` | The policy block installed into Codex `AGENTS.md` |
-| `pantheon` | Lifecycle CLI and source-of-truth install manifest |
+| `pantheon` | Lifecycle CLI and source-of-truth install/migration manifest |
 | `install.sh` | Backward-compatible install entry point |
-| `tests/test.sh` | Isolated lifecycle and policy regression suite |
+| `tests/test.sh` | Isolated lifecycle, migration, and policy regression suite |
 | `docs/` | User, install, design, CLI, release, and milestone guidance |
 
 ## Change guidelines
 
 - Preserve explicit, thread-scoped activation and solo-by-default behavior.
-- Keep the parent Codex thread responsible for interpretation, delegation, integration, verification, and the final response.
-- Give every delegated agent a bounded objective, scope, constraints, permissions, expected evidence, and a prohibition on spawning subagents.
+- Preserve the two-role architecture: Astra stays in the main thread and `pantheon_worker` remains the only Pantheon child unless the design doctrine is explicitly changed.
+- Keep the parent/Astra thread responsible for planning, architecture, delegation, integration, review, final verification judgment, and the final response.
+- Use Luna for bounded exploration, reference research, implementation, fixes, and focused validation/evidence when delegation materially helps.
+- Give every delegated worker a bounded objective, scope, constraints, permissions, expected evidence, and a prohibition on spawning subagents.
+- Keep Pantheon Daily conservative and reserve justified parallel Luna work for full Pantheon; do not reintroduce a separate team mode or specialist pipeline by default.
 - Preserve user-owned Codex configuration outside Pantheon's files and managed markers.
 - Install custom agent roles as regular files, never symlinks.
 - Prefer a skill, configuration change, or small script over new runtime machinery.
-- Do not add automatic activation, prompt interception, recursive orchestration, daemons, task databases, or hidden cross-thread state without an explicit change to the design doctrine.
+- Do not add automatic activation, prompt interception, recursive orchestration, daemons, task databases, quota stores, or hidden cross-thread state without an explicit change to the design doctrine.
 
 Pantheon's operating contract is repeated in several installed surfaces. When changing it, inspect and keep the applicable copies aligned:
 
+- `agents/pantheon-worker.toml`
 - `skills/pantheon/SKILL.md`
+- `skills/pantheon-daily/SKILL.md`
+- `skills/pantheon-plan/SKILL.md`
+- `skills/pantheon-review/SKILL.md`
 - `policy/managed-block.md`
 - `AGENTS.md`
 - `README.md`
@@ -67,7 +74,7 @@ For a release, follow [docs/RELEASING.md](docs/RELEASING.md) and synchronize `VE
 
 ## Validation
 
-Run the complete repository test suite for lifecycle, policy, agent, or skill changes:
+Run the complete repository test suite for lifecycle, policy, agent, migration, or skill changes:
 
 ```bash
 ./tests/test.sh

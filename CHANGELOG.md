@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+## 0.5.0 — 2026-09-05
+
+### Added
+
+- `pantheon_worker`, a single GPT-5.6 Luna High child role for bounded repository exploration, reference research, implementation, fixes, and focused validation/evidence.
+- v0.5 migration checks that require the old v0.4 specialist/team payload to be absent from a healthy installation.
+
+### Changed
+
+- Pantheon now uses a two-role architecture: GPT-6 Astra remains the main-thread orchestrator and Luna is the only Pantheon child.
+- `$pantheon-daily` is now the conservative default philosophy: normally 0-1 Luna calls per request, no parallel workers, and a second sequential call only for a concrete unresolved blocker/evidence gap.
+- Full `$pantheon` owns higher-intensity delegation and may use multiple or parallel Luna workers only for material, genuinely independent work.
+- Planning, architecture, prioritization, integration, review, final verification judgment, and merge/release verdicts stay with the parent/Astra thread.
+- `$pantheon-plan` uses Luna only as optional read-only research support; `$pantheon-review` uses Luna only as optional evidence support while Astra owns the review verdict.
+- Install/update/bootstrap automatically remove Pantheon's seven v0.4 agent files and the old `pantheon-team` skill.
+- Doctor reports reappearing legacy Pantheon agent/team paths as unhealthy.
+
+### Removed
+
+- The Explorer, Librarian, Oracle, Fixer, Designer, Reviewer, and Verifier child-agent roster.
+- `$pantheon-team`; justified parallelism now belongs directly to full Pantheon.
+- Fast/normal/deep full-Pantheon effort levels. Daily and full Pantheon are the two delegation-intensity controls.
+
+### Not included
+
+- No automatic model switching, prompt interception, token/quota meter, persistent budget state, daemon, scheduler, dashboard, recursive agent tree, or custom orchestration runtime.
+
 ## 0.4.0 — 2026-09-04
 
 ### Added

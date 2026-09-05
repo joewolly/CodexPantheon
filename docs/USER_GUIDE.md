@@ -1,230 +1,173 @@
 # Codex Pantheon User Guide
 
-Pantheon adds a small set of specialist agents and explicit workflows to Codex. It stays inactive until you ask to use it, and the parent Codex thread always remains responsible for the mission.
+Pantheon v0.5 is intentionally simple: **GPT-6 Astra stays in the main Codex thread and GPT-5.6 Luna is the single optional worker.** Pantheon stays inactive until you explicitly ask to use it.
 
-Pantheon v0.4 provides two sticky orchestration profiles: quota-conscious **Pantheon Daily** for routine work and full **Pantheon** for quality-and-confidence-first work where additional specialist usage is worthwhile.
+> **Astra thinks. Luna does.**
 
 ## 1. Install and verify
 
-The recommended path is to open this repository in Codex and ask:
+Open this repository in Codex and ask:
 
 ```text
 Install Codex Pantheon for me.
 ```
 
-Codex runs the bounded bootstrap command:
+Codex runs:
 
 ```bash
 ./pantheon bootstrap
 ```
 
-For manual setup and troubleshooting, see [CODEX_INSTALL.md](CODEX_INSTALL.md).
-For a consolidated command, path, environment-variable, and exit-behavior reference, see the [CLI reference](CLI_REFERENCE.md).
+That lifecycle request does not activate Pantheon. For manual setup, see [CODEX_INSTALL.md](CODEX_INSTALL.md). For commands and owned paths, see [CLI_REFERENCE.md](CLI_REFERENCE.md).
 
-## 2. Choose an operating profile
+## 2. Understand the two roles
 
-Every new thread starts in ordinary Codex mode. Pantheon activates only when you explicitly select a profile.
-
-| Profile | Activate with | Best for | Delegation posture |
-| --- | --- | --- | --- |
-| Ordinary Codex | default / `Stop using Pantheon.` | Trivial or cheapest-path work | Parent only |
-| Pantheon Daily | `$pantheon-daily` | Normal day-to-day work when you want to stretch a fixed allowance | Parent first; normally 0-2 specialist calls per request |
-| Full Pantheon | `$pantheon` | High-value, uncertain, risky, or release-critical work | Progressive evidence-earned delegation without Daily's numeric ceiling |
-
-### Use Pantheon Daily
-
-```text
-$pantheon-daily
-
-Implement the settings change and add the focused tests.
-```
-
-A clear request such as `Use Pantheon Daily for this task` also activates it. Daily remains active for ordinary follow-ups in that thread:
-
-```text
-Now fix the remaining test failure.
-Update the docs.
-```
-
-Daily prefers direct parent work when delegation would add little value. When a specialist materially reduces uncertainty, rework, or parent effort, it selects one best-fit role first. It normally uses no more than two specialist calls for one request. A third call is reserved for a concrete unresolved blocker, risk, or evidence gap that the parent cannot resolve efficiently; Daily never uses four or more calls for one request and never silently switches to full Pantheon or team mode.
-
-### Use full Pantheon
-
-```text
-$pantheon
-
-Trace the authentication flow, fix the stale-session bug, and independently verify the change.
-```
-
-A clear request such as `Use Pantheon for this task` also activates full Pantheon. Full Pantheon still escalates progressively, but it has no Daily-style numeric specialist ceiling when additional independent work materially improves quality or confidence.
-
-### Switch or disable
-
-The selected profile is sticky only inside the current thread. You do not need to repeat its skill on ordinary follow-ups.
-
-Switch profiles explicitly:
-
-```text
-$pantheon
-```
-
-while Daily is active switches to full Pantheon. Conversely:
-
-```text
-$pantheon-daily
-```
-
-while full Pantheon is active switches to Daily.
-
-To return the current thread to ordinary Codex behavior, say:
-
-```text
-Stop using Pantheon.
-```
-
-Activation never carries into a different thread. Mentioning Pantheon is not the same as activating it. Requests such as `Update the Pantheon README` or `Run Pantheon doctor` operate on the project without activating orchestration unless you separately ask to use a profile.
-
-## 3. Choose full-Pantheon effort
-
-Fast/normal/deep are effort levels for full Pantheon. Daily is a separate operating profile, not an effort level.
-
-Full Pantheon starts at normal effort unless you say otherwise. Effort changes orchestration depth, not the available agents.
-
-| Effort | Best for | Typical delegation |
+| Role | Model | Responsibility |
 | --- | --- | --- |
-| Fast | Small, well-understood tasks | Zero or one specialist |
-| Normal | Most substantial implementation and diagnosis work | Progressive delegation plus independent evidence when useful |
-| Deep | High-risk decisions or broad, uncertain work | More research and independent checking within Pantheon's bounded routing rules |
+| Main thread / orchestrator | GPT-6 Astra | Plan, decide, architect, integrate, review, judge final verification, communicate, own final result |
+| `pantheon_worker` | GPT-5.6 Luna High | Explore, research, implement, fix, run focused validation, return evidence |
 
-Select an effort in ordinary language:
+Astra is not an installed subagent. Pantheon assumes you selected Astra as your main Codex model; it does not auto-switch the parent model or spawn an Astra child.
+
+There is no longer a seven-agent specialist roster. The one Luna worker receives task-specific instructions instead of changing personalities.
+
+## 3. Choose an operating profile
+
+Every new thread starts in ordinary Codex mode.
+
+| Profile | Activate with | Delegation posture |
+| --- | --- | --- |
+| Ordinary Codex | default / `Stop using Pantheon.` | No Pantheon worker calls |
+| Pantheon Daily | `$pantheon-daily` | Conservative: normally 0-1 Luna calls per request; no parallel workers |
+| Full Pantheon | `$pantheon` | Higher intensity: multiple Luna calls allowed; parallel only for genuinely independent workstreams |
+
+The selected Pantheon profile is sticky only inside the current thread. Invoke the other profile to switch. Say `Stop using Pantheon.` to return to ordinary Codex. Nothing persists across threads.
+
+### Pantheon Daily
+
+```text
+$pantheon-daily
+
+Fix the API retry regression and run the focused tests.
+```
+
+Daily is designed to conserve usage. Zero Luna calls is a good outcome when Astra can finish cheaply itself. If delegation helps, Astra normally sends one cohesive task to Luna. For example, Luna can inspect the relevant code, find the implementation point, make the scoped fix, and run focused validation in one call.
+
+Daily never parallelizes Luna workers. A second sequential call is reserved for a concrete unresolved blocker or evidence gap that Astra cannot resolve cheaply.
+
+### Full Pantheon
 
 ```text
 $pantheon
 
-Use deep orchestration for this migration.
+Implement the storage migration. Parallelize server and client work only if they are genuinely independent.
 ```
 
-Change it later while full Pantheon remains active:
+Full Pantheon uses the same roles with a higher delegation allowance. Astra may use multiple Luna workers and parallel workstreams when that materially improves execution. There is no separate `$pantheon-team` mode.
 
-```text
-Switch Pantheon to fast.
-Use normal Pantheon effort.
-```
+Pantheon v0.5 also removes fast/normal/deep effort levels. **Daily versus full is the intensity choice.**
 
-The selected effort persists within the active full-Pantheon thread. Switching to Daily or disabling Pantheon clears it. Switching from Daily back to full Pantheon starts at normal unless you request another effort.
+## 4. What Astra should delegate
 
-## 4. Dispatch progressively and keep context small
+Luna is appropriate for bounded execution:
 
-In either profile, the parent decides whether delegation adds material value, then selects one best specialist first and stops when its result is sufficient. Add another specialist only for a specific unresolved need, genuinely independent workstream, or material verification requirement. Every additional specialist must earn its place. Do not create a complexity swarm.
+- repository or local-system exploration;
+- external/reference research available to the child;
+- implementation, refactoring, and bug fixes;
+- focused tests, builds, reproduction, or acceptance evidence.
 
-Use the smallest matching role: known scoped change → Fixer; unknown repository path or ownership → Explorer; unknown external documentation or reference → Librarian; unresolved architecture → Oracle; UI/UX → Designer; static correctness/diff/security/regression → Reviewer; executable tests/builds/reproduction/acceptance → Verifier. Explorer is not a Fixer preflight, Fixer can inspect a known target, Oracle is only for unresolved architecture, and team mode is the independent-workstream exception.
+Astra keeps:
 
-Daily is stricter: the parent may implement low-risk scoped work directly, Explorer and Librarian should not both be used unless both evidence lanes are independently necessary, Oracle is escalation-only, and an implementation should normally use at most one independent check—Reviewer or Verifier—based on the dominant risk.
+- problem framing and decomposition;
+- architecture and tradeoff decisions;
+- prioritization and sequencing;
+- integration across worker results;
+- final code/diff review;
+- final verification judgment;
+- merge/release verdicts and user communication.
 
-Native child spawns, including direct named-agent requests, default to `fork_turns: "none"` with a self-contained assignment and minimal context. Inherit only the minimum supported context when a genuine parent dependency requires it, with an inherited-fork exception only when no inheritance would make a required dynamic tool unavailable. Never use full-history inheritance by default. Every child remains bounded, receives an objective and stopping condition, and is instructed not to spawn subagents.
+Do not manufacture specialist stages. If one Luna assignment can safely cover exploration through implementation and validation, prefer that over separate calls.
 
-## 5. Use the specialized workflows
+## 5. Keep worker context small
 
-The focused workflow skills apply only to the request that invokes them. They do not create sticky planning, review, or team submodes and do not replace the currently active Daily/full profile.
+Native child spawns default to `fork_turns: "none"` with a self-contained assignment. Give Luna the objective, relevant scope, constraints/known context, write permission, expected evidence/output, stopping condition, and an instruction not to spawn subagents.
+
+Do not inherit context merely because it is available. Use the minimum supported inheritance only when a genuine parent dependency requires it. A supported inherited fork is acceptable when no inheritance would make a required dynamic tool unavailable. Never use full-history inheritance by default.
+
+If the assignment is research, planning support, or review support, explicitly make it read-only. If it is implementation, authorize only the necessary scope.
+
+## 6. Use the request-scoped workflows
+
+These workflows apply only to the request that invokes them. They do not activate or replace the current sticky Daily/full profile.
 
 ### Plan without implementing
 
 ```text
-$pantheon-plan Plan the storage migration, including rollback and validation, but do not implement it.
+$pantheon-plan Plan the multi-workspace migration, including validation and rollback, but do not implement it.
 ```
 
-The result should be an actionable plan grounded in repository evidence.
+Astra owns the plan. Luna is optional and read-only, used only for repository or reference evidence that materially improves planning.
 
-### Request an independent review
+### Review with Pantheon
 
 ```text
 $pantheon-review Review this branch against main and give me a merge verdict.
 ```
 
-The Reviewer inspects the actual target. A Verifier may reproduce tests or acceptance criteria when that materially improves confidence.
+Astra performs the actual review and owns the verdict. Luna may gather bounded evidence: map a specific code path, confirm an external requirement, run tests/builds, reproduce a suspected regression, or provide a read-only second opinion on a narrowly defined question when independent inspection materially helps. Luna does not become a dedicated Reviewer persona.
 
-### Run genuinely independent workstreams
+### Direct worker request
 
-```text
-$pantheon-team Split the API migration and client migration into separate workstreams, then integrate and verify them.
-```
-
-Team mode is for work that truly separates. The parent thread still owns integration and conflict resolution; child agents do not create further agents.
-
-## 6. Ask for a named specialist
-
-You can request a particular role when you know which perspective you need:
-
-| Specialist | Use it for |
-| --- | --- |
-| Explorer | Read-only repository mapping and execution-path tracing |
-| Librarian | Authoritative external docs, APIs, and version-specific research |
-| Oracle | Architecture, tradeoffs, difficult debugging, and second opinions |
-| Fixer | Focused implementation after the scope is understood |
-| Designer | UI/UX critique or explicitly permitted interface implementation |
-| Reviewer | Independent correctness, regression, security, and maintainability review |
-| Verifier | Independent tests, builds, reproduction, and acceptance evidence |
-
-For example:
+You can explicitly request Luna for a single bounded request without activating a sticky profile:
 
 ```text
-Use Pantheon Explorer to map where authorization decisions are made. Do not change files.
+Use Pantheon Worker to map the authentication flow. Do not change files.
 ```
-
-Named-agent requests are bounded to that request; they do not create a permanent named-agent mode.
 
 ## 7. Write effective requests
 
-Pantheon works best when the task states the outcome and the important boundaries. Include the target, constraints, authorized mutations, expected evidence, and stopping point when they matter.
+You do not need to design the agent topology. State the outcome and important constraints.
 
 Daily example:
 
 ```text
 $pantheon-daily
 
-Fix the retry regression in the API client. Preserve the public API, modify only the client and its tests, and run the focused tests.
+Fix the retry regression. Preserve the public API, change only the client and its tests, and run the focused test target.
 ```
 
-Full-Pantheon example:
+Full example:
 
 ```text
 $pantheon
 
-Use deep orchestration for the storage migration. Challenge the architecture, implement the selected approach, and independently verify rollback behavior.
+Implement the storage migration. Keep Astra responsible for architecture and review; use Luna for implementation and execution evidence. Parallelize only independent work.
 ```
-
-You do not need to design the agent team yourself. The parent Codex thread chooses the useful specialists and remains accountable for the final result.
 
 ## 8. Understand the evidence
 
-Pantheon distinguishes different kinds of proof:
+A Luna report proves only what it actually inspected or executed. A passing test does not prove every static correctness property, and two workers agreeing is not stronger evidence by itself. Astra reconciles evidence and decides what remains unproven.
 
-- an Explorer report establishes repository evidence, not runtime behavior;
-- a Reviewer finding is an independent code assessment, not a passing test;
-- a Verifier result proves only the commands and environment it actually exercised;
-- `./pantheon doctor` verifies installation files and policy drift, not live subagent availability;
-- Daily's routing rules are policy constraints, not a live quota meter or billing estimator.
+`./pantheon doctor` verifies static installation files, migration cleanup, and managed policy drift. It does not prove live child-spawn availability, model access, provider behavior, quota usage, or billing.
 
-Ask for the specific lane you need: unit tests, a build, a rendered UI, hosted CI, live-provider behavior, or packaged-artifact verification are separate claims.
+## 9. Upgrade from v0.4
 
-## 9. Update, repair, or remove Pantheon
-
-Run the bootstrap flow after updating the source package:
+Run:
 
 ```bash
 ./pantheon bootstrap
 ```
 
-It refreshes Pantheon-owned files and runs `doctor`. To verify without modifying the installation:
+v0.5 removes Pantheon's old seven specialist agent files and the `pantheon-team` skill, installs `pantheon-worker.toml`, updates the four remaining workflow skills, and replaces the managed policy block.
+
+The old direct specialist names and fast/normal/deep effort semantics are intentionally gone. Use `pantheon_worker` for bounded execution, `$pantheon-daily` for conservative delegation, and `$pantheon` when heavier/parallel delegation is justified.
+
+## 10. Update, repair, or remove Pantheon
 
 ```bash
-./pantheon doctor
+./pantheon bootstrap   # install/update + doctor
+./pantheon doctor      # read-only verification
+./pantheon uninstall   # remove Pantheon-owned current and legacy paths
 ```
 
-To remove Pantheon-owned files and the managed policy block while preserving unrelated Codex configuration:
-
-```bash
-./pantheon uninstall
-```
-
-For support and reporting guidance, see [SUPPORT.md](../SUPPORT.md).
+Uninstall preserves unrelated Codex agents, skills, and text outside Pantheon's managed `AGENTS.md` block.
