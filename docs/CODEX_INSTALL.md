@@ -1,18 +1,18 @@
 # Install Codex Pantheon with Codex
 
-Pantheon v0.4.0 can bootstrap itself through an ordinary Codex workspace. No separate orchestration runtime is required.
+Pantheon v0.5.0 bootstraps through an ordinary Codex workspace. No separate orchestration runtime is required.
 
 ## Recommended flow
 
 1. Download or clone the Codex Pantheon source.
-2. Open the Pantheon source directory in the Codex app or start Codex from that directory.
-3. Ask Codex:
+2. Open the source directory in Codex.
+3. Ask:
 
    ```text
    Install Codex Pantheon for me.
    ```
 
-This request operates on the Pantheon product; it does not activate Pantheon orchestration. `$pantheon` followed by a task explicitly activates full orchestration, `$pantheon-daily` explicitly activates the quota-conscious Daily profile, and `Use Pantheon to update the Pantheon installer.` explicitly activates full Pantheon and then operates on Pantheon.
+This is a lifecycle request and **does not activate Pantheon orchestration**. `$pantheon` explicitly activates full Pantheon; `$pantheon-daily` explicitly activates Daily.
 
 The repository `AGENTS.md` tells Codex to execute:
 
@@ -20,39 +20,51 @@ The repository `AGENTS.md` tells Codex to execute:
 ./pantheon bootstrap
 ```
 
-`bootstrap` performs the Pantheon-owned install/update and immediately runs `doctor`.
+`bootstrap` installs or updates Pantheon-owned files and immediately runs `doctor`.
 
-The repository tests validate packaged policy/configuration and lifecycle safeguards; they do not prove live Codex backend, provider, runtime, quota behavior, billing, or child-spawn availability.
+## What v0.5 installs
 
-## What Codex is allowed to change
+Pantheon owns these current paths:
 
-The bootstrap command is deliberately bounded. It may synchronize only:
-
-- Pantheon custom-agent TOMLs under `${CODEX_HOME:-~/.codex}/agents/`;
-- Pantheon workflow skills under `${PANTHEON_SKILLS_HOME:-~/.agents/skills}`;
-- Pantheon's marked block in `${CODEX_HOME:-~/.codex}/AGENTS.md`;
+- `${CODEX_HOME:-~/.codex}/agents/pantheon-worker.toml`;
+- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon/`;
+- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-daily/`;
+- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-plan/`;
+- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-review/`;
+- the marked Pantheon block in `${CODEX_HOME:-~/.codex}/AGENTS.md`;
 - `${CODEX_HOME:-~/.codex}/.pantheon-version`.
 
-It preserves unrelated Codex configuration and unrelated skills.
+Same-named current Pantheon paths are replaced on install/update and removed on uninstall. Pantheon does not back them up.
 
-### Pantheon-owned names
+## v0.4 migration cleanup
 
-Install and update replace the bundled Pantheon agent files and workflow skill directories when those same names already exist. Uninstall removes those paths. They are Pantheon-owned and are not backed up:
+v0.5 intentionally removes these Pantheon-owned legacy agent files during install/update/uninstall:
 
-- the seven `pantheon-*.toml` agent definitions bundled under `agents/`;
-- the `pantheon`, `pantheon-daily`, `pantheon-plan`, `pantheon-review`, and `pantheon-team` skill directories;
-- the managed Pantheon block in `AGENTS.md`;
-- the `.pantheon-version` marker.
+- `pantheon-explorer.toml`
+- `pantheon-librarian.toml`
+- `pantheon-oracle.toml`
+- `pantheon-fixer.toml`
+- `pantheon-designer.toml`
+- `pantheon-reviewer.toml`
+- `pantheon-verifier.toml`
 
-Move or rename unrelated content that already uses one of those exact names before installing. Other agent names, other skills, and text outside Pantheon's managed markers remain user-owned.
+It also removes the legacy `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-team/` skill. Full `$pantheon` now owns justified parallel Luna work directly.
+
+If you placed unrelated personal content at one of those exact Pantheon-owned legacy paths, move it before updating. Other agent names, other skills, and text outside Pantheon's managed markers remain user-owned.
+
+## Architecture note
+
+Astra is the intended main Codex model; it is not installed by Pantheon. The only Pantheon child definition is `pantheon_worker`, pinned to GPT-5.6 Luna High. Pantheon does not automatically change the main model.
 
 ## Fail-closed behavior
 
-If Pantheon detects malformed/duplicate managed markers, a protected `AGENTS.md` symlink, or another integrity problem, bootstrap stops and Codex should report the error rather than bypassing the safeguard with manual file edits.
+If Pantheon detects malformed/duplicate managed markers, a protected `AGENTS.md` symlink, missing source payload, legacy source files that should have been removed, or another integrity problem, bootstrap stops. Do not bypass the safeguard by manually overwriting user-owned configuration.
 
-## Other natural-language requests
+## Evidence boundary
 
-From the Pantheon source workspace, these requests are also defined by the repository instructions:
+Repository tests validate packaged policy/configuration, migration logic, and lifecycle safeguards. `doctor` validates static installed state. Neither proves live Codex backend/provider behavior, model availability, quota use, billing, or successful native child spawning.
+
+## Other natural-language lifecycle requests
 
 ```text
 Update Pantheon for me.
@@ -61,4 +73,4 @@ Check whether Pantheon is installed correctly.
 Uninstall Pantheon.
 ```
 
-Install/update/repair use `./pantheon bootstrap`; verification uses `./pantheon doctor`; uninstall runs only on an explicit removal request.
+Install/update/repair use `./pantheon bootstrap`; verification uses `./pantheon doctor`; uninstall runs only on an explicit removal request. None of these activates Pantheon unless the user separately asks to use a Pantheon profile.

@@ -5,18 +5,20 @@ description: Explicit Pantheon planning workflow. Use only when the user explici
 
 # Pantheon Plan
 
-This is a planning-only workflow. Do not implement, edit source, or mutate project state. The parent Codex thread owns the plan and the final answer.
+This is a planning-only, request-scoped workflow. It does not activate Pantheon, replace the selected Daily/full profile, or become a sticky planning mode. If a sticky profile was already active, resume it after this request.
 
-This workflow is request-scoped: it does not become a sticky planning submode or change the base Pantheon state or effort. If base Pantheon is active, resume its prior state after this request.
+The parent Codex thread owns the plan. Pantheon is designed for GPT-6 Astra as the main thread; Astra performs decomposition, architecture, tradeoff decisions, sequencing, risk analysis, and the final planning answer.
 
-## Bounded planning delegation
+## Bounded Luna research
 
-The parent decides whether research adds material value, then selects one best specialist first. Stop when the plan has sufficient evidence. Add another specialist only for a specific unresolved need, genuinely independent workstream, or material verification requirement. Every additional specialist must earn its place. Do not create a complexity swarm.
+Use `pantheon_worker` only when repository exploration, external/reference research, or other concrete evidence materially improves the plan. Zero worker calls is valid. One worker call is normally enough; add another only for a genuinely independent essential evidence gap.
 
-Use the relevant specialist: Explorer for unknown repository paths/ownership, Librarian for unknown external references, Oracle only for unresolved architecture/tradeoffs, and Designer for UI/UX planning. Never invoke Fixer merely to make a plan concrete.
+Any worker assignment in this workflow is **read-only**. Do not implement, edit production source, mutate project state, commit, push, merge, tag, or release.
 
-For every native child spawn, default to `fork_turns: "none"` and provide a self-contained, bounded assignment: objective, scope, constraints/known context, write permission (read-only in this workflow), expected evidence/output, stopping condition, and a direct instruction not to spawn subagents. Do not inherit context merely because it is available. Use the minimum supported inheritance only when genuine parent context is required, with the sole special exception of a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default.
+Every child spawn defaults to `fork_turns: "none"` and receives a self-contained, bounded assignment containing the objective, scope, known constraints/context, explicit read-only permission, expected evidence/output, stopping condition, and a direct instruction not to spawn subagents.
 
-Each child remains bounded; the parent reconciles evidence, calls out assumptions, migrations, validation gates, rollback/compatibility concerns, and out-of-scope work only when material. Return one actionable plan with sequencing, ownership boundaries, validation criteria, material risks, and unresolved decisions.
+Do not inherit context merely because it is available. Use the minimum supported inheritance only when a genuine parent dependency requires it, with the sole exception of a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default.
 
-Repository tests prove packaged policy/configuration and lifecycle behavior, not live backend, provider, runtime, or native child-spawn behavior.
+Return one actionable plan with sequencing, ownership boundaries, validation criteria, material risks, migration/rollback concerns when relevant, and unresolved decisions only where evidence cannot resolve them.
+
+Repository tests prove packaged policy/configuration, migration, and lifecycle behavior, not live backend, provider, model availability, quota behavior, or native child-spawn behavior.

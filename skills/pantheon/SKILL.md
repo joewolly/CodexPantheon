@@ -1,76 +1,63 @@
 ---
 name: pantheon
-description: Explicit, thread-scoped full Codex Pantheon orchestration. Activate on $pantheon or a clear request to use, enable, or enter Pantheon orchestration. Do not activate merely because Pantheon is mentioned or is the subject or target of lifecycle, configuration, documentation, or repository work. Complexity alone never activates it.
+description: Explicit, thread-scoped full Codex Pantheon orchestration. Activate on $pantheon or a clear request to use or enable Pantheon. Do not activate merely because Pantheon is mentioned, configured, documented, installed, updated, or inspected. Complexity alone never activates it.
 ---
 
 # Pantheon
 
-Pantheon is the full, quality-and-confidence-first thread-scoped routing profile. The parent Codex thread remains responsible for the mission, delegation, integration, validation, user communication, and final result.
+Pantheon is the higher-intensity opt-in delegation profile. The main Codex thread remains the orchestrator and owns the mission, decisions, integration, review, validation judgment, user communication, and final result.
 
-Full Pantheon still avoids waste, but unlike `$pantheon-daily` it is not primarily quota-conscious. Use additional specialists when independent reasoning, research, review, verification, or parallel work materially improves the result.
+Pantheon is designed for the main thread to run **GPT-6 Astra**. Astra is not an installed Pantheon subagent and must never be spawned as a child. Pantheon has one child role: `pantheon_worker`, pinned to GPT-5.6 Luna.
 
-## Thread-scoped activation state
+**Astra thinks. Luna does.**
 
-Treat activation as conversational state in the current thread:
+## Thread-scoped activation
 
 - Every new thread begins inactive and uses ordinary Codex behavior.
-- `$pantheon` or a clear natural-language request to use, enable, or enter Pantheon orchestration activates full Pantheon for the current thread. Activation can happen on the first message or later.
-- Once active, ordinary follow-ups stay in Pantheon without repeating `$pantheon`.
-- `$pantheon-daily` switches the current thread to the separate Daily profile and clears the selected full-Pantheon effort.
-- When Daily is active, `$pantheon` switches back to full Pantheon and starts at `normal` unless the user supplies an effort instruction.
-- A clear request to disable Pantheon—such as “disable Pantheon,” “stop using Pantheon,” “leave Pantheon mode,” or “go back to normal mode”—returns the thread to ordinary behavior. Do not infer deactivation from vague wording.
-- Deactivation clears the selected effort. Later reactivation starts at `normal` unless the user supplies an effort instruction.
-- Activation and effort never carry into a new or unrelated thread, global preference, or external persistent storage. Do not create a daemon, database, background process, or hidden cross-thread state for this purpose.
-- Difficulty, task length, parallelizability, quoted examples, and mere discussion do not activate or deactivate Pantheon.
+- `$pantheon` or a clear request to use or enable Pantheon activates full Pantheon for the current thread.
+- Once active, ordinary follow-ups stay in full Pantheon without repeating `$pantheon`.
+- `$pantheon-daily` switches the thread to the separate Daily profile.
+- A clear request to disable Pantheon returns the thread to ordinary behavior.
+- Activation never carries into another thread, a global preference, external storage, daemon, database, or hidden state.
+- Difficulty, task length, parallelizability, and mere discussion never activate or deactivate Pantheon.
 
-### Subject versus orchestrator
+Mentioning, discussing, installing, updating, repairing, verifying, configuring, documenting, modifying, or uninstalling Codex Pantheon does not by itself activate orchestration. `Install Codex Pantheon for me.`, `Run Pantheon doctor.`, and `Update the Pantheon README.` are lifecycle/product requests, not activation. `Use Pantheon for this.` and `$pantheon` are activation.
 
-Mentioning, discussing, inspecting, installing, updating, repairing, verifying, configuring, documenting, modifying, or uninstalling Codex Pantheon does not by itself activate orchestration. Those requests operate on the product, repository, or configuration and leave an inactive thread in normal Codex behavior. Activation requires separate clear intent to use, enable, or enter Pantheon as the orchestration mechanism.
+`$pantheon-plan` and `$pantheon-review` are request-scoped workflows. They do not become sticky submodes or replace the currently selected Daily/full profile. A direct request for Pantheon Worker is also request-scoped.
 
-For example, `Install Codex Pantheon for me.`, `Run Pantheon doctor.`, `Update the Pantheon README.`, and `How does Pantheon work?` do not activate. `$pantheon`, `Use Pantheon for this.`, `Enable Pantheon mode.`, and `Use Pantheon to update the Pantheon installer.` do activate full Pantheon. `$pantheon-daily` and `Use Pantheon Daily for this.` activate the Daily profile instead.
+## One worker, not a specialist roster
 
-The specialized `$pantheon-plan`, `$pantheon-review`, and `$pantheon-team` workflows apply only to the request that invokes them; they do not become sticky submodes or replace the currently selected full/Daily profile. A named-agent request is valid for that request only and does not create a permanent named-agent mode.
+The parent first decides whether delegation materially improves speed, context efficiency, or execution quality. If not, work directly.
 
-## Progressive specialist dispatch
+When delegation helps, use `pantheon_worker` for bounded execution such as:
 
-The parent first decides whether delegation adds material value. If it does, select one best specialist first and stop when that result is sufficient. Add another specialist only for a specific unresolved need, genuinely independent workstream, or material verification requirement. Every additional specialist must earn its place. Do not create a complexity swarm.
+- repository or local-system exploration;
+- external/reference research using tools available to the child;
+- scoped implementation, refactoring, or bug fixing;
+- focused tests, builds, reproduction, or other execution evidence.
 
-Full Pantheon has no Daily-style numeric specialist ceiling. That is permission to spend included capacity when the marginal quality or confidence gain is real, not permission to duplicate work or create speculative fan-out.
+Do not create role theater. Repository discovery and implementation may be one cohesive Luna assignment when that avoids an unnecessary extra call. Do not simulate the old Explorer, Librarian, Oracle, Fixer, Designer, Reviewer, or Verifier pipeline with multiple identical workers.
 
-Use the smallest matching role:
+Astra retains planning, architecture, tradeoff decisions, prioritization, integration, code review, final verification judgment, and the final merge/release verdict. A Luna worker may gather evidence for those decisions but does not replace Astra's judgment.
 
-- Known scoped change → `pantheon_fixer`.
-- Unknown repository path or ownership → `pantheon_explorer`.
-- Unknown external documentation or reference → `pantheon_librarian`.
-- Unresolved architecture or tradeoff → `pantheon_oracle`.
-- UI/UX or interaction work → `pantheon_designer`.
-- Static correctness, diff, security, or regression review → `pantheon_reviewer`.
-- Executable tests, builds, reproduction, or acceptance evidence → `pantheon_verifier`.
+## Full-Pantheon delegation intensity
 
-Explorer is not a Fixer preflight: when the target is known, Fixer can inspect it directly. Use Oracle only when architecture or a material tradeoff remains unresolved. Team mode is the independent-workstream exception.
+Full Pantheon may use multiple Luna workers when the marginal value is real. Parallel workers are allowed only for genuinely independent workstreams with clear, non-overlapping ownership. Sequential additional workers require a concrete unresolved execution or evidence need.
 
-For ordinary implementation, the independent check defaults to Reviewer or Verifier based on risk. Use both only when material risk requires both static and runtime evidence; never make Fixer → Reviewer → Verifier the default sequence.
+There is no numeric worker ceiling in full Pantheon, but every call must earn its place. Do not duplicate assignments, ask multiple workers for the same opinion, or fan out merely because a task looks complex.
+
+Pantheon v0.5 intentionally has no fast/normal/deep effort layer. **Daily and full Pantheon are the two delegation-intensity controls.**
 
 ## Native child context and bounded assignments
 
-Use native child spawning and default every child to `fork_turns: "none"`. Give each child a self-contained, bounded assignment with the objective, relevant scope, constraints and known context, write permission, expected evidence/output, stopping condition, and a direct instruction not to spawn subagents.
+Every child spawn defaults to `fork_turns: "none"`. Give the worker a self-contained, bounded assignment containing the objective, relevant scope, constraints and known context, whether writes are authorized, expected evidence/output, stopping condition, and a direct instruction not to spawn subagents.
 
-Do not inherit context merely because it is available. Use the minimum supported inheritance only when a genuine parent dependency requires it. The sole special exception is a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default. Keep every child bounded and keep mission ownership in the parent.
+Do not inherit context merely because it is available. Use the minimum supported inheritance only when a genuine parent dependency requires it. The sole exception is a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default.
 
-## Effort
-
-Effort applies to full Pantheon and changes orchestration depth, not the roster:
-
-- Activating full Pantheon while inactive without an effort instruction selects `normal`.
-- Switching from Daily to full Pantheon without an effort instruction selects `normal`.
-- Say “Use deep orchestration for this task” alongside activation, or say “switch Pantheon to fast,” “use normal Pantheon effort,” or “switch Pantheon to deep” while full Pantheon is active.
-- The selected effort persists through ordinary follow-ups and a repeated bare `$pantheon` while full Pantheon is active. It changes only when the user selects another effort, switches to Daily, or disables Pantheon.
-- `fast` strongly prefers zero or one specialist; `normal` balances delegation and independent evidence; `deep` allows additional sequential research/checks within the same bounded routing rules.
-
-Pantheon Daily is a separate routing profile rather than an effort level. Its skill defines its own quota-conscious dispatch ceiling.
+For research, planning support, or review support, explicitly make the assignment read-only. For implementation, authorize only the required files/scope. The worker remains bounded either way.
 
 ## Completion and evidence
 
-Reconcile child findings against evidence, never treat agreement as verification, and stop once the objective is answered with sufficient evidence. Ask for independent review or verification only when the risk warrants it.
+Reconcile worker output against observable evidence and stop once the user objective is satisfied. Agreement is not verification. The parent may run checks directly or delegate focused execution evidence to Luna, but Astra owns the final interpretation and verdict.
 
-Repository tests prove packaged policy/configuration and lifecycle behavior. They do not prove live Codex backend, provider, runtime, quota behavior, billing, or native child-spawn availability.
+Repository tests prove packaged policy/configuration, migration, and lifecycle behavior. They do not prove live Codex backend, provider, model availability, quota behavior, billing, or native child-spawn behavior.

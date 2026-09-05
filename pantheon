@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="0.4.0"
+VERSION="0.5.0"
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 CODEX_HOME_DIR="${CODEX_HOME:-${HOME}/.codex}"
 AGENT_DEST_DIR="${CODEX_HOME_DIR}/agents"
@@ -13,6 +13,10 @@ START_MARKER='<!-- PANTHEON:START -->'
 END_MARKER='<!-- PANTHEON:END -->'
 
 AGENT_FILES=(
+  pantheon-worker.toml
+)
+
+LEGACY_AGENT_FILES=(
   pantheon-explorer.toml
   pantheon-librarian.toml
   pantheon-oracle.toml
@@ -27,6 +31,9 @@ SKILL_DIRS=(
   pantheon-daily
   pantheon-plan
   pantheon-review
+)
+
+LEGACY_SKILL_DIRS=(
   pantheon-team
 )
 
@@ -68,10 +75,18 @@ require_source_tree() {
     grep -q '^developer_instructions[[:space:]]*=' "${SCRIPT_DIR}/agents/${f}" || fail "Agent missing developer_instructions: agents/${f}"
   done
 
+  for f in "${LEGACY_AGENT_FILES[@]}"; do
+    [ ! -e "${SCRIPT_DIR}/agents/${f}" ] && [ ! -L "${SCRIPT_DIR}/agents/${f}" ] || fail "Legacy source agent must not exist in v${VERSION}: agents/${f}"
+  done
+
   for f in "${SKILL_DIRS[@]}"; do
     [ -f "${SCRIPT_DIR}/skills/${f}/SKILL.md" ] || fail "Missing source skill: skills/${f}/SKILL.md"
     grep -q '^name:' "${SCRIPT_DIR}/skills/${f}/SKILL.md" || fail "Skill missing name metadata: skills/${f}/SKILL.md"
     grep -q '^description:' "${SCRIPT_DIR}/skills/${f}/SKILL.md" || fail "Skill missing description metadata: skills/${f}/SKILL.md"
+  done
+
+  for f in "${LEGACY_SKILL_DIRS[@]}"; do
+    [ ! -e "${SCRIPT_DIR}/skills/${f}" ] && [ ! -L "${SCRIPT_DIR}/skills/${f}" ] || fail "Legacy source skill must not exist in v${VERSION}: skills/${f}"
   done
 }
 
@@ -170,10 +185,22 @@ copy_regular_file() {
   chmod 0644 "$dst" 2>/dev/null || true
 }
 
+remove_legacy_payload() {
+  local f
+  for f in "${LEGACY_AGENT_FILES[@]}"; do
+    rm -f "${AGENT_DEST_DIR}/${f}"
+  done
+  for f in "${LEGACY_SKILL_DIRS[@]}"; do
+    rm -rf "${SKILLS_DEST_ROOT}/${f}"
+  done
+}
+
 install_payload() {
   require_source_tree
   validate_marker_state
   mkdir -p "$AGENT_DEST_DIR" "$SKILLS_DEST_ROOT"
+
+  remove_legacy_payload
 
   local f dest
   for f in "${AGENT_FILES[@]}"; do
@@ -235,7 +262,7 @@ outside_block_contains_pantheon() {
     $0 == start { in_block=1; next }
     $0 == end { in_block=0; next }
     !in_block { print }
-  ' "$AGENTS_FILE" | grep -Eqi 'codex[[:space:]]+pantheon|\$pantheon|pantheon_(explorer|librarian|oracle|fixer|designer|reviewer|verifier)'
+  ' "$AGENTS_FILE" | grep -Eqi 'codex[[:space:]]+pantheon|\$pantheon|pantheon_(worker|explorer|librarian|oracle|fixer|designer|reviewer|verifier)'
 }
 
 find_codex() {
@@ -275,7 +302,7 @@ cmd_doctor() {
   fi
 
   say ""
-  say "Agents"
+  say "Agent"
   for f in "${AGENT_FILES[@]}"; do
     src="${SCRIPT_DIR}/agents/${f}"
     dst="${AGENT_DEST_DIR}/${f}"
@@ -292,6 +319,26 @@ cmd_doctor() {
       errors=$((errors + 1))
     fi
   done
+
+  say ""
+  say "Legacy cleanup"
+  for f in "${LEGACY_AGENT_FILES[@]}"; do
+    dst="${AGENT_DEST_DIR}/${f}"
+    if [ -e "$dst" ] || [ -L "$dst" ]; then
+      printf '✗ legacy Pantheon agent still installed: %s\n' "$f" >&2
+      errors=$((errors + 1))
+    fi
+  done
+  for f in "${LEGACY_SKILL_DIRS[@]}"; do
+    dst="${SKILLS_DEST_ROOT}/${f}"
+    if [ -e "$dst" ] || [ -L "$dst" ]; then
+      printf '✗ legacy Pantheon skill still installed: %s\n' "$f" >&2
+      errors=$((errors + 1))
+    fi
+  done
+  if [ "$errors" -eq 0 ]; then
+    ok "Legacy v0.4 agent/team payload absent"
+  fi
 
   say ""
   say "Skills"
@@ -363,11 +410,11 @@ cmd_uninstall() {
   validate_marker_state
 
   local f
-  for f in "${AGENT_FILES[@]}"; do
+  for f in "${AGENT_FILES[@]}" "${LEGACY_AGENT_FILES[@]}"; do
     rm -f "${AGENT_DEST_DIR}/${f}"
   done
 
-  for f in "${SKILL_DIRS[@]}"; do
+  for f in "${SKILL_DIRS[@]}" "${LEGACY_SKILL_DIRS[@]}"; do
     rm -rf "${SKILLS_DEST_ROOT}/${f}"
   done
 
