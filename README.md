@@ -21,17 +21,9 @@ Codex Pantheon is a slim, explicit, Codex-native orchestration layer for an Astr
 
 The custom agent names intentionally include `luna_` so the Codex app can show which Luna lane is running.
 
-```mermaid
-flowchart TD
-    U[You] --> A[GPT-6 Astra<br/>Orchestrator]
-    A -->|repository unknowns| E[luna_explorer<br/>Luna High · read-only]
-    A -->|external/reference unknowns| L[luna_librarian<br/>Luna High · read-only]
-    E -->|evidence| A
-    L -->|evidence| A
-    A -->|Astra creates implementation spec| F[luna_fixer<br/>Luna High · workspace-write]
-    F -->|changes + focused validation| A
-    A -->|review + final verification| U
-```
+<p align="center">
+  <img src="docs/pantheon.png" alt="Codex Pantheon v0.6 — Astra Orchestrator with Luna Explorer, Librarian, and Fixer" width="100%">
+</p>
 
 The core dependency is:
 
