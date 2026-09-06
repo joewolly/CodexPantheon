@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="0.5.0"
+VERSION="0.6.0"
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 CODEX_HOME_DIR="${CODEX_HOME:-${HOME}/.codex}"
 AGENT_DEST_DIR="${CODEX_HOME_DIR}/agents"
@@ -13,10 +13,13 @@ START_MARKER='<!-- PANTHEON:START -->'
 END_MARKER='<!-- PANTHEON:END -->'
 
 AGENT_FILES=(
-  pantheon-worker.toml
+  luna-explorer.toml
+  luna-librarian.toml
+  luna-fixer.toml
 )
 
 LEGACY_AGENT_FILES=(
+  pantheon-worker.toml
   pantheon-explorer.toml
   pantheon-librarian.toml
   pantheon-oracle.toml
@@ -262,7 +265,7 @@ outside_block_contains_pantheon() {
     $0 == start { in_block=1; next }
     $0 == end { in_block=0; next }
     !in_block { print }
-  ' "$AGENTS_FILE" | grep -Eqi 'codex[[:space:]]+pantheon|\$pantheon|pantheon_(worker|explorer|librarian|oracle|fixer|designer|reviewer|verifier)'
+  ' "$AGENTS_FILE" | grep -Eqi 'codex[[:space:]]+pantheon|\$pantheon|pantheon_(worker|explorer|librarian|oracle|fixer|designer|reviewer|verifier)|luna_(explorer|librarian|fixer)'
 }
 
 find_codex() {
@@ -302,7 +305,7 @@ cmd_doctor() {
   fi
 
   say ""
-  say "Agent"
+  say "Agents"
   for f in "${AGENT_FILES[@]}"; do
     src="${SCRIPT_DIR}/agents/${f}"
     dst="${AGENT_DEST_DIR}/${f}"
@@ -337,7 +340,7 @@ cmd_doctor() {
     fi
   done
   if [ "$errors" -eq 0 ]; then
-    ok "Legacy v0.4 agent/team payload absent"
+    ok "Legacy v0.4/v0.5 Pantheon payload absent"
   fi
 
   say ""

@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+## 0.6.0 — 2026-09-05
+
+### Added
+
+- Three named GPT-5.6 Luna High agents so running lanes are distinguishable in Codex: `luna_explorer`, `luna_librarian`, and `luna_fixer`.
+- Hard role boundaries adapted from the MIT-licensed `oh-my-opencode-slim` Orchestrator/Explorer/Librarian/Fixer model.
+- `THIRD_PARTY_NOTICES.md` with upstream attribution and license text.
+- Regression assertions for the complete evidence → Astra plan/specification → Fixer implementation → Astra review/verification dependency.
+
+### Changed
+
+- GPT-6 Astra is now explicitly prompted as an OMO-style workflow manager: understand, plan, schedule, delegate, reconcile, review, and verify; Astra is not the default implementation worker.
+- Explorer and Librarian are hard read-only evidence roles and cannot create the solution/implementation plan.
+- Fixer is the write-enabled implementation role and executes Astra's scoped specification rather than independently replanning or conducting broad research.
+- `$pantheon-daily` keeps the same ownership model as full Pantheon, removes the v0.5 `0-1` worker-call ceiling, forbids parallel child calls, and allows sequential research/exploration followed by Fixer when required.
+- Full `$pantheon` may parallelize genuinely independent read-only lanes and non-overlapping Fixer workstreams.
+- Install/update/bootstrap migrate v0.5 `pantheon-worker.toml` to the three named Luna agent files while preserving v0.4 cleanup behavior.
+
+### Removed
+
+- The generic `pantheon_worker` role and the preferred one-call explore → implement pattern that blurred planning versus execution ownership.
+
+### Not included
+
+- The OpenCode/Bun plugin runtime, TUI, background-job board, scheduler, or other OpenCode-specific machinery from `oh-my-opencode-slim`.
+- No Oracle, Designer, Reviewer, Verifier, Council, separate team mode, automatic activation, persistent state, quota meter, daemon, or custom orchestration runtime.
+
 ## 0.5.0 — 2026-09-05
 
 ### Added
