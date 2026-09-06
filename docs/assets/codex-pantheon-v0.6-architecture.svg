@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Codex Pantheon v0.6 architecture</title>
+  <desc id="desc">GPT-6 Astra orchestrates three GPT-5.6 Luna High specialists: Explorer, Librarian, and Fixer. Explorer and Librarian gather read-only evidence. Astra creates the plan. Fixer implements. Astra reviews and verifies.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07111f"/>
+      <stop offset="0.52" stop-color="#0a1324"/>
+      <stop offset="1" stop-color="#07101b"/>
+    </linearGradient>
+    <linearGradient id="astra" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#152a55"/>
+      <stop offset="1" stop-color="#10213f"/>
+    </linearGradient>
+    <linearGradient id="explorer" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a2735"/>
+      <stop offset="1" stop-color="#0d1d29"/>
+    </linearGradient>
+    <linearGradient id="librarian" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#23183f"/>
+      <stop offset="1" stop-color="#171529"/>
+    </linearGradient>
+    <linearGradient id="fixer" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a2213"/>
+      <stop offset="1" stop-color="#211710"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+    <filter id="glowBlue" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L12,6 L0,12 z" fill="#7faaf7"/>
+    </marker>
+    <style>
+      .sans { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .title { font-size: 64px; font-weight: 800; letter-spacing: 13px; fill: #f7fbff; }
+      .subtitle { font-size: 23px; font-weight: 600; letter-spacing: 5px; fill: #a9bedc; }
+      .eyebrow { font-size: 16px; font-weight: 800; letter-spacing: 4px; }
+      .cardTitle { font-size: 29px; font-weight: 800; letter-spacing: 4px; fill: #f7fbff; }
+      .cardSub { font-size: 17px; font-weight: 700; letter-spacing: 2.5px; }
+      .body { font-size: 18px; font-weight: 500; fill: #d7e0ec; }
+      .small { font-size: 15px; font-weight: 700; letter-spacing: 1.4px; }
+      .flow { font-size: 18px; font-weight: 800; letter-spacing: 2px; fill: #dbe8ff; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="250" cy="120" r="250" fill="#12315c" opacity="0.11"/>
+  <circle cx="1370" cy="735" r="300" fill="#31215d" opacity="0.08"/>
+  <path d="M80 188 H1520" stroke="#24425f" stroke-width="1" opacity="0.7"/>
+
+  <g class="sans" text-anchor="middle">
+    <text x="800" y="92" class="title">PANTHEON</text>
+    <text x="800" y="132" class="subtitle">CODEX-NATIVE ORCHESTRATION · v0.6</text>
+    <text x="800" y="168" font-size="19" font-weight="650" fill="#d5dfec">Astra = Orchestrator  ·  Luna = Explorer + Librarian + Fixer</text>
+  </g>
+
+  <!-- Astra -->
+  <g filter="url(#shadow)" class="sans">
+    <rect x="390" y="220" width="820" height="190" rx="28" fill="url(#astra)" stroke="#4da3ff" stroke-width="3"/>
+    <circle cx="510" cy="315" r="55" fill="#18366d" stroke="#73b8ff" stroke-width="2"/>
+    <path d="M510 260 L524 300 L564 315 L524 330 L510 370 L496 330 L456 315 L496 300 Z" fill="#a6c8ff" filter="url(#glowBlue)"/>
+    <text x="600" y="298" class="cardTitle" fill="#ffffff">ASTRA</text>
+    <text x="600" y="330" class="cardSub" fill="#73b8ff">GPT-6 · ORCHESTRATOR</text>
+    <line x1="780" y1="260" x2="780" y2="370" stroke="#35527b" stroke-width="1.5"/>
+    <text x="825" y="282" class="body">Understands the goal</text>
+    <text x="825" y="313" class="body">Plans and architects</text>
+    <text x="825" y="344" class="body">Delegates, reconciles, reviews, verifies</text>
+    <text x="825" y="375" class="body">Not the default implementation worker</text>
+  </g>
+
+  <g class="sans" text-anchor="middle">
+    <text x="800" y="456" class="eyebrow" fill="#88a6d4">SPECIALIST LANES</text>
+  </g>
+
+  <!-- connectors -->
+  <path d="M800 410 V475 H275 V508" fill="none" stroke="#6e92c7" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M800 410 V508" fill="none" stroke="#6e92c7" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M800 475 H1325 V508" fill="none" stroke="#6e92c7" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <!-- Explorer -->
+  <g filter="url(#shadow)" class="sans">
+    <rect x="85" y="520" width="390" height="235" rx="24" fill="url(#explorer)" stroke="#47d8ff" stroke-width="2.5"/>
+    <circle cx="140" cy="582" r="30" fill="#103b4e" stroke="#47d8ff" stroke-width="2"/>
+    <path d="M126 594 L134 570 L158 562 L150 586 L126 594 Z" fill="none" stroke="#75e6ff" stroke-width="4"/>
+    <circle cx="142" cy="578" r="5" fill="#75e6ff"/>
+    <text x="190" y="568" class="cardTitle" font-size="24">LUNA EXPLORER</text>
+    <text x="190" y="596" class="cardSub" fill="#67e1ff">REPOSITORY RECONNAISSANCE</text>
+    <text x="120" y="641" class="body">• Finds files, symbols, execution paths</text>
+    <text x="120" y="673" class="body">• Maps behavior and ownership</text>
+    <text x="120" y="705" class="body">• Returns code evidence to Astra</text>
+    <rect x="117" y="722" width="150" height="30" rx="15" fill="#102d3b" stroke="#47d8ff"/>
+    <text x="192" y="742" text-anchor="middle" class="small" fill="#79e9ff">LUNA HIGH</text>
+    <rect x="280" y="722" width="150" height="30" rx="15" fill="#102d3b" stroke="#47d8ff"/>
+    <text x="355" y="742" text-anchor="middle" class="small" fill="#79e9ff">READ-ONLY</text>
+  </g>
+
+  <!-- Librarian -->
+  <g filter="url(#shadow)" class="sans">
+    <rect x="605" y="520" width="390" height="235" rx="24" fill="url(#librarian)" stroke="#b485ff" stroke-width="2.5"/>
+    <circle cx="660" cy="582" r="30" fill="#2d1d4b" stroke="#b485ff" stroke-width="2"/>
+    <path d="M644 568 Q658 563 670 571 V596 Q658 588 644 594 Z M676 571 Q688 563 702 568 V594 Q688 588 676 596 Z" fill="#c9a7ff"/>
+    <text x="710" y="568" class="cardTitle" font-size="24">LUNA LIBRARIAN</text>
+    <text x="710" y="596" class="cardSub" fill="#c29aff">RESEARCH &amp; REFERENCES</text>
+    <text x="640" y="641" class="body">• Researches docs, APIs, upstream behavior</text>
+    <text x="640" y="673" class="body">• Finds authoritative references</text>
+    <text x="640" y="705" class="body">• Returns external evidence to Astra</text>
+    <rect x="637" y="722" width="150" height="30" rx="15" fill="#271a40" stroke="#b485ff"/>
+    <text x="712" y="742" text-anchor="middle" class="small" fill="#d1b6ff">LUNA HIGH</text>
+    <rect x="800" y="722" width="150" height="30" rx="15" fill="#271a40" stroke="#b485ff"/>
+    <text x="875" y="742" text-anchor="middle" class="small" fill="#d1b6ff">READ-ONLY</text>
+  </g>
+
+  <!-- Fixer -->
+  <g filter="url(#shadow)" class="sans">
+    <rect x="1125" y="520" width="390" height="235" rx="24" fill="url(#fixer)" stroke="#ff9b4b" stroke-width="2.5"/>
+    <circle cx="1180" cy="582" r="30" fill="#4a2a15" stroke="#ff9b4b" stroke-width="2"/>
+    <path d="M1170 568 L1156 582 L1170 596 M1190 568 L1204 582 L1190 596 M1185 562 L1176 602" fill="none" stroke="#ffb06d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="1230" y="568" class="cardTitle" font-size="24">LUNA FIXER</text>
+    <text x="1230" y="596" class="cardSub" fill="#ffb06d">IMPLEMENTATION</text>
+    <text x="1160" y="641" class="body">• Receives Astra's scoped specification</text>
+    <text x="1160" y="673" class="body">• Implements the requested change</text>
+    <text x="1160" y="705" class="body">• Runs assigned focused validation</text>
+    <rect x="1157" y="722" width="150" height="30" rx="15" fill="#3b2415" stroke="#ff9b4b"/>
+    <text x="1232" y="742" text-anchor="middle" class="small" fill="#ffc18d">LUNA HIGH</text>
+    <rect x="1320" y="722" width="150" height="30" rx="15" fill="#3b2415" stroke="#ff9b4b"/>
+    <text x="1395" y="742" text-anchor="middle" class="small" fill="#ffc18d">WORKSPACE-WRITE</text>
+  </g>
+
+  <!-- workflow footer -->
+  <g class="sans">
+    <rect x="130" y="796" width="1340" height="66" rx="20" fill="#0b1828" stroke="#294665" stroke-width="1.5"/>
+    <text x="230" y="835" class="flow">EVIDENCE</text>
+    <path d="M340 829 H455" stroke="#668bbd" stroke-width="3" marker-end="url(#arrow)"/>
+    <text x="500" y="835" class="flow">ASTRA PLAN</text>
+    <path d="M650 829 H765" stroke="#668bbd" stroke-width="3" marker-end="url(#arrow)"/>
+    <text x="810" y="835" class="flow">FIXER IMPLEMENTS</text>
+    <path d="M1030 829 H1145" stroke="#668bbd" stroke-width="3" marker-end="url(#arrow)"/>
+    <text x="1190" y="835" class="flow">ASTRA REVIEWS + VERIFIES</text>
+  </g>
+</svg>
