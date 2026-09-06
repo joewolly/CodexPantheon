@@ -81,7 +81,7 @@ for marker in \
   '`luna_librarian`' \
   '`luna_fixer`' \
   "Explorer/Librarian evidence when needed" \
-  "Astra then synthesizes the returned evidence and creates the implementation plan before calling `luna_fixer`" \
+  'Astra then synthesizes the returned evidence and creates the implementation plan before calling `luna_fixer`' \
   "Do not use Explorer/Librarian for reconnaissance and then have Astra take over substantive implementation" \
   "There is no numeric worker-call ceiling" \
   "no parallel child calls" \
@@ -124,9 +124,9 @@ assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "no numeric worker-call c
 assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "do not parallelize child agents in Daily"
 assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "Astra plan → Fixer → Astra review"
 assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "Astra owns the plan"
-assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "Do **not** use `luna_fixer`"
+assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" 'Do **not** use `luna_fixer`'
 assert_contains "$ROOT/skills/pantheon-review/SKILL.md" "Astra performs the actual review and owns the verdict"
-assert_contains "$ROOT/skills/pantheon-review/SKILL.md" "Do not use `luna_fixer` during a review-only request"
+assert_contains "$ROOT/skills/pantheon-review/SKILL.md" 'Do not use `luna_fixer` during a review-only request'
 pass "four skills preserve strict plan/evidence/implementation/review ownership"
 
 TMP="$(mktemp -d)"
