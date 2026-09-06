@@ -1,103 +1,98 @@
 <p align="center">
-  <img src="docs/codex-pantheon-banner.png" alt="Codex Pantheon — Astra + Luna Slim" width="100%">
+  <img src="docs/codex-pantheon-banner.png" alt="Codex Pantheon" width="100%">
 </p>
-Codex Pantheon is a slim, explicit, Codex-native delegation layer for an Astra-led Codex session.
-Pantheon v0.5 has two roles:
 
-- **GPT-6 Astra — main thread / orchestrator.** Plans, decides, integrates, reviews, validates the final result, and talks to you.
-- **GPT-5.6 Luna — `pantheon_worker`.** Explores, researches, implements, fixes, and runs focused validation when Astra delegates bounded work.
+# Codex Pantheon
 
-> **Astra thinks. Luna does. Pantheon controls how much Luna Astra is allowed to use.**
+Codex Pantheon is a slim, explicit, Codex-native orchestration layer for an Astra-led Codex session.
 
-Astra is not installed as a Pantheon subagent. It remains your selected main Codex model. Pantheon installs exactly one custom child-agent definition: `pantheon_worker`.
+**v0.6 ports the core Orchestrator → Explorer/Librarian/Fixer behavior of [oh-my-opencode-slim](https://github.com/alvinunreal/oh-my-opencode-slim) onto Codex-native agents while preserving Pantheon's thread-scoped on/off switch.** It does not embed or depend on the OpenCode plugin runtime.
 
-![Codex Pantheon v0.5 — Astra + Luna Slim architecture](docs/codex-pantheon-v0.5.png)
+> **Astra decides. Luna specialists execute their lane.**
 
-## v0.5.0 — Astra + Luna Slim
+**Astra = Orchestrator. Luna = Explorer + Librarian + Fixer.**
 
-v0.5 is the architecture simplification release:
+## Architecture
 
-- collapses the seven v0.4 specialist subagents into one universal Luna worker;
-- keeps Astra in the main thread instead of creating an orchestrator child;
-- makes `$pantheon-daily` the conservative day-to-day profile: normally 0-1 Luna calls and no parallel workers;
-- makes `$pantheon` the higher-intensity profile: multiple Luna calls are allowed when useful, including parallel workers for genuinely independent workstreams;
-- keeps planning, architecture, integration, review, and final verification judgment with Astra;
-- removes the old Fixer/Explorer/Librarian/Oracle/Designer/Reviewer/Verifier routing ceremony;
-- removes the redundant `$pantheon-team` workflow because full Pantheon already owns justified parallelism;
-- removes fast/normal/deep effort levels: **Daily and full Pantheon are now the two intensity controls**;
-- preserves explicit activation, thread-local state, bounded child context, and solo-by-default Codex behavior;
-- automatically removes the old v0.4 Pantheon-owned agent files and `pantheon-team` skill on install/update.
+- **GPT-6 Astra — main thread / Orchestrator.** Understands the request, gathers evidence when needed, makes architecture and product decisions, creates the implementation specification, delegates, reconciles, reviews, verifies, and owns the final answer.
+- **GPT-5.6 Luna High — `luna_explorer`.** Read-only repository reconnaissance. Finds files, symbols, execution paths, ownership, and code evidence. It does not design the solution.
+- **GPT-5.6 Luna High — `luna_librarian`.** Read-only documentation/API/upstream/reference research. It does not design the solution.
+- **GPT-5.6 Luna High — `luna_fixer`.** Write-enabled implementation specialist. Executes Astra's scoped implementation specification and assigned validation. It does not independently replan or redesign the mission.
 
-See [the v0.5 release notes](docs/V0.5.0.md) and [design doctrine](docs/DESIGN_DOCTRINE.md).
+The custom agent names intentionally include `luna_` so the Codex app can show which Luna lane is running.
+
+```mermaid
+flowchart TD
+    U[You] --> A[GPT-6 Astra<br/>Orchestrator]
+    A -->|repository unknowns| E[luna_explorer<br/>Luna High · read-only]
+    A -->|external/reference unknowns| L[luna_librarian<br/>Luna High · read-only]
+    E -->|evidence| A
+    L -->|evidence| A
+    A -->|Astra creates implementation spec| F[luna_fixer<br/>Luna High · workspace-write]
+    F -->|changes + focused validation| A
+    A -->|review + final verification| U
+```
+
+The core dependency is:
+
+```text
+Explorer/Librarian evidence → Astra plan/specification → Fixer implementation → Astra review/verification
+```
+
+Astra may directly handle one isolated, clear, low-risk action when delegation would cost more than execution. It is **not** the default implementation worker for substantive work.
 
 ## Operating profiles
 
-| Profile | Activation | What happens |
+| Profile | Activation | Behavior |
 | --- | --- | --- |
-| Ordinary Codex | default | No Pantheon delegation. Astra/main thread works normally. |
-| Pantheon Daily | `$pantheon-daily` | Conservative delegation. Zero Luna calls is fine; normally 0-1 call per request; no parallel workers. |
-| Full Pantheon | `$pantheon` | Higher-intensity delegation. Astra may use multiple Luna workers and parallelize genuinely independent workstreams. |
+| Ordinary Codex | default | Pantheon does nothing; normal Codex behavior |
+| Pantheon Daily | `$pantheon-daily` | Same role ownership, conservative delegation, no parallel child calls |
+| Full Pantheon | `$pantheon` | Same role ownership, more aggressive specialist use and justified parallelism |
 
-Both Pantheon profiles are sticky only inside the current thread. Invoke the other profile to switch. Say `stop using Pantheon` to return to ordinary Codex. Nothing persists across threads.
-
-Installation, discussion, documentation, `doctor`, and other Pantheon lifecycle work do **not** activate orchestration. Pantheon is used only when you explicitly select it.
+Both Pantheon profiles are sticky only inside the current thread. Invoke the other profile to switch. Say `Stop using Pantheon.` to return to ordinary Codex. Nothing persists across threads.
 
 ### Pantheon Daily
 
-```text
-$pantheon-daily
+Daily protects usage by changing **how readily Astra delegates**, not by changing who owns planning or implementation. There is no numeric worker-call ceiling.
 
-Implement the settings change and run the focused tests.
+Known implementation:
+
+```text
+Astra plan → Luna Fixer → Astra review
 ```
 
-Daily is designed to stretch usage. Astra should do cheap, well-understood work directly and call Luna only when delegation materially saves context, exploration time, implementation work, or execution effort. Prefer one cohesive Luna assignment over multiple specialist-style handoffs.
+Unknown implementation:
+
+```text
+Luna Explorer and/or Librarian → Astra plan → Luna Fixer → Astra review
+```
+
+Daily never parallelizes children, but a necessary sequential research/exploration pass followed by Fixer is valid. It must not burn a single allowed call on reconnaissance and then make Astra implement the substantive change; the old v0.5 `0-1` rule is gone.
 
 ### Full Pantheon
 
-```text
-$pantheon
+Full Pantheon uses the same ownership boundaries with fewer delegation constraints. Astra may parallelize independent Explorer/Librarian lanes and may use multiple Fixers only when write ownership is clearly non-overlapping.
 
-Implement the storage migration. Split independent server/client work only if parallel Luna workers materially help.
-```
-
-Full Pantheon uses the same Astra/Luna architecture with fewer delegation constraints. Parallelism belongs here; there is no separate team mode.
-
-## The worker
-
-Pantheon installs one agent file:
-
-| Agent | Model | Reasoning | Permission posture | Purpose |
-| --- | --- | --- | --- | --- |
-| `pantheon_worker` | `gpt-5.6-luna` | `high` | Workspace-write, but read-only unless the assignment explicitly authorizes edits | Repository exploration, reference research, implementation, fixes, focused validation/evidence |
-
-The worker does **not** orchestrate, recursively spawn subagents, own architecture, perform the parent's final review, or issue the final merge/release verdict.
-
-Because the same Luna worker can explore and then implement within one bounded assignment, Pantheon no longer needs separate Explorer → Fixer transitions. That is the main v0.5 efficiency win.
+There is no `$pantheon-team`, no fast/normal/deep layer, and no Oracle/Designer/Reviewer/Verifier child roster.
 
 ## Request-scoped workflows
-
-Two focused workflows remain:
 
 ```text
 $pantheon-plan Plan the migration without implementing it.
 $pantheon-review Review this branch against main and give me a merge verdict.
 ```
 
-`$pantheon-plan` keeps planning with Astra and may use Luna only for read-only evidence gathering. `$pantheon-review` keeps the actual review/verdict with Astra and may use Luna for bounded evidence such as repository mapping, authoritative references, tests, builds, or reproduction.
+`$pantheon-plan` keeps the plan with Astra and may use only read-only Explorer/Librarian evidence. Fixer is not used.
 
-These workflows do not activate a sticky Pantheon profile by themselves. After the request, any previously active Daily/full profile resumes.
+`$pantheon-review` keeps the review and verdict with Astra and may use only read-only Explorer/Librarian evidence. A review-only request does not use Fixer or modify production source.
 
-You can also explicitly request the worker for one bounded request:
+These workflows do not activate a sticky Pantheon profile by themselves.
 
-```text
-Use Pantheon Worker to map the authentication flow. Do not change files.
-```
+## Context discipline
 
-## Context efficiency
+Every Pantheon child spawn defaults to native `fork_turns: "none"` with a self-contained bounded assignment. Inherit only the minimum supported context required by a genuine dependency. Full-history inheritance is never the default.
 
-Every Pantheon child spawn defaults to native `fork_turns: "none"` with a self-contained assignment. Inherit only the minimum supported context required by a genuine parent dependency, with an inherited-fork exception only when no inheritance would make a required dynamic tool unavailable. Full-history inheritance is never the default.
-
-Every Luna assignment should include the objective, scope, relevant constraints/context, write permission, expected evidence/output, stopping condition, and an instruction not to spawn subagents.
+Every assignment names the objective, scope, relevant constraints/context, permission boundary, expected evidence/output, stopping condition, and a prohibition on spawning subagents.
 
 ## Install with Codex
 
@@ -113,7 +108,7 @@ The repository instructions direct Codex to run:
 ./pantheon bootstrap
 ```
 
-This is a lifecycle request and leaves Pantheon mode OFF.
+That installs/updates Pantheon-owned files and runs `doctor`. It does **not** activate Pantheon mode.
 
 ### Manual install/update
 
@@ -128,21 +123,16 @@ or:
 ./pantheon doctor
 ```
 
-After pulling a newer source package:
+Pantheon v0.6 installs:
 
-```bash
-./pantheon update
-./pantheon doctor
-```
+- `${CODEX_HOME:-~/.codex}/agents/luna-explorer.toml`
+- `${CODEX_HOME:-~/.codex}/agents/luna-librarian.toml`
+- `${CODEX_HOME:-~/.codex}/agents/luna-fixer.toml`
+- the `pantheon`, `pantheon-daily`, `pantheon-plan`, and `pantheon-review` skills
+- one managed policy block in `${CODEX_HOME:-~/.codex}/AGENTS.md`
+- `${CODEX_HOME:-~/.codex}/.pantheon-version`
 
-Pantheon installs:
-
-- `pantheon-worker.toml` into `${CODEX_HOME:-~/.codex}/agents/`;
-- the `pantheon`, `pantheon-daily`, `pantheon-plan`, and `pantheon-review` skills into `${PANTHEON_SKILLS_HOME:-~/.agents/skills}`;
-- one managed policy block into `${CODEX_HOME:-~/.codex}/AGENTS.md`;
-- `${CODEX_HOME:-~/.codex}/.pantheon-version`.
-
-Updating from v0.4 automatically removes Pantheon's old seven agent files and the old `pantheon-team` skill. Other agent names, skills, and text outside Pantheon's managed markers remain user-owned.
+Updating removes Pantheon's v0.5 `pantheon-worker.toml`, the older v0.4 specialist files, and the old `pantheon-team` skill. Unrelated Codex agents, skills, and text outside the managed markers remain user-owned.
 
 ## Doctor
 
@@ -150,9 +140,7 @@ Updating from v0.4 automatically removes Pantheon's old seven agent files and th
 ./pantheon doctor
 ```
 
-Doctor is read-only. It checks the v0.5 source package, installed version, the single Luna worker, all four workflow skills, absence of the v0.4 legacy payload, the managed policy block, possible unmanaged Pantheon text, and Codex executable discovery.
-
-Doctor validates static installation integrity, not live model/provider availability or a real child spawn.
+Doctor is read-only. It checks source/package integrity, all three named Luna agents, the four skills, legacy cleanup, managed policy drift, and Codex executable discovery. It does not prove live model/provider availability or a successful native child spawn.
 
 ## Uninstall
 
@@ -160,7 +148,7 @@ Doctor validates static installation integrity, not live model/provider availabi
 ./pantheon uninstall
 ```
 
-Uninstall removes current Pantheon-owned files **and** legacy v0.4 Pantheon-owned agent/team paths while preserving unrelated Codex configuration.
+Uninstall removes current and legacy Pantheon-owned paths while preserving unrelated Codex configuration.
 
 ## Documentation
 
@@ -168,15 +156,16 @@ Uninstall removes current Pantheon-owned files **and** legacy v0.4 Pantheon-owne
 - [Codex-assisted install guide](docs/CODEX_INSTALL.md)
 - [CLI reference](docs/CLI_REFERENCE.md)
 - [Design doctrine](docs/DESIGN_DOCTRINE.md)
-- [v0.5 release notes](docs/V0.5.0.md)
+- [v0.6 release notes](docs/V0.6.0.md)
+- [Third-party notices](THIRD_PARTY_NOTICES.md)
 - [Changelog](CHANGELOG.md)
 
 ## What Pantheon intentionally does not do
 
-Core Pantheon has no automatic prompt interception, proactive activation, recursive agent tree, custom orchestration runtime, persistent mission database, token/quota meter, scheduler, daemon, dashboard, agent marketplace, or hidden cross-thread state.
+Core Pantheon has no automatic prompt interception, proactive activation, recursive agent tree, custom orchestration runtime, persistent mission database, token/quota meter, scheduler, daemon, dashboard, or hidden cross-thread state.
 
 > Enhance Codex. Don't replace it.
 
 ## License
 
-Codex Pantheon is available under the [MIT License](LICENSE).
+Codex Pantheon is available under the [MIT License](LICENSE). Portions of the v0.6 role/routing semantics are adapted from the MIT-licensed `oh-my-opencode-slim`; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

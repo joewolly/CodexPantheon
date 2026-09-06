@@ -1,6 +1,6 @@
 # Install Codex Pantheon with Codex
 
-Pantheon v0.5.0 bootstraps through an ordinary Codex workspace. No separate orchestration runtime is required.
+Pantheon v0.6.0 bootstraps through an ordinary Codex workspace. No separate orchestration runtime is required.
 
 ## Recommended flow
 
@@ -12,9 +12,9 @@ Pantheon v0.5.0 bootstraps through an ordinary Codex workspace. No separate orch
    Install Codex Pantheon for me.
    ```
 
-This is a lifecycle request and **does not activate Pantheon orchestration**. `$pantheon` explicitly activates full Pantheon; `$pantheon-daily` explicitly activates Daily.
+This lifecycle request does **not** activate Pantheon. `$pantheon` activates full Pantheon; `$pantheon-daily` activates Daily.
 
-The repository `AGENTS.md` tells Codex to execute:
+The repository `AGENTS.md` tells Codex to run:
 
 ```bash
 ./pantheon bootstrap
@@ -22,23 +22,27 @@ The repository `AGENTS.md` tells Codex to execute:
 
 `bootstrap` installs or updates Pantheon-owned files and immediately runs `doctor`.
 
-## What v0.5 installs
+## What v0.6 installs
 
 Pantheon owns these current paths:
 
-- `${CODEX_HOME:-~/.codex}/agents/pantheon-worker.toml`;
-- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon/`;
-- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-daily/`;
-- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-plan/`;
-- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-review/`;
-- the marked Pantheon block in `${CODEX_HOME:-~/.codex}/AGENTS.md`;
-- `${CODEX_HOME:-~/.codex}/.pantheon-version`.
+- `${CODEX_HOME:-~/.codex}/agents/luna-explorer.toml`
+- `${CODEX_HOME:-~/.codex}/agents/luna-librarian.toml`
+- `${CODEX_HOME:-~/.codex}/agents/luna-fixer.toml`
+- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon/`
+- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-daily/`
+- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-plan/`
+- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-review/`
+- the marked Pantheon block in `${CODEX_HOME:-~/.codex}/AGENTS.md`
+- `${CODEX_HOME:-~/.codex}/.pantheon-version`
 
-Same-named current Pantheon paths are replaced on install/update and removed on uninstall. Pantheon does not back them up.
+Same-named Pantheon paths are replaced on install/update and removed on uninstall.
 
-## v0.4 migration cleanup
+## v0.5 migration cleanup
 
-v0.5 intentionally removes these Pantheon-owned legacy agent files during install/update/uninstall:
+v0.6 removes the former v0.5 `${CODEX_HOME:-~/.codex}/agents/pantheon-worker.toml` during install/update/bootstrap/uninstall.
+
+It also continues to remove Pantheon's older v0.4 owned agent filenames:
 
 - `pantheon-explorer.toml`
 - `pantheon-librarian.toml`
@@ -48,13 +52,13 @@ v0.5 intentionally removes these Pantheon-owned legacy agent files during instal
 - `pantheon-reviewer.toml`
 - `pantheon-verifier.toml`
 
-It also removes the legacy `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-team/` skill. Full `$pantheon` now owns justified parallel Luna work directly.
+and the legacy `pantheon-team` skill directory.
 
-If you placed unrelated personal content at one of those exact Pantheon-owned legacy paths, move it before updating. Other agent names, other skills, and text outside Pantheon's managed markers remain user-owned.
+If you placed unrelated personal content at one of those exact Pantheon-owned legacy paths, move it before updating. Other agent names, skills, and text outside Pantheon's managed markers remain user-owned.
 
 ## Architecture note
 
-Astra is the intended main Codex model; it is not installed by Pantheon. The only Pantheon child definition is `pantheon_worker`, pinned to GPT-5.6 Luna High. Pantheon does not automatically change the main model.
+Astra is the intended main Codex model and is not installed by Pantheon. The three child definitions are `luna_explorer`, `luna_librarian`, and `luna_fixer`, all pinned to GPT-5.6 Luna High. Explorer/Librarian are read-only; Fixer is workspace-write.
 
 ## Fail-closed behavior
 
@@ -63,14 +67,3 @@ If Pantheon detects malformed/duplicate managed markers, a protected `AGENTS.md`
 ## Evidence boundary
 
 Repository tests validate packaged policy/configuration, migration logic, and lifecycle safeguards. `doctor` validates static installed state. Neither proves live Codex backend/provider behavior, model availability, quota use, billing, or successful native child spawning.
-
-## Other natural-language lifecycle requests
-
-```text
-Update Pantheon for me.
-Repair my Pantheon installation.
-Check whether Pantheon is installed correctly.
-Uninstall Pantheon.
-```
-
-Install/update/repair use `./pantheon bootstrap`; verification uses `./pantheon doctor`; uninstall runs only on an explicit removal request. None of these activates Pantheon unless the user separately asks to use a Pantheon profile.
