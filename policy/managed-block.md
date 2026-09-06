@@ -21,6 +21,8 @@ For substantive work use these lanes:
 
 ### Routing invariant
 
+Canonical dependency: **Explorer/Librarian evidence when needed → Astra plan/specification → Fixer implementation → Astra review/verification.**
+
 - If Astra already has enough evidence, Astra creates the implementation plan/specification and delegates non-trivial implementation to `luna_fixer`.
 - If evidence is missing, delegate the bounded unknown to `luna_explorer` and/or `luna_librarian`; Astra then synthesizes the returned evidence and creates the implementation plan before calling `luna_fixer`.
 - Do not use Explorer/Librarian for reconnaissance and then have Astra take over substantive implementation merely because their findings made the work clearer.

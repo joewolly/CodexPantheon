@@ -10,6 +10,8 @@ Codex Pantheon is a slim, explicit, Codex-native orchestration layer for an Astr
 
 > **Astra decides. Luna specialists execute their lane.**
 
+**Astra = Orchestrator. Luna = Explorer + Librarian + Fixer.**
+
 ## Architecture
 
 - **GPT-6 Astra — main thread / Orchestrator.** Understands the request, gathers evidence when needed, makes architecture and product decisions, creates the implementation specification, delegates, reconciles, reviews, verifies, and owns the final answer.
