@@ -12,6 +12,10 @@ Codex Pantheon is a slim, explicit, Codex-native orchestration layer for an Astr
 
 **Astra = Orchestrator. Luna = Explorer + Librarian + Fixer.**
 
+<p align="center">
+  <img src="docs/pantheon.png" alt="Codex Pantheon v0.6 — Astra Orchestrator with Luna Explorer, Librarian, and Fixer" width="100%">
+</p>
+
 ## Architecture
 
 - **GPT-6 Astra — main thread / Orchestrator.** Understands the request, gathers evidence when needed, makes architecture and product decisions, creates the implementation specification, delegates, reconciles, reviews, verifies, and owns the final answer.
@@ -20,11 +24,6 @@ Codex Pantheon is a slim, explicit, Codex-native orchestration layer for an Astr
 - **GPT-5.6 Luna High — `luna_fixer`.** Write-enabled implementation specialist. Executes Astra's scoped implementation specification and assigned validation. It does not independently replan or redesign the mission.
 
 The custom agent names intentionally include `luna_` so the Codex app can show which Luna lane is running.
-
-<p align="center">
-  <img src="docs/pantheon.png" alt="Codex Pantheon v0.6 — Astra Orchestrator with Luna Explorer, Librarian, and Fixer" width="100%">
-</p>
-
 The core dependency is:
 
 ```text
