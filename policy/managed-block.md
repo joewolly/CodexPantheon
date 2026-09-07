@@ -19,6 +19,16 @@ For substantive work use these lanes:
 - `luna_librarian` — read-only external/reference research. Finds authoritative docs, APIs, upstream behavior, standards, and examples. It does not plan the solution.
 - `luna_fixer` — write-enabled implementation. It receives Astra's scoped implementation specification, implements it, and runs assigned focused validation. It does not independently redesign or replan the mission.
 
+### Visible child task identity
+
+Every Astra child spawn must set a role-prefixed `task_name` so the Codex app is glanceable without inferring the worker lane from its activity text:
+
+- Explorer: `luna_explorer_<specific_assignment>`
+- Librarian: `luna_librarian_<specific_assignment>`
+- Fixer: `luna_fixer_<specific_assignment>`
+
+Use lowercase snake_case because the current Codex `task_name` contract accepts lowercase letters, digits, and underscores. The suffix must describe the concrete bounded assignment, such as `luna_explorer_trace_guest_lifecycle`, not a generic label such as `physics_evidence`, `research`, or `implementation`. Concurrent workers in the same lane must use distinct assignment suffixes. Astra remains the main thread and must not be spawned merely to create an `Astra` child card.
+
 ### Routing invariant
 
 Canonical dependency: **Explorer/Librarian evidence when needed → Astra plan/specification → Fixer implementation → Astra review/verification.**
