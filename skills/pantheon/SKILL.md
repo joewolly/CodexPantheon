@@ -65,6 +65,14 @@ If Fixer discovers evidence that materially contradicts Astra's plan or requires
 
 Every child spawn defaults to `fork_turns: "none"`. Give each specialist a self-contained, bounded assignment containing the objective, relevant scope, constraints and known context, permission boundary, expected evidence/output, stopping condition, and a direct instruction not to spawn subagents.
 
+Every child spawn must also set a role-prefixed `task_name`:
+
+- `luna_explorer_<specific_assignment>` for Explorer;
+- `luna_librarian_<specific_assignment>` for Librarian;
+- `luna_fixer_<specific_assignment>` for Fixer.
+
+Use lowercase letters, digits, and underscores only, matching Codex's current `task_name` contract. The assignment suffix must be concrete and concise enough to identify the work at a glance. Prefer `luna_explorer_trace_guest_lifecycle` over `physics_evidence`; prefer `luna_fixer_repair_guest_creation` over `implementation`. If multiple workers share a lane, give each a distinct suffix. The intended human reading is `Luna Explorer · Trace guest lifecycle`, `Luna Librarian · Research API behavior`, or `Luna Fixer · Repair guest creation`, even though the current native spawn field is snake_case. Astra stays the main thread and is not spawned as a display-only child.
+
 Do not inherit context merely because it is available. Use the minimum supported inheritance only when a genuine parent dependency requires it. The sole exception is a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default.
 
 Full Pantheon may parallelize genuinely independent lanes, but it must not duplicate work, overlap write ownership, create role theater, or manufacture a swarm.
