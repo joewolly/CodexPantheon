@@ -1,12 +1,13 @@
 # Releasing Codex Pantheon
 
-This checklist keeps the source package, installed payload, documentation, migration behavior, and release metadata aligned.
+This checklist keeps the source package, installed payload, documentation, migration behavior, platform frontends, and release metadata aligned.
 
 ## 1. Confirm scope and state
 
 - Start from the intended base branch and fetch current remote state.
 - Confirm only intended release changes are present.
 - Review user-visible behavior, compatibility, install/update migration, and uninstall behavior.
+- Confirm the Bash and PowerShell frontends still consume one shared payload rather than platform-specific copies.
 
 ## 2. Synchronize the version
 
@@ -14,7 +15,8 @@ Update:
 
 - `VERSION`
 - the `VERSION` constant in `pantheon`
-- version-specific expectations in `tests/test.sh`
+- the `$Version` constant in `pantheon.ps1`
+- version-specific expectations in `tests/test.sh` and `tests/test.ps1`
 - `CHANGELOG.md`
 - the README current-release summary
 - a milestone note such as `docs/Vx.y.z.md` for material releases
@@ -36,6 +38,7 @@ For v0.6+, inspect all of these when routing or role ownership changes:
 - repository `AGENTS.md`
 - `README.md` and relevant docs
 - `tests/test.sh`
+- `tests/test.ps1`
 
 Confirm the core invariants:
 
@@ -55,7 +58,7 @@ When adapting additional `oh-my-opencode-slim` prompt/routing material, keep `TH
 
 ## 5. Validate
 
-Run:
+macOS/Linux:
 
 ```bash
 ./tests/test.sh
@@ -63,7 +66,15 @@ bash -n pantheon install.sh tests/test.sh
 git diff --check
 ```
 
-The regression suite exercises install, update, doctor, bootstrap, migration cleanup, and uninstall with isolated temporary homes. Live model/subagent behavior must be verified separately when a release depends on it.
+Windows PowerShell:
+
+```powershell
+.\tests\test.ps1
+```
+
+The GitHub Actions matrix must pass both the Linux lifecycle job and the Windows lifecycle job before release. The regression suites exercise install, update, doctor, bootstrap, migration cleanup, path defaults, user-owned configuration preservation, and uninstall with isolated temporary homes.
+
+Live model/subagent behavior must be verified separately when a release depends on it.
 
 ## 6. Publish separately
 
