@@ -8,6 +8,7 @@ Keep Pantheon slim, explicit, and Codex-native.
 - Preserve the v0.6 orchestration architecture: GPT-6 Astra remains the main-thread orchestrator; `luna_explorer`, `luna_librarian`, and `luna_fixer` are the only Pantheon child roles.
 - Astra owns planning, architecture, product/tradeoff decisions, prioritization, integration, review, final verification judgment, and the final response. Astra is not the default implementation worker.
 - Luna Explorer and Librarian are read-only evidence specialists. Luna Fixer implements Astra's scoped specification and must not independently redesign or replan the mission.
+- Every Astra child spawn must use a role-prefixed `task_name`: `luna_explorer_<assignment>`, `luna_librarian_<assignment>`, or `luna_fixer_<assignment>`. The assignment suffix must be concrete, concise, and unique enough to distinguish concurrent work; generic task names that omit the Luna lane are not acceptable.
 - For non-trivial implementation, preserve the dependency chain: Explorer/Librarian evidence when needed → Astra plan/specification → Fixer implementation → Astra review/verification.
 - Keep Daily and full Pantheon as the only delegation-intensity profiles. Daily may delegate less and does not parallelize children, but it must not alter role ownership or impose a numeric worker-call ceiling.
 - Preserve user-owned Codex configuration outside Pantheon-managed files/markers.
