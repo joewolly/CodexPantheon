@@ -80,6 +80,9 @@ for marker in \
   '`luna_explorer`' \
   '`luna_librarian`' \
   '`luna_fixer`' \
+  'luna_explorer_<specific_assignment>' \
+  'luna_librarian_<specific_assignment>' \
+  'luna_fixer_<specific_assignment>' \
   "Explorer/Librarian evidence when needed" \
   'Astra then synthesizes the returned evidence and creates the implementation plan before calling `luna_fixer`' \
   "Do not use Explorer/Librarian for reconnaissance and then have Astra take over substantive implementation" \
@@ -101,7 +104,7 @@ for obsolete in \
   'pantheon_verifier'; do
   assert_not_contains "$POLICY" "$obsolete"
 done
-pass "managed policy encodes OMO-style Astra orchestration and named Luna lanes"
+pass "managed policy encodes OMO-style Astra orchestration, named Luna lanes, and visible task identity"
 
 for skill in pantheon pantheon-daily pantheon-plan pantheon-review; do
   skill_file="$ROOT/skills/$skill/SKILL.md"
@@ -109,6 +112,9 @@ for skill in pantheon pantheon-daily pantheon-plan pantheon-review; do
   assert_contains "$skill_file" 'fork_turns: "none"'
   assert_contains "$skill_file" "self-contained"
   assert_contains "$skill_file" "bounded"
+  assert_contains "$skill_file" 'role-prefixed `task_name`'
+  assert_contains "$skill_file" 'luna_explorer_<specific_assignment>'
+  assert_contains "$skill_file" 'luna_librarian_<specific_assignment>'
   assert_contains "$skill_file" "Do not inherit context merely because it is available"
   assert_contains "$skill_file" "minimum supported inheritance"
   assert_contains "$skill_file" "required dynamic tool unavailable"
@@ -116,6 +122,8 @@ for skill in pantheon pantheon-daily pantheon-plan pantheon-review; do
   assert_contains "$skill_file" "not to spawn subagents"
   assert_contains "$skill_file" "Repository tests prove packaged policy/configuration"
 done
+assert_contains "$ROOT/skills/pantheon/SKILL.md" 'luna_fixer_<specific_assignment>'
+assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" 'luna_fixer_<specific_assignment>'
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "Astra is **not the default implementation worker**"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "Explorer/Librarian evidence → Astra plan/specification → Fixer implementation → Astra review/verification"
 assert_contains "$ROOT/skills/pantheon/SKILL.md" "multiple Fixers may run in parallel only with clear non-overlapping write ownership"
@@ -127,7 +135,7 @@ assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "Astra owns the plan"
 assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" 'Do **not** use `luna_fixer`'
 assert_contains "$ROOT/skills/pantheon-review/SKILL.md" "Astra performs the actual review and owns the verdict"
 assert_contains "$ROOT/skills/pantheon-review/SKILL.md" 'Do not use `luna_fixer` during a review-only request'
-pass "four skills preserve strict plan/evidence/implementation/review ownership"
+pass "four skills preserve strict ownership and role-prefixed task identity"
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
@@ -171,6 +179,9 @@ for skill in pantheon pantheon-daily pantheon-plan pantheon-review; do
 done
 assert_contains "$CODEX_HOME/AGENTS.md" "Astra is not the default implementation worker"
 assert_contains "$CODEX_HOME/AGENTS.md" "There is no numeric worker-call ceiling"
+assert_contains "$CODEX_HOME/AGENTS.md" 'luna_explorer_<specific_assignment>'
+assert_contains "$CODEX_HOME/AGENTS.md" 'luna_librarian_<specific_assignment>'
+assert_contains "$CODEX_HOME/AGENTS.md" 'luna_fixer_<specific_assignment>'
 pass "install migrates v0.4/v0.5 payload and preserves unrelated configuration"
 
 BEFORE="$(cksum "$CODEX_HOME/AGENTS.md")"
@@ -286,14 +297,17 @@ assert_contains "$BOOT_OUT" "Status: HEALTHY"
 pass "bootstrap performs migration-aware install/update plus doctor idempotently"
 
 assert_contains "$ROOT/AGENTS.md" "Preserve the v0.6 orchestration architecture"
+assert_contains "$ROOT/AGENTS.md" 'role-prefixed `task_name`'
 assert_contains "$ROOT/README.md" "Astra = Orchestrator"
+assert_contains "$ROOT/README.md" "Glanceable subagent titles"
 assert_contains "$ROOT/docs/USER_GUIDE.md" "luna_explorer"
+assert_contains "$ROOT/docs/USER_GUIDE.md" "Context and visible task identity"
 assert_contains "$ROOT/docs/DESIGN_DOCTRINE.md" "Astra plans. Luna specialists execute their lane."
 assert_contains "$ROOT/docs/CODEX_INSTALL.md" "v0.5 migration cleanup"
 assert_contains "$ROOT/docs/CLI_REFERENCE.md" "luna-fixer.toml"
 assert_contains "$ROOT/docs/V0.6.0.md" "Orchestrator + three Luna specialists"
 assert_contains "$ROOT/CHANGELOG.md" "## 0.6.0 — 2026-09-05"
 assert_contains "$ROOT/THIRD_PARTY_NOTICES.md" "oh-my-opencode-slim"
-pass "v0.6 documentation matches the OMO-style Codex orchestration architecture"
+pass "v0.6 documentation matches the OMO-style Codex orchestration architecture and visible task contract"
 
 printf '1..%d\n' "$PASS"
