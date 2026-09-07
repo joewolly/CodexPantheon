@@ -23,7 +23,6 @@ Codex Pantheon is a slim, explicit, Codex-native orchestration layer for an Astr
 - **GPT-5.6 Luna High — `luna_librarian`.** Read-only documentation/API/upstream/reference research. It does not design the solution.
 - **GPT-5.6 Luna High — `luna_fixer`.** Write-enabled implementation specialist. Executes Astra's scoped implementation specification and assigned validation. It does not independently replan or redesign the mission.
 
-The custom agent names intentionally include `luna_` so the Codex app can show which Luna lane is running.
 The core dependency is:
 
 ```text
@@ -31,6 +30,26 @@ Explorer/Librarian evidence → Astra plan/specification → Fixer implementatio
 ```
 
 Astra may directly handle one isolated, clear, low-risk action when delegation would cost more than execution. It is **not** the default implementation worker for substantive work.
+
+### Glanceable subagent titles
+
+Pantheon requires Astra to encode the Luna lane into every child task name. The conceptual user-facing convention is:
+
+```text
+Luna Explorer · <specific assignment>
+Luna Librarian · <specific assignment>
+Luna Fixer · <specific assignment>
+```
+
+Codex's current native `task_name` field accepts lowercase letters, digits, and underscores, so Pantheon sends the enforceable equivalent:
+
+```text
+luna_explorer_trace_pve_guest_lifecycle
+luna_librarian_research_pve_api_behavior
+luna_fixer_repair_guest_creation_flow
+```
+
+This keeps the role visible on Codex surfaces that display or humanize the task name instead of forcing the user to infer the worker from a generic title such as `physics_evidence`. Multiple workers in the same lane must use distinct assignment suffixes. Astra remains the main thread and is never spawned merely to create an `Astra` child card.
 
 ## Operating profiles
 
@@ -83,7 +102,7 @@ These workflows do not activate a sticky Pantheon profile by themselves.
 
 Every Pantheon child spawn defaults to native `fork_turns: "none"` with a self-contained bounded assignment. Inherit only the minimum supported context required by a genuine dependency. Full-history inheritance is never the default.
 
-Every assignment names the objective, scope, relevant constraints/context, permission boundary, expected evidence/output, stopping condition, and a prohibition on spawning subagents.
+Every assignment names the objective, scope, relevant constraints/context, permission boundary, expected evidence/output, stopping condition, and a prohibition on spawning subagents. Every spawn also carries the role-prefixed task name described above.
 
 ## Install with Codex
 
