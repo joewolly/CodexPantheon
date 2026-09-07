@@ -298,8 +298,8 @@ function Test-OutsideBlockContainsPantheon {
 function Find-Codex {
     $commandInfo = Get-Command codex -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($null -ne $commandInfo) {
-        if (-not [string]::IsNullOrWhiteSpace($commandInfo.Source)) { return $commandInfo.Source }
-        if ($commandInfo.PSObject.Properties.Name -contains 'Path' -and -not [string]::IsNullOrWhiteSpace($commandInfo.Path)) { return $commandInfo.Path }
+        if ($commandInfo.PSObject.Properties.Name -contains 'Source' -and -not [string]::IsNullOrWhiteSpace([string]$commandInfo.Source)) { return $commandInfo.Source }
+        if ($commandInfo.PSObject.Properties.Name -contains 'Path' -and -not [string]::IsNullOrWhiteSpace([string]$commandInfo.Path)) { return $commandInfo.Path }
     }
 
     if ([string]::IsNullOrWhiteSpace($env:LOCALAPPDATA)) { return $null }
@@ -343,7 +343,7 @@ function Cmd-Bootstrap {
     $priorState = 'new installation'
     if ($null -ne (Get-PathItem $VersionFile) -or $null -ne (Get-PathItem $AgentsFile)) {
         $state = Get-MarkerState
-        if (Test-RegularFile $VersionFile -or $state.Starts -gt 0) { $priorState = 'existing/partial installation' }
+        if ((Test-RegularFile $VersionFile) -or $state.Starts -gt 0) { $priorState = 'existing/partial installation' }
     }
     Say "Codex Pantheon bootstrap ($priorState)"
     Install-Payload
@@ -362,7 +362,7 @@ function Cmd-Doctor {
     Say
     Say 'Core'
 
-    if (Test-RegularFile $VersionFile -and (Read-Text $VersionFile).Trim() -ceq $Version) {
+    if ((Test-RegularFile $VersionFile) -and (Read-Text $VersionFile).Trim() -ceq $Version) {
         Ok "Installed version marker: $Version"
     }
     else {
