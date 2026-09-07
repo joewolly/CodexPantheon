@@ -104,6 +104,15 @@ Every Pantheon child spawn defaults to native `fork_turns: "none"` with a self-c
 
 Every assignment names the objective, scope, relevant constraints/context, permission boundary, expected evidence/output, stopping condition, and a prohibition on spawning subagents. Every spawn also carries the role-prefixed task name described above.
 
+## Platform support
+
+Pantheon keeps one shared payload under `agents/`, `skills/`, and `policy/` and exposes platform-native lifecycle frontends:
+
+- **macOS/Linux:** Bash — `pantheon` and `install.sh`
+- **Windows:** PowerShell — `pantheon.ps1` and `install.ps1`
+
+Both frontends install the same Luna agents, the same four Pantheon skills, the same managed `AGENTS.md` block, and the same version marker. Windows support is native; WSL or Git Bash is not required for installation.
+
 ## Install with Codex
 
 Open the Pantheon source directory in Codex and ask:
@@ -112,15 +121,9 @@ Open the Pantheon source directory in Codex and ask:
 Install Codex Pantheon for me.
 ```
 
-The repository instructions direct Codex to run:
+The repository instructions direct Codex to run the platform-appropriate bootstrap command. Bootstrap installs/updates Pantheon-owned files and runs `doctor`. It does **not** activate Pantheon mode.
 
-```bash
-./pantheon bootstrap
-```
-
-That installs/updates Pantheon-owned files and runs `doctor`. It does **not** activate Pantheon mode.
-
-### Manual install/update
+### macOS/Linux
 
 ```bash
 ./pantheon bootstrap
@@ -133,29 +136,76 @@ or:
 ./pantheon doctor
 ```
 
-Pantheon v0.6 installs:
+The convenience installer is:
 
-- `${CODEX_HOME:-~/.codex}/agents/luna-explorer.toml`
+```bash
+./install.sh
+```
+
+### Windows
+
+From PowerShell:
+
+```powershell
+.\pantheon.ps1 bootstrap
+```
+
+or:
+
+```powershell
+.\pantheon.ps1 install
+.\pantheon.ps1 doctor
+```
+
+The convenience installer is:
+
+```powershell
+.\install.ps1
+```
+
+On Windows, the default locations are `%USERPROFILE%\.codex` and `%USERPROFILE%\.agents\skills`. `CODEX_HOME` and `PANTHEON_SKILLS_HOME` override those defaults on every platform.
+
+## Installed payload
+
+Pantheon installs:
+
+- `${CODEX_HOME:-~/.codex}/agents/luna-explorer.toml` (Windows equivalent: `%CODEX_HOME%\agents\luna-explorer.toml`)
 - `${CODEX_HOME:-~/.codex}/agents/luna-librarian.toml`
 - `${CODEX_HOME:-~/.codex}/agents/luna-fixer.toml`
 - the `pantheon`, `pantheon-daily`, `pantheon-plan`, and `pantheon-review` skills
-- one managed policy block in `${CODEX_HOME:-~/.codex}/AGENTS.md`
-- `${CODEX_HOME:-~/.codex}/.pantheon-version`
+- one managed policy block in `AGENTS.md` under the Codex home
+- `.pantheon-version` under the Codex home
 
 Updating removes Pantheon's v0.5 `pantheon-worker.toml`, the older v0.4 specialist files, and the old `pantheon-team` skill. Unrelated Codex agents, skills, and text outside the managed markers remain user-owned.
 
 ## Doctor
 
+macOS/Linux:
+
 ```bash
 ./pantheon doctor
 ```
 
-Doctor is read-only. It checks source/package integrity, all three named Luna agents, the four skills, legacy cleanup, managed policy drift, and Codex executable discovery. It does not prove live model/provider availability or a successful native child spawn.
+Windows:
+
+```powershell
+.\pantheon.ps1 doctor
+```
+
+Doctor is read-only. It checks source/package integrity, all three named Luna agents, the four skills, legacy cleanup, managed policy drift, and Codex executable discovery. The Windows frontend checks PATH plus native Codex app/standalone locations under `%LOCALAPPDATA%`. Doctor does not prove live model/provider availability or a successful native child spawn.
 
 ## Uninstall
 
+macOS/Linux:
+
 ```bash
 ./pantheon uninstall
+```
+
+Windows:
+
+```powershell
+.\pantheon.ps1 uninstall
 ```
 
 Uninstall removes current and legacy Pantheon-owned paths while preserving unrelated Codex configuration.
