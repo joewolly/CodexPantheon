@@ -1,24 +1,19 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [string]$Command = "help"
+    [string]$Command = 'help'
 )
 
 Set-StrictMode -Version Latest
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = 'Stop'
 
-$Version = "0.6.1"
+$Version = '0.6.0'
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $StartMarker = '<!-- PANTHEON:START -->'
 $EndMarker = '<!-- PANTHEON:END -->'
 $Utf8NoBom = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false
 
-$AgentFiles = @(
-    'luna-explorer.toml',
-    'luna-librarian.toml',
-    'luna-fixer.toml'
-)
-
+$AgentFiles = @('luna-explorer.toml', 'luna-librarian.toml', 'luna-fixer.toml')
 $LegacyAgentFiles = @(
     'pantheon-worker.toml',
     'pantheon-explorer.toml',
@@ -29,23 +24,12 @@ $LegacyAgentFiles = @(
     'pantheon-reviewer.toml',
     'pantheon-verifier.toml'
 )
-
-$SkillDirs = @(
-    'pantheon',
-    'pantheon-daily',
-    'pantheon-plan',
-    'pantheon-review'
-)
-
+$SkillDirs = @('pantheon', 'pantheon-daily', 'pantheon-plan', 'pantheon-review')
 $LegacySkillDirs = @('pantheon-team')
 
 function Resolve-UserHome {
-    if (-not [string]::IsNullOrWhiteSpace($env:USERPROFILE)) {
-        return $env:USERPROFILE
-    }
-    if (-not [string]::IsNullOrWhiteSpace($HOME)) {
-        return $HOME
-    }
+    if (-not [string]::IsNullOrWhiteSpace($env:USERPROFILE)) { return $env:USERPROFILE }
+    if (-not [string]::IsNullOrWhiteSpace($HOME)) { return $HOME }
     throw 'Unable to resolve the current user profile directory.'
 }
 
@@ -57,25 +41,13 @@ $AgentsFile = Join-Path $CodexHomeDir 'AGENTS.md'
 $VersionFile = Join-Path $CodexHomeDir '.pantheon-version'
 $BlockFile = Join-Path (Join-Path $ScriptDir 'policy') 'managed-block.md'
 
-function Say([string]$Message = '') {
-    Write-Output $Message
-}
-
-function Ok([string]$Message) {
-    Write-Output "✓ $Message"
-}
-
-function Warn([string]$Message) {
-    [Console]::Error.WriteLine("! $Message")
-}
-
-function Fail([string]$Message) {
-    [Console]::Error.WriteLine("✗ $Message")
-    exit 1
-}
+function Say([string]$Message = '') { Write-Output $Message }
+function Ok([string]$Message) { Write-Output "✓ $Message" }
+function Warn([string]$Message) { [Console]::Error.WriteLine("! $Message") }
+function Fail([string]$Message) { [Console]::Error.WriteLine("✗ $Message"); exit 1 }
 
 function Get-UsageText {
-    return @"
+    @"
 Codex Pantheon $Version
 
 Usage:
@@ -95,40 +67,39 @@ Environment:
 
 function Get-PathItem([string]$Path) {
     try {
-        return Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+        Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+        return
     }
     catch {
         $parent = Split-Path -Parent $Path
         $leaf = Split-Path -Leaf $Path
         if (-not [string]::IsNullOrWhiteSpace($parent) -and (Test-Path -LiteralPath $parent -PathType Container)) {
-            return Get-ChildItem -LiteralPath $parent -Force -ErrorAction SilentlyContinue |
+            Get-ChildItem -LiteralPath $parent -Force -ErrorAction SilentlyContinue |
                 Where-Object { $_.Name -ceq $leaf } |
                 Select-Object -First 1
         }
-        return $null
     }
 }
 
-function Test-ReparsePointItem($Item) {
+function Test-ReparsePoint($Item) {
     if ($null -eq $Item) { return $false }
-    return (($Item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0)
+    (($Item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0)
 }
 
 function Test-RegularFile([string]$Path) {
     $item = Get-PathItem $Path
-    return ($null -ne $item -and -not $item.PSIsContainer -and -not (Test-ReparsePointItem $item))
+    ($null -ne $item -and -not $item.PSIsContainer -and -not (Test-ReparsePoint $item))
 }
 
 function Test-RegularDirectory([string]$Path) {
     $item = Get-PathItem $Path
-    return ($null -ne $item -and $item.PSIsContainer -and -not (Test-ReparsePointItem $item))
+    ($null -ne $item -and $item.PSIsContainer -and -not (Test-ReparsePoint $item))
 }
 
-function Remove-PathSafely([string]$Path) {
+function Remove-OwnedPath([string]$Path) {
     $item = Get-PathItem $Path
     if ($null -eq $item) { return }
-
-    if (Test-ReparsePointItem $item) {
+    if (Test-ReparsePoint $item) {
         Remove-Item -LiteralPath $Path -Force
     }
     else {
@@ -136,9 +107,7 @@ function Remove-PathSafely([string]$Path) {
     }
 }
 
-function Read-Text([string]$Path) {
-    return [System.IO.File]::ReadAllText($Path)
-}
+function Read-Text([string]$Path) { [System.IO.File]::ReadAllText($Path) }
 
 function Write-Utf8NoBom([string]$Path, [string]$Text) {
     $parent = Split-Path -Parent $Path
@@ -153,20 +122,10 @@ function Write-TextAtomic([string]$Path, [string]$Text) {
     if (-not (Test-Path -LiteralPath $parent -PathType Container)) {
         New-Item -ItemType Directory -Path $parent -Force | Out-Null
     }
-
     $temp = Join-Path $parent ('.pantheon-' + [Guid]::NewGuid().ToString('N') + '.tmp')
     try {
         Write-Utf8NoBom $temp $Text
-        $existing = Get-PathItem $Path
-        if ($null -eq $existing) {
-            Move-Item -LiteralPath $temp -Destination $Path
-        }
-        else {
-            if ($existing.PSIsContainer -or (Test-ReparsePointItem $existing)) {
-                throw "Refusing to replace non-regular path: $Path"
-            }
-            [System.IO.File]::Replace($temp, $Path, $null)
-        }
+        Move-Item -LiteralPath $temp -Destination $Path -Force
     }
     finally {
         if ($null -ne (Get-PathItem $temp)) {
@@ -175,31 +134,31 @@ function Write-TextAtomic([string]$Path, [string]$Text) {
     }
 }
 
-function Get-MarkerCount([string]$Marker, [string]$Path) {
-    if (-not (Test-RegularFile $Path)) { return 0 }
-    $lines = @([System.IO.File]::ReadAllLines($Path))
-    return @($lines | Where-Object { $_ -ceq $Marker }).Count
-}
-
-function Validate-MarkerState {
+function Get-MarkerState {
     $item = Get-PathItem $AgentsFile
-    if ($null -eq $item) { return }
+    if ($null -eq $item) {
+        return [PSCustomObject]@{ Lines = @(); Starts = 0; Ends = 0; StartIndex = -1; EndIndex = -1 }
+    }
     if ($item.PSIsContainer) { Fail "$AgentsFile exists but is not a regular file. Refusing to modify it." }
-    if (Test-ReparsePointItem $item) { Fail "$AgentsFile is a reparse point. Refusing to modify it." }
+    if (Test-ReparsePoint $item) { Fail "$AgentsFile is a reparse point. Refusing to modify it." }
 
     $lines = @([System.IO.File]::ReadAllLines($AgentsFile))
     $starts = @($lines | Where-Object { $_ -ceq $StartMarker }).Count
     $ends = @($lines | Where-Object { $_ -ceq $EndMarker }).Count
-    if ($starts -ne $ends -or $starts -gt 1) {
+    $startIndex = if ($starts -eq 1) { [Array]::IndexOf($lines, $StartMarker) } else { -1 }
+    $endIndex = if ($ends -eq 1) { [Array]::IndexOf($lines, $EndMarker) } else { -1 }
+    [PSCustomObject]@{ Lines = $lines; Starts = $starts; Ends = $ends; StartIndex = $startIndex; EndIndex = $endIndex }
+}
+
+function Validate-MarkerState {
+    $state = Get-MarkerState
+    if ($state.Starts -ne $state.Ends -or $state.Starts -gt 1) {
         Fail "Malformed or duplicate Pantheon markers in $AgentsFile. Fix them manually before install/update/uninstall."
     }
-    if ($starts -eq 1) {
-        $startIndex = [Array]::IndexOf($lines, $StartMarker)
-        $endIndex = [Array]::IndexOf($lines, $EndMarker)
-        if ($startIndex -lt 0 -or $endIndex -le $startIndex) {
-            Fail "Malformed Pantheon marker order in $AgentsFile. Fix it manually before install/update/uninstall."
-        }
+    if ($state.Starts -eq 1 -and $state.EndIndex -le $state.StartIndex) {
+        Fail "Malformed Pantheon marker order in $AgentsFile. Fix it manually before install/update/uninstall."
     }
+    $state
 }
 
 function Require-SourceTree {
@@ -218,8 +177,9 @@ function Require-SourceTree {
     }
 
     foreach ($file in $LegacyAgentFiles) {
-        $path = Join-Path (Join-Path $ScriptDir 'agents') $file
-        if ($null -ne (Get-PathItem $path)) { Fail "Legacy source agent must not exist in v$Version`: agents/$file" }
+        if ($null -ne (Get-PathItem (Join-Path (Join-Path $ScriptDir 'agents') $file))) {
+            Fail "Legacy source agent must not exist in v${Version}: agents/$file"
+        }
     }
 
     foreach ($skill in $SkillDirs) {
@@ -233,13 +193,14 @@ function Require-SourceTree {
     }
 
     foreach ($skill in $LegacySkillDirs) {
-        $path = Join-Path (Join-Path $ScriptDir 'skills') $skill
-        if ($null -ne (Get-PathItem $path)) { Fail "Legacy source skill must not exist in v$Version`: skills/$skill" }
+        if ($null -ne (Get-PathItem (Join-Path (Join-Path $ScriptDir 'skills') $skill))) {
+            Fail "Legacy source skill must not exist in v${Version}: skills/$skill"
+        }
     }
 }
 
 function Replace-OrAppendBlock {
-    Validate-MarkerState
+    $state = Validate-MarkerState
     New-Item -ItemType Directory -Path $CodexHomeDir -Force | Out-Null
 
     if ($null -eq (Get-PathItem $AgentsFile)) {
@@ -249,10 +210,7 @@ function Replace-OrAppendBlock {
 
     $newline = [Environment]::NewLine
     $blockLines = @([System.IO.File]::ReadAllLines($BlockFile))
-    $lines = @([System.IO.File]::ReadAllLines($AgentsFile))
-    $starts = @($lines | Where-Object { $_ -ceq $StartMarker }).Count
-
-    if ($starts -eq 0) {
+    if ($state.Starts -eq 0) {
         $existing = Read-Text $AgentsFile
         $block = $blockLines -join $newline
         $text = if ($existing.Length -gt 0) { $existing + $newline + $block + $newline } else { $block + $newline }
@@ -260,69 +218,53 @@ function Replace-OrAppendBlock {
         return
     }
 
-    $startIndex = [Array]::IndexOf($lines, $StartMarker)
-    $endIndex = [Array]::IndexOf($lines, $EndMarker)
     $output = New-Object 'System.Collections.Generic.List[string]'
-
-    for ($i = 0; $i -lt $startIndex; $i++) { $output.Add($lines[$i]) }
+    for ($i = 0; $i -lt $state.StartIndex; $i++) { $output.Add($state.Lines[$i]) }
     foreach ($line in $blockLines) { $output.Add($line) }
-    for ($i = $endIndex + 1; $i -lt $lines.Count; $i++) { $output.Add($lines[$i]) }
-
+    for ($i = $state.EndIndex + 1; $i -lt $state.Lines.Count; $i++) { $output.Add($state.Lines[$i]) }
     Write-TextAtomic $AgentsFile (($output -join $newline) + $newline)
 }
 
 function Remove-ManagedBlock {
-    Validate-MarkerState
-    if (-not (Test-RegularFile $AgentsFile)) { return }
+    $state = Validate-MarkerState
+    if ($state.Starts -ne 1) { return }
 
-    $lines = @([System.IO.File]::ReadAllLines($AgentsFile))
-    if (@($lines | Where-Object { $_ -ceq $StartMarker }).Count -ne 1) { return }
-
-    $startIndex = [Array]::IndexOf($lines, $StartMarker)
-    $endIndex = [Array]::IndexOf($lines, $EndMarker)
     $output = New-Object 'System.Collections.Generic.List[string]'
-    for ($i = 0; $i -lt $startIndex; $i++) { $output.Add($lines[$i]) }
-    for ($i = $endIndex + 1; $i -lt $lines.Count; $i++) { $output.Add($lines[$i]) }
+    for ($i = 0; $i -lt $state.StartIndex; $i++) { $output.Add($state.Lines[$i]) }
+    for ($i = $state.EndIndex + 1; $i -lt $state.Lines.Count; $i++) { $output.Add($state.Lines[$i]) }
 
     $remaining = $output -join [Environment]::NewLine
     if ($remaining -match '\S') {
         Write-TextAtomic $AgentsFile ($remaining + [Environment]::NewLine)
     }
     else {
-        Remove-Item -LiteralPath $AgentsFile -Force
+        Remove-OwnedPath $AgentsFile
     }
-}
-
-function Copy-RegularFile([string]$Source, [string]$Destination) {
-    Remove-PathSafely $Destination
-    Copy-Item -LiteralPath $Source -Destination $Destination
 }
 
 function Remove-LegacyPayload {
-    foreach ($file in $LegacyAgentFiles) {
-        Remove-PathSafely (Join-Path $AgentDestDir $file)
-    }
-    foreach ($skill in $LegacySkillDirs) {
-        Remove-PathSafely (Join-Path $SkillsDestRoot $skill)
-    }
+    foreach ($file in $LegacyAgentFiles) { Remove-OwnedPath (Join-Path $AgentDestDir $file) }
+    foreach ($skill in $LegacySkillDirs) { Remove-OwnedPath (Join-Path $SkillsDestRoot $skill) }
 }
 
 function Install-Payload {
     Require-SourceTree
-    Validate-MarkerState
+    Validate-MarkerState | Out-Null
     New-Item -ItemType Directory -Path $AgentDestDir -Force | Out-Null
     New-Item -ItemType Directory -Path $SkillsDestRoot -Force | Out-Null
-
     Remove-LegacyPayload
 
     foreach ($file in $AgentFiles) {
-        Copy-RegularFile (Join-Path (Join-Path $ScriptDir 'agents') $file) (Join-Path $AgentDestDir $file)
+        $source = Join-Path (Join-Path $ScriptDir 'agents') $file
+        $destination = Join-Path $AgentDestDir $file
+        Remove-OwnedPath $destination
+        Copy-Item -LiteralPath $source -Destination $destination
     }
 
     foreach ($skill in $SkillDirs) {
         $source = Join-Path (Join-Path $ScriptDir 'skills') $skill
         $destination = Join-Path $SkillsDestRoot $skill
-        Remove-PathSafely $destination
+        Remove-OwnedPath $destination
         Copy-Item -LiteralPath $source -Destination $SkillsDestRoot -Recurse
     }
 
@@ -332,72 +274,57 @@ function Install-Payload {
 
 function Test-FilesEqual([string]$Left, [string]$Right) {
     if (-not (Test-RegularFile $Left) -or -not (Test-RegularFile $Right)) { return $false }
-    return (Get-FileHash -LiteralPath $Left -Algorithm SHA256).Hash -ceq (Get-FileHash -LiteralPath $Right -Algorithm SHA256).Hash
-}
-
-function Get-InstalledManagedBlockLines {
-    if (-not (Test-RegularFile $AgentsFile)) { return @() }
-    $lines = @([System.IO.File]::ReadAllLines($AgentsFile))
-    $startIndex = [Array]::IndexOf($lines, $StartMarker)
-    $endIndex = [Array]::IndexOf($lines, $EndMarker)
-    if ($startIndex -lt 0 -or $endIndex -lt $startIndex) { return @() }
-    return @($lines[$startIndex..$endIndex])
+    (Get-FileHash -LiteralPath $Left -Algorithm SHA256).Hash -ceq (Get-FileHash -LiteralPath $Right -Algorithm SHA256).Hash
 }
 
 function Test-ManagedBlockMatches {
-    $sourceLines = @([System.IO.File]::ReadAllLines($BlockFile))
-    $installedLines = @(Get-InstalledManagedBlockLines)
-    return (($sourceLines -join "`n") -ceq ($installedLines -join "`n"))
+    $state = Get-MarkerState
+    if ($state.Starts -ne 1 -or $state.Ends -ne 1 -or $state.EndIndex -le $state.StartIndex) { return $false }
+    $installed = @($state.Lines[$state.StartIndex..$state.EndIndex])
+    $source = @([System.IO.File]::ReadAllLines($BlockFile))
+    (($installed -join "`n") -ceq ($source -join "`n"))
 }
 
 function Test-OutsideBlockContainsPantheon {
-    if (-not (Test-RegularFile $AgentsFile)) { return $false }
-    $lines = @([System.IO.File]::ReadAllLines($AgentsFile))
-    $startIndex = [Array]::IndexOf($lines, $StartMarker)
-    $endIndex = [Array]::IndexOf($lines, $EndMarker)
+    $state = Get-MarkerState
     $outside = New-Object 'System.Collections.Generic.List[string]'
-
-    for ($i = 0; $i -lt $lines.Count; $i++) {
-        if ($startIndex -ge 0 -and $i -ge $startIndex -and $i -le $endIndex) { continue }
-        $outside.Add($lines[$i])
+    for ($i = 0; $i -lt $state.Lines.Count; $i++) {
+        if ($state.Starts -eq 1 -and $i -ge $state.StartIndex -and $i -le $state.EndIndex) { continue }
+        $outside.Add($state.Lines[$i])
     }
-
-    $text = $outside -join "`n"
-    return [regex]::IsMatch($text, '(?i)codex\s+pantheon|\$pantheon|pantheon_(worker|explorer|librarian|oracle|fixer|designer|reviewer|verifier)|luna_(explorer|librarian|fixer)')
+    [regex]::IsMatch(($outside -join "`n"), '(?i)codex\s+pantheon|\$pantheon|pantheon_(worker|explorer|librarian|oracle|fixer|designer|reviewer|verifier)|luna_(explorer|librarian|fixer)')
 }
 
 function Find-Codex {
-    $commandInfo = Get-Command -Name @('codex.exe', 'codex.cmd', 'codex') -ErrorAction SilentlyContinue | Select-Object -First 1
+    $commandInfo = Get-Command codex -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($null -ne $commandInfo) {
         if (-not [string]::IsNullOrWhiteSpace($commandInfo.Source)) { return $commandInfo.Source }
         if ($commandInfo.PSObject.Properties.Name -contains 'Path' -and -not [string]::IsNullOrWhiteSpace($commandInfo.Path)) { return $commandInfo.Path }
     }
 
-    if (-not [string]::IsNullOrWhiteSpace($env:LOCALAPPDATA)) {
-        $candidates = @(
-            (Join-Path $env:LOCALAPPDATA 'Programs\OpenAI\Codex\bin\codex.exe'),
-            (Join-Path $env:LOCALAPPDATA 'OpenAI\Codex\bin\codex.exe'),
-            (Join-Path $env:LOCALAPPDATA 'Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\OpenAI\Codex\bin\codex.exe')
-        )
-        foreach ($candidate in $candidates) {
-            if (Test-Path -LiteralPath $candidate -PathType Leaf) { return $candidate }
-        }
+    if ([string]::IsNullOrWhiteSpace($env:LOCALAPPDATA)) { return $null }
 
-        $runtimeRoots = @(
-            (Join-Path $env:LOCALAPPDATA 'OpenAI\Codex\bin'),
-            (Join-Path $env:LOCALAPPDATA 'Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\OpenAI\Codex\bin')
-        )
-        foreach ($root in $runtimeRoots) {
-            if (-not (Test-Path -LiteralPath $root -PathType Container)) { continue }
-            $dirs = Get-ChildItem -LiteralPath $root -Directory -Force -ErrorAction SilentlyContinue | Sort-Object LastWriteTimeUtc -Descending
-            foreach ($dir in $dirs) {
-                $candidate = Join-Path $dir.FullName 'codex.exe'
-                if (Test-Path -LiteralPath $candidate -PathType Leaf) { return $candidate }
-            }
-        }
+    $candidates = @(
+        (Join-Path $env:LOCALAPPDATA 'Programs\OpenAI\Codex\bin\codex.exe'),
+        (Join-Path $env:LOCALAPPDATA 'OpenAI\Codex\bin\codex.exe'),
+        (Join-Path $env:LOCALAPPDATA 'Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\OpenAI\Codex\bin\codex.exe')
+    )
+    foreach ($candidate in $candidates) {
+        if (Test-Path -LiteralPath $candidate -PathType Leaf) { return $candidate }
     }
 
-    return $null
+    $roots = @(
+        (Join-Path $env:LOCALAPPDATA 'OpenAI\Codex\bin'),
+        (Join-Path $env:LOCALAPPDATA 'Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\OpenAI\Codex\bin')
+    )
+    foreach ($root in $roots) {
+        if (-not (Test-Path -LiteralPath $root -PathType Container)) { continue }
+        foreach ($dir in (Get-ChildItem -LiteralPath $root -Directory -Force -ErrorAction SilentlyContinue | Sort-Object LastWriteTimeUtc -Descending)) {
+            $candidate = Join-Path $dir.FullName 'codex.exe'
+            if (Test-Path -LiteralPath $candidate -PathType Leaf) { return $candidate }
+        }
+    }
+    $null
 }
 
 function Cmd-Install {
@@ -415,11 +342,9 @@ function Cmd-Update {
 function Cmd-Bootstrap {
     $priorState = 'new installation'
     if ($null -ne (Get-PathItem $VersionFile) -or $null -ne (Get-PathItem $AgentsFile)) {
-        if (Test-RegularFile $VersionFile -or (Get-MarkerCount $StartMarker $AgentsFile) -gt 0) {
-            $priorState = 'existing/partial installation'
-        }
+        $state = Get-MarkerState
+        if (Test-RegularFile $VersionFile -or $state.Starts -gt 0) { $priorState = 'existing/partial installation' }
     }
-
     Say "Codex Pantheon bootstrap ($priorState)"
     Install-Payload
     Say "Pantheon-owned files synchronized to v$Version."
@@ -429,14 +354,14 @@ function Cmd-Bootstrap {
 
 function Cmd-Doctor {
     Require-SourceTree
-
     $errors = 0
     $warnings = 0
+
     Say 'Codex Pantheon Doctor'
     Say "Version: $Version"
     Say
-
     Say 'Core'
+
     if (Test-RegularFile $VersionFile -and (Read-Text $VersionFile).Trim() -ceq $Version) {
         Ok "Installed version marker: $Version"
     }
@@ -448,13 +373,8 @@ function Cmd-Doctor {
     $codexBin = Find-Codex
     if ($null -ne $codexBin) {
         $codexVersion = ''
-        try {
-            $codexVersion = (& $codexBin --version 2>$null | Select-Object -First 1)
-        }
-        catch {
-            $codexVersion = ''
-        }
-        $suffix = if ([string]::IsNullOrWhiteSpace([string]$codexVersion)) { '' } else { " ($codexVersion)" }
+        try { $codexVersion = [string](& $codexBin --version 2>$null | Select-Object -First 1) } catch { $codexVersion = '' }
+        $suffix = if ([string]::IsNullOrWhiteSpace($codexVersion)) { '' } else { " ($codexVersion)" }
         Ok "Codex executable: $codexBin$suffix"
     }
     else {
@@ -468,7 +388,7 @@ function Cmd-Doctor {
         $source = Join-Path (Join-Path $ScriptDir 'agents') $file
         $destination = Join-Path $AgentDestDir $file
         $item = Get-PathItem $destination
-        if ($null -ne $item -and (Test-ReparsePointItem $item)) {
+        if ($null -ne $item -and (Test-ReparsePoint $item)) {
             [Console]::Error.WriteLine("✗ $file is a reparse point; Pantheon custom agents must be regular files")
             $errors++
         }
@@ -476,32 +396,23 @@ function Cmd-Doctor {
             [Console]::Error.WriteLine("✗ $file is missing")
             $errors++
         }
-        elseif (Test-FilesEqual $source $destination) {
-            Ok $file
-        }
-        else {
-            [Console]::Error.WriteLine("✗ $file differs from the v$Version source package")
-            $errors++
-        }
+        elseif (Test-FilesEqual $source $destination) { Ok $file }
+        else { [Console]::Error.WriteLine("✗ $file differs from the v$Version source package"); $errors++ }
     }
 
     Say
     Say 'Legacy cleanup'
     $legacyErrors = 0
     foreach ($file in $LegacyAgentFiles) {
-        $destination = Join-Path $AgentDestDir $file
-        if ($null -ne (Get-PathItem $destination)) {
+        if ($null -ne (Get-PathItem (Join-Path $AgentDestDir $file))) {
             [Console]::Error.WriteLine("✗ legacy Pantheon agent still installed: $file")
-            $errors++
-            $legacyErrors++
+            $errors++; $legacyErrors++
         }
     }
     foreach ($skill in $LegacySkillDirs) {
-        $destination = Join-Path $SkillsDestRoot $skill
-        if ($null -ne (Get-PathItem $destination)) {
+        if ($null -ne (Get-PathItem (Join-Path $SkillsDestRoot $skill))) {
             [Console]::Error.WriteLine("✗ legacy Pantheon skill still installed: $skill")
-            $errors++
-            $legacyErrors++
+            $errors++; $legacyErrors++
         }
     }
     if ($legacyErrors -eq 0) { Ok 'Legacy v0.4/v0.5 Pantheon payload absent' }
@@ -512,7 +423,7 @@ function Cmd-Doctor {
         $source = Join-Path (Join-Path (Join-Path $ScriptDir 'skills') $skill) 'SKILL.md'
         $destination = Join-Path (Join-Path $SkillsDestRoot $skill) 'SKILL.md'
         $item = Get-PathItem $destination
-        if ($null -ne $item -and (Test-ReparsePointItem $item)) {
+        if ($null -ne $item -and (Test-ReparsePoint $item)) {
             [Console]::Error.WriteLine("✗ $skill/SKILL.md is a reparse point")
             $errors++
         }
@@ -520,13 +431,8 @@ function Cmd-Doctor {
             [Console]::Error.WriteLine("✗ $skill is missing")
             $errors++
         }
-        elseif (Test-FilesEqual $source $destination) {
-            Ok $skill
-        }
-        else {
-            [Console]::Error.WriteLine("✗ $skill differs from the v$Version source package")
-            $errors++
-        }
+        elseif (Test-FilesEqual $source $destination) { Ok $skill }
+        else { [Console]::Error.WriteLine("✗ $skill differs from the v$Version source package"); $errors++ }
     }
 
     Say
@@ -536,30 +442,19 @@ function Cmd-Doctor {
         [Console]::Error.WriteLine("✗ $AgentsFile is missing")
         $errors++
     }
-    elseif (Test-ReparsePointItem $agentsItem) {
+    elseif (Test-ReparsePoint $agentsItem) {
         [Console]::Error.WriteLine("✗ $AgentsFile is a reparse point; Pantheon refuses to manage it")
         $errors++
     }
     else {
-        $starts = Get-MarkerCount $StartMarker $AgentsFile
-        $ends = Get-MarkerCount $EndMarker $AgentsFile
-        if ($starts -ne 1 -or $ends -ne 1) {
-            [Console]::Error.WriteLine('✗ Managed Pantheon marker pair is missing, malformed, or duplicated')
+        $state = Get-MarkerState
+        if ($state.Starts -ne 1 -or $state.Ends -ne 1 -or $state.EndIndex -le $state.StartIndex) {
+            [Console]::Error.WriteLine('✗ Managed Pantheon marker pair is missing, malformed, duplicated, or misordered')
             $errors++
         }
         else {
-            $lines = @([System.IO.File]::ReadAllLines($AgentsFile))
-            if ([Array]::IndexOf($lines, $EndMarker) -le [Array]::IndexOf($lines, $StartMarker)) {
-                [Console]::Error.WriteLine('✗ Managed Pantheon marker order is malformed')
-                $errors++
-            }
-            elseif (Test-ManagedBlockMatches) {
-                Ok "Managed AGENTS.md block matches v$Version"
-            }
-            else {
-                [Console]::Error.WriteLine("✗ Managed AGENTS.md block differs from v$Version")
-                $errors++
-            }
+            if (Test-ManagedBlockMatches) { Ok "Managed AGENTS.md block matches v$Version" }
+            else { [Console]::Error.WriteLine("✗ Managed AGENTS.md block differs from v$Version"); $errors++ }
 
             if (Test-OutsideBlockContainsPantheon) {
                 Warn 'Possible legacy/unmanaged Pantheon instructions exist outside the managed block; review them manually before deleting anything.'
@@ -569,33 +464,19 @@ function Cmd-Doctor {
     }
 
     Say
-    if ($errors -eq 0 -and $warnings -eq 0) {
-        Say 'Status: HEALTHY'
-        return
-    }
-    if ($errors -eq 0) {
-        Say "Status: HEALTHY WITH WARNINGS ($warnings)"
-        return
-    }
-
+    if ($errors -eq 0 -and $warnings -eq 0) { Say 'Status: HEALTHY'; return }
+    if ($errors -eq 0) { Say "Status: HEALTHY WITH WARNINGS ($warnings)"; return }
     Say "Status: UNHEALTHY ($errors error(s), $warnings warning(s))"
     Say 'Repair Pantheon-owned files with: .\pantheon.ps1 update'
     exit 1
 }
 
 function Cmd-Uninstall {
-    Validate-MarkerState
-
-    foreach ($file in @($AgentFiles + $LegacyAgentFiles)) {
-        Remove-PathSafely (Join-Path $AgentDestDir $file)
-    }
-    foreach ($skill in @($SkillDirs + $LegacySkillDirs)) {
-        Remove-PathSafely (Join-Path $SkillsDestRoot $skill)
-    }
-
+    Validate-MarkerState | Out-Null
+    foreach ($file in @($AgentFiles + $LegacyAgentFiles)) { Remove-OwnedPath (Join-Path $AgentDestDir $file) }
+    foreach ($skill in @($SkillDirs + $LegacySkillDirs)) { Remove-OwnedPath (Join-Path $SkillsDestRoot $skill) }
     Remove-ManagedBlock
-    Remove-PathSafely $VersionFile
-
+    Remove-OwnedPath $VersionFile
     Say "Codex Pantheon $Version uninstalled."
     Say 'Other Codex configuration and non-Pantheon skills were preserved.'
 }
@@ -612,8 +493,5 @@ switch ($Command.ToLowerInvariant()) {
     'help' { Say (Get-UsageText); break }
     '--help' { Say (Get-UsageText); break }
     '-h' { Say (Get-UsageText); break }
-    default {
-        [Console]::Error.WriteLine((Get-UsageText))
-        exit 2
-    }
+    default { [Console]::Error.WriteLine((Get-UsageText)); exit 2 }
 }
