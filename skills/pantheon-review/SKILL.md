@@ -19,6 +19,8 @@ Astra may run focused tests/builds/reproduction directly when needed for the rev
 
 Every child spawn defaults to `fork_turns: "none"` and receives a self-contained, bounded assignment with objective, review target/scope, constraints/context, explicit read-only permission, expected evidence/output, stopping condition, and a direct instruction not to spawn subagents.
 
+Every evidence child must use a role-prefixed `task_name`: `luna_explorer_<specific_assignment>` or `luna_librarian_<specific_assignment>`. Use lowercase letters, digits, and underscores only. The suffix must identify the actual bounded review question rather than a generic label such as `evidence` or `review`, so the Codex app exposes the worker lane at a glance. Concurrent evidence lanes must use distinct assignment suffixes. Astra remains the main thread and is not spawned as a display-only child.
+
 Do not inherit context merely because it is available. Use the minimum supported inheritance only when a genuine parent dependency requires it, with the sole exception of a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default.
 
 For a merge or release decision, return a clear `PASS`, `PASS WITH NOTES`, or `FAIL / NO-MERGE` verdict with blocking reasons and material unverified gates.
