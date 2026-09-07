@@ -81,9 +81,21 @@ If execution reveals a material architecture/product decision or contradicts Ast
 
 These workflows do not activate a sticky Pantheon profile by themselves.
 
-## 6. Context discipline
+## 6. Context and visible task identity
 
 Every child spawn defaults to `fork_turns: "none"` with a self-contained bounded assignment. Astra gives the child only the objective, scope, constraints/context, permissions, expected evidence/output, stopping condition, and prohibition on subagents that it needs.
+
+Astra also gives every child a role-prefixed native `task_name`:
+
+```text
+luna_explorer_<specific_assignment>
+luna_librarian_<specific_assignment>
+luna_fixer_<specific_assignment>
+```
+
+The assignment suffix must be concrete, concise, and distinguish simultaneous work. For example, use `luna_explorer_trace_guest_lifecycle` instead of `physics_evidence`. The conceptual label is `Luna Explorer · Trace guest lifecycle`; Codex's current task-name field uses lowercase snake_case, so Pantheon encodes that label in the supported form. This makes the Luna lane visible on Codex surfaces that display or humanize task names.
+
+Astra stays in the main thread; Pantheon does not spawn an Astra child just to add a label.
 
 Never use full-history inheritance by default.
 
