@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Added
+
+- Native Windows PowerShell lifecycle support through `pantheon.ps1` and `install.ps1`, using the same agents, skills, policy block, and version marker as the macOS/Linux Bash frontend.
+- Windows lifecycle regression coverage for install, update, doctor, bootstrap, migration cleanup, user-owned configuration preservation, malformed-marker fail-closed behavior, uninstall, and `%USERPROFILE%` defaults.
+- GitHub Actions coverage for both Linux/Bash and Windows/PowerShell lifecycle suites.
+
+### Changed
+
+- Repository lifecycle instructions and user documentation now route install/update/doctor/uninstall commands by platform.
+- Windows Doctor discovers Codex from PATH and current native standalone/Desktop runtime layouts under `%LOCALAPPDATA%`.
+- Windows protected-path checks treat NTFS reparse points as the analogue of the Bash symlink safeguard.
+
 ## 0.6.0 — 2026-09-05
 
 ### Added
