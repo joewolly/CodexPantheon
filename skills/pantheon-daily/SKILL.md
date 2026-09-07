@@ -52,6 +52,8 @@ Typical shapes:
 
 Every child spawn defaults to `fork_turns: "none"`. Give each specialist a self-contained, bounded assignment with objective, scope, constraints/context, permission boundary, expected evidence/output, stopping condition, and a direct instruction not to spawn subagents.
 
+Every child spawn must use a role-prefixed `task_name`: `luna_explorer_<specific_assignment>`, `luna_librarian_<specific_assignment>`, or `luna_fixer_<specific_assignment>`. Use lowercase letters, digits, and underscores only. The suffix must state the concrete assignment rather than a generic label, so the Codex app makes the Luna lane obvious at a glance. Even though Daily never parallelizes children, use a specific suffix that would remain unambiguous in task history. Astra remains the main thread and is not spawned as a display-only child.
+
 Do not inherit context merely because it is available. Use the minimum supported inheritance only when a genuine parent dependency requires it. The sole exception is a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default.
 
 Daily and full Pantheon are the only delegation-intensity profiles. Daily has no separate team mode, effort levels, token accounting, quota polling, daemon, scheduler, or custom runtime.
