@@ -42,9 +42,9 @@ $VersionFile = Join-Path $CodexHomeDir '.pantheon-version'
 $BlockFile = Join-Path (Join-Path $ScriptDir 'policy') 'managed-block.md'
 
 function Say([string]$Message = '') { Write-Output $Message }
-function Ok([string]$Message) { Write-Output "✓ $Message" }
-function Warn([string]$Message) { [Console]::Error.WriteLine("! $Message") }
-function Fail([string]$Message) { [Console]::Error.WriteLine("✗ $Message"); exit 1 }
+function Ok([string]$Message) { Write-Output "OK: $Message" }
+function Warn([string]$Message) { [Console]::Error.WriteLine("WARN: $Message") }
+function Fail([string]$Message) { [Console]::Error.WriteLine("ERROR: $Message"); exit 1 }
 
 function Get-UsageText {
     @"
@@ -366,7 +366,7 @@ function Cmd-Doctor {
         Ok "Installed version marker: $Version"
     }
     else {
-        [Console]::Error.WriteLine("✗ Installed version marker missing or not $Version")
+        [Console]::Error.WriteLine("ERROR: Installed version marker missing or not $Version")
         $errors++
     }
 
@@ -389,15 +389,15 @@ function Cmd-Doctor {
         $destination = Join-Path $AgentDestDir $file
         $item = Get-PathItem $destination
         if ($null -ne $item -and (Test-ReparsePoint $item)) {
-            [Console]::Error.WriteLine("✗ $file is a reparse point; Pantheon custom agents must be regular files")
+            [Console]::Error.WriteLine("ERROR: $file is a reparse point; Pantheon custom agents must be regular files")
             $errors++
         }
         elseif (-not (Test-RegularFile $destination)) {
-            [Console]::Error.WriteLine("✗ $file is missing")
+            [Console]::Error.WriteLine("ERROR: $file is missing")
             $errors++
         }
         elseif (Test-FilesEqual $source $destination) { Ok $file }
-        else { [Console]::Error.WriteLine("✗ $file differs from the v$Version source package"); $errors++ }
+        else { [Console]::Error.WriteLine("ERROR: $file differs from the v$Version source package"); $errors++ }
     }
 
     Say
@@ -405,13 +405,13 @@ function Cmd-Doctor {
     $legacyErrors = 0
     foreach ($file in $LegacyAgentFiles) {
         if ($null -ne (Get-PathItem (Join-Path $AgentDestDir $file))) {
-            [Console]::Error.WriteLine("✗ legacy Pantheon agent still installed: $file")
+            [Console]::Error.WriteLine("ERROR: legacy Pantheon agent still installed: $file")
             $errors++; $legacyErrors++
         }
     }
     foreach ($skill in $LegacySkillDirs) {
         if ($null -ne (Get-PathItem (Join-Path $SkillsDestRoot $skill))) {
-            [Console]::Error.WriteLine("✗ legacy Pantheon skill still installed: $skill")
+            [Console]::Error.WriteLine("ERROR: legacy Pantheon skill still installed: $skill")
             $errors++; $legacyErrors++
         }
     }
@@ -424,37 +424,37 @@ function Cmd-Doctor {
         $destination = Join-Path (Join-Path $SkillsDestRoot $skill) 'SKILL.md'
         $item = Get-PathItem $destination
         if ($null -ne $item -and (Test-ReparsePoint $item)) {
-            [Console]::Error.WriteLine("✗ $skill/SKILL.md is a reparse point")
+            [Console]::Error.WriteLine("ERROR: $skill/SKILL.md is a reparse point")
             $errors++
         }
         elseif (-not (Test-RegularFile $destination)) {
-            [Console]::Error.WriteLine("✗ $skill is missing")
+            [Console]::Error.WriteLine("ERROR: $skill is missing")
             $errors++
         }
         elseif (Test-FilesEqual $source $destination) { Ok $skill }
-        else { [Console]::Error.WriteLine("✗ $skill differs from the v$Version source package"); $errors++ }
+        else { [Console]::Error.WriteLine("ERROR: $skill differs from the v$Version source package"); $errors++ }
     }
 
     Say
     Say 'Policy'
     $agentsItem = Get-PathItem $AgentsFile
     if ($null -eq $agentsItem -or $agentsItem.PSIsContainer) {
-        [Console]::Error.WriteLine("✗ $AgentsFile is missing")
+        [Console]::Error.WriteLine("ERROR: $AgentsFile is missing")
         $errors++
     }
     elseif (Test-ReparsePoint $agentsItem) {
-        [Console]::Error.WriteLine("✗ $AgentsFile is a reparse point; Pantheon refuses to manage it")
+        [Console]::Error.WriteLine("ERROR: $AgentsFile is a reparse point; Pantheon refuses to manage it")
         $errors++
     }
     else {
         $state = Get-MarkerState
         if ($state.Starts -ne 1 -or $state.Ends -ne 1 -or $state.EndIndex -le $state.StartIndex) {
-            [Console]::Error.WriteLine('✗ Managed Pantheon marker pair is missing, malformed, duplicated, or misordered')
+            [Console]::Error.WriteLine('ERROR: Managed Pantheon marker pair is missing, malformed, duplicated, or misordered')
             $errors++
         }
         else {
             if (Test-ManagedBlockMatches) { Ok "Managed AGENTS.md block matches v$Version" }
-            else { [Console]::Error.WriteLine("✗ Managed AGENTS.md block differs from v$Version"); $errors++ }
+            else { [Console]::Error.WriteLine("ERROR: Managed AGENTS.md block differs from v$Version"); $errors++ }
 
             if (Test-OutsideBlockContainsPantheon) {
                 Warn 'Possible legacy/unmanaged Pantheon instructions exist outside the managed block; review them manually before deleting anything.'
