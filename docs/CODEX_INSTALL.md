@@ -1,6 +1,13 @@
 # Install Codex Pantheon with Codex
 
-Pantheon v0.6.0 bootstraps through an ordinary Codex workspace. No separate orchestration runtime is required.
+Pantheon v0.6 bootstraps through an ordinary Codex workspace. No separate orchestration runtime is required.
+
+Pantheon uses one shared payload and two platform-native lifecycle frontends:
+
+- macOS/Linux: `pantheon` / `install.sh`
+- Windows: `pantheon.ps1` / `install.ps1`
+
+WSL or Git Bash is not required for a native Windows install.
 
 ## Recommended flow
 
@@ -14,33 +21,78 @@ Pantheon v0.6.0 bootstraps through an ordinary Codex workspace. No separate orch
 
 This lifecycle request does **not** activate Pantheon. `$pantheon` activates full Pantheon; `$pantheon-daily` activates Daily.
 
-The repository `AGENTS.md` tells Codex to run:
+The repository `AGENTS.md` tells Codex to run the platform-appropriate bootstrap command.
+
+macOS/Linux:
 
 ```bash
 ./pantheon bootstrap
 ```
 
+Windows PowerShell:
+
+```powershell
+.\pantheon.ps1 bootstrap
+```
+
 `bootstrap` installs or updates Pantheon-owned files and immediately runs `doctor`.
 
-## What v0.6 installs
+## Manual install/update
 
-Pantheon owns these current paths:
+### macOS/Linux
 
-- `${CODEX_HOME:-~/.codex}/agents/luna-explorer.toml`
-- `${CODEX_HOME:-~/.codex}/agents/luna-librarian.toml`
-- `${CODEX_HOME:-~/.codex}/agents/luna-fixer.toml`
-- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon/`
-- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-daily/`
-- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-plan/`
-- `${PANTHEON_SKILLS_HOME:-~/.agents/skills}/pantheon-review/`
-- the marked Pantheon block in `${CODEX_HOME:-~/.codex}/AGENTS.md`
-- `${CODEX_HOME:-~/.codex}/.pantheon-version`
+```bash
+./pantheon install
+./pantheon doctor
+```
 
-Same-named Pantheon paths are replaced on install/update and removed on uninstall.
+Convenience installer:
+
+```bash
+./install.sh
+```
+
+### Windows
+
+```powershell
+.\pantheon.ps1 install
+.\pantheon.ps1 doctor
+```
+
+Convenience installer:
+
+```powershell
+.\install.ps1
+```
+
+The Windows frontend defaults to `%USERPROFILE%\.codex` for Codex state and `%USERPROFILE%\.agents\skills` for skills. `CODEX_HOME` and `PANTHEON_SKILLS_HOME` override those defaults.
+
+## What Pantheon installs
+
+Pantheon owns these current logical paths:
+
+- `<Codex home>/agents/luna-explorer.toml`
+- `<Codex home>/agents/luna-librarian.toml`
+- `<Codex home>/agents/luna-fixer.toml`
+- `<skills home>/pantheon/`
+- `<skills home>/pantheon-daily/`
+- `<skills home>/pantheon-plan/`
+- `<skills home>/pantheon-review/`
+- the marked Pantheon block in `<Codex home>/AGENTS.md`
+- `<Codex home>/.pantheon-version`
+
+Defaults:
+
+| Platform | Codex home | Skills home |
+| --- | --- | --- |
+| macOS/Linux | `~/.codex` | `~/.agents/skills` |
+| Windows | `%USERPROFILE%\.codex` | `%USERPROFILE%\.agents\skills` |
+
+Same-named Pantheon paths are replaced on install/update and removed on uninstall. The Bash and PowerShell frontends both consume the same `agents/`, `skills/`, and `policy/` source files.
 
 ## v0.5 migration cleanup
 
-v0.6 removes the former v0.5 `${CODEX_HOME:-~/.codex}/agents/pantheon-worker.toml` during install/update/bootstrap/uninstall.
+v0.6 removes the former v0.5 `<Codex home>/agents/pantheon-worker.toml` during install/update/bootstrap/uninstall.
 
 It also continues to remove Pantheon's older v0.4 owned agent filenames:
 
@@ -62,7 +114,15 @@ Astra is the intended main Codex model and is not installed by Pantheon. The thr
 
 ## Fail-closed behavior
 
-If Pantheon detects malformed/duplicate managed markers, a protected `AGENTS.md` symlink, missing source payload, legacy source files that should have been removed, or another integrity problem, bootstrap stops. Do not bypass the safeguard by manually overwriting user-owned configuration.
+If Pantheon detects malformed/duplicate managed markers, a protected `AGENTS.md` symlink/reparse point, missing source payload, legacy source files that should have been removed, or another integrity problem, bootstrap stops. Do not bypass the safeguard by manually overwriting user-owned configuration.
+
+On Windows, Pantheon treats NTFS reparse points at protected managed paths as the analogue of the Bash symlink safeguard and refuses to manage `AGENTS.md` through one.
+
+## Doctor and Codex discovery
+
+Both frontends validate the same static installation state. The Windows Doctor looks for Codex on PATH and in native Codex app/standalone locations under `%LOCALAPPDATA%`, including the current app runtime and standalone CLI layouts.
+
+Failure to discover an executable is a warning rather than a static Pantheon integrity failure; installed payload validation can still succeed.
 
 ## Evidence boundary
 
