@@ -35,7 +35,7 @@ function Invoke-Pantheon([string[]]$Arguments) {
 Assert-File $Pantheon
 Assert-File (Join-Path $Root 'install.ps1')
 Assert-Contains (Join-Path $Root 'VERSION') '0.6.0'
-Assert-Contains $Pantheon "$Version = '0.6.0'"
+Assert-Contains $Pantheon '$Version = ''0.6.0'''
 $version = Invoke-Pantheon @('version')
 Assert-True ($version.ExitCode -eq 0 -and $version.Output.Contains('Codex Pantheon 0.6.0')) 'version command mismatch'
 Pass 'PowerShell entrypoints match current release metadata'
