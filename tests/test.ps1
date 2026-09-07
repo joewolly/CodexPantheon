@@ -25,9 +25,17 @@ function Assert-EqualFiles([string]$Left, [string]$Right) {
     Assert-True ((Get-FileHash -LiteralPath $Left -Algorithm SHA256).Hash -ceq (Get-FileHash -LiteralPath $Right -Algorithm SHA256).Hash) "files differ: $Left $Right"
 }
 function Invoke-Pantheon([string[]]$Arguments) {
-    $output = & $PowerShellExe -NoLogo -NoProfile -ExecutionPolicy Bypass -File $Pantheon @Arguments 2>&1
+    $previousErrorActionPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = 'Continue'
+        $output = & $PowerShellExe -NoLogo -NoProfile -ExecutionPolicy Bypass -File $Pantheon @Arguments 2>&1
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
     [PSCustomObject]@{
-        ExitCode = $LASTEXITCODE
+        ExitCode = $exitCode
         Output = (@($output | ForEach-Object { [string]$_ }) -join [Environment]::NewLine)
     }
 }
