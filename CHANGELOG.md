@@ -2,18 +2,6 @@
 
 ## Unreleased
 
-### Added
-
-- Native Windows PowerShell lifecycle support through `pantheon.ps1` and `install.ps1`, using the same agents, skills, policy block, and version marker as the macOS/Linux Bash frontend.
-- Windows lifecycle regression coverage for install, update, doctor, bootstrap, migration cleanup, user-owned configuration preservation, malformed-marker fail-closed behavior, uninstall, and `%USERPROFILE%` defaults.
-- GitHub Actions coverage for both Linux/Bash and Windows/PowerShell lifecycle suites.
-
-### Changed
-
-- Repository lifecycle instructions and user documentation now route install/update/doctor/uninstall commands by platform.
-- Windows Doctor discovers Codex from PATH and current native standalone/Desktop runtime layouts under `%LOCALAPPDATA%`.
-- Windows protected-path checks treat NTFS reparse points as the analogue of the Bash symlink safeguard.
-
 ## 0.6.0 — 2026-09-05
 
 ### Added
@@ -22,6 +10,10 @@
 - Hard role boundaries adapted from the MIT-licensed `oh-my-opencode-slim` Orchestrator/Explorer/Librarian/Fixer model.
 - `THIRD_PARTY_NOTICES.md` with upstream attribution and license text.
 - Regression assertions for the complete evidence → Astra plan/specification → Fixer implementation → Astra review/verification dependency.
+- Role-prefixed Luna child task names so Explorer, Librarian, and Fixer work is glanceable in Codex task surfaces.
+- Native Windows PowerShell lifecycle support through `pantheon.ps1` and `install.ps1`, using the same agents, skills, policy block, and version marker as the macOS/Linux Bash frontend.
+- Windows lifecycle regression coverage for install, update, doctor, bootstrap, migration cleanup, user-owned configuration preservation, malformed-marker fail-closed behavior, uninstall, and `%USERPROFILE%` defaults.
+- GitHub Actions coverage for both Linux/Bash and Windows/PowerShell lifecycle suites.
 
 ### Changed
 
@@ -31,6 +23,10 @@
 - `$pantheon-daily` keeps the same ownership model as full Pantheon, removes the v0.5 `0-1` worker-call ceiling, forbids parallel child calls, and allows sequential research/exploration followed by Fixer when required.
 - Full `$pantheon` may parallelize genuinely independent read-only lanes and non-overlapping Fixer workstreams.
 - Install/update/bootstrap migrate v0.5 `pantheon-worker.toml` to the three named Luna agent files while preserving v0.4 cleanup behavior.
+- Repository lifecycle instructions and user documentation now route install/update/doctor/uninstall commands by platform.
+- Windows Doctor discovers Codex from PATH and current native standalone/Desktop runtime layouts under `%LOCALAPPDATA%`.
+- Windows protected-path checks treat NTFS reparse points as the analogue of the Bash symlink safeguard.
+- Windows lifecycle support is compatible with Windows PowerShell 5.1 as well as newer PowerShell runtimes.
 
 ### Removed
 

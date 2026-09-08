@@ -6,7 +6,7 @@
 
 Codex Pantheon is a slim, explicit, Codex-native orchestration layer for an Astra-led Codex session.
 
-**v0.6 ports the core Orchestrator → Explorer/Librarian/Fixer behavior of [oh-my-opencode-slim](https://github.com/alvinunreal/oh-my-opencode-slim) onto Codex-native agents while preserving Pantheon's thread-scoped on/off switch.** It does not embed or depend on the OpenCode plugin runtime.
+**v0.6.0 ports the core Orchestrator → Explorer/Librarian/Fixer behavior of [oh-my-opencode-slim](https://github.com/alvinunreal/oh-my-opencode-slim) onto Codex-native agents, makes Luna lanes glanceable in Codex, and adds native Windows PowerShell lifecycle support while preserving Pantheon's thread-scoped on/off switch.** It does not embed or depend on the OpenCode plugin runtime.
 
 > **Astra decides. Luna specialists execute their lane.**
 
@@ -216,7 +216,7 @@ Uninstall removes current and legacy Pantheon-owned paths while preserving unrel
 - [Codex-assisted install guide](docs/CODEX_INSTALL.md)
 - [CLI reference](docs/CLI_REFERENCE.md)
 - [Design doctrine](docs/DESIGN_DOCTRINE.md)
-- [v0.6 release notes](docs/V0.6.0.md)
+- [v0.6.0 release notes](docs/V0.6.0.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 - [Changelog](CHANGELOG.md)
 
