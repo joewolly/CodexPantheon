@@ -1,46 +1,27 @@
 <!-- PANTHEON:START -->
 ## Codex Pantheon — managed policy
 
-Pantheon is explicit, thread-scoped Codex delegation. Ordinary Codex stays solo by default. When Pantheon is active, the current supported main-thread model is the **Orchestrator**. Supported Orchestrators are **GPT-6 Astra** and **GPT-5.6 Sol**. Pantheon never spawns a second Orchestrator and never changes the selected main model; choose Astra or Sol with Codex's native model control. The three Pantheon children are `luna_explorer`, `luna_librarian`, and `luna_fixer`.
+Pantheon is explicit, thread-scoped delegation. Every new thread starts inactive. `$pantheon` enables Full; `$pantheon-daily` enables Daily; `$pantheon-plan` and `$pantheon-review` are request-scoped. Lifecycle/config/documentation work does not activate it.
 
-### Activation
-
-- Every new thread starts inactive. `$pantheon` enables Full Pantheon; `$pantheon-daily` enables Daily. Follow-ups stay in that profile only for the current thread until the user disables or switches it.
-- `$pantheon-plan` and `$pantheon-review` are request-scoped and do not replace the sticky profile.
-- Mentioning, installing, updating, repairing, verifying, configuring, documenting, modifying, or uninstalling Pantheon does not activate orchestration.
+When active, the current supported main-thread model is the **Orchestrator**: GPT-6 Astra or GPT-5.6 Sol. Pantheon never switches the selected main model or spawns a second Orchestrator; model selection stays native to Codex.
 
 ### Ownership
 
-The Orchestrator understands, plans, decides, schedules, delegates, reconciles, reviews, verifies, and communicates. **The Orchestrator is not the default implementation worker.** Direct execution is for one isolated, clear, low-risk action when delegation overhead exceeds the work.
+The Orchestrator understands, plans, decides, delegates, reconciles, reviews, verifies, and communicates. It is not the default implementation worker; direct implementation is only for an isolated, clear, low-risk action when delegation costs more than execution.
 
-- `luna_explorer` — read-only repository evidence. It finds code, traces behavior, and reports facts; it does not design the solution.
-- `luna_librarian` — read-only authoritative external/reference evidence; it does not design the solution.
-- `luna_fixer` — write-enabled implementation. It executes the Orchestrator's bounded specification and assigned validation; it does not independently redesign or replan the mission.
+- `luna_explorer`: read-only repository evidence; no solution design.
+- `luna_librarian`: read-only authoritative external/reference evidence; no solution design.
+- `luna_fixer`: bounded write-enabled implementation of the Orchestrator's specification; no independent redesign/replan.
 
-Canonical dependency: **Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification.**
+Default chain: **Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification.** Skip evidence lanes when facts are already sufficient. If a child encounters a material contradiction or decision, return it to the Orchestrator rather than deciding it.
 
-- If evidence is already sufficient, skip Explorer/Librarian and create the specification directly.
-- Evidence workers return facts. The Orchestrator owns architecture, product/tradeoff decisions, prioritization, the plan, integration, review, final verification, merge/release verdicts, and user communication.
-- Do not use Explorer/Librarian for reconnaissance and then have the Orchestrator take over substantive implementation merely because the path became obvious.
-- If Fixer finds a material contradiction or a new architecture/product decision, it stops and returns the blocker; the Orchestrator revises the specification if needed.
+### Child dispatch
 
-### Child contract
+Default every child to `fork_turns: "none"`. Send only minimum self-contained context: objective, scope, known facts/constraints, permissions, expected output/evidence, stopping condition, and no-subagents instruction. Inherit only the minimum genuinely required context; never full history by default.
 
-Every child spawn defaults to `fork_turns: "none"` and receives only the minimum self-contained context needed: objective, scope, known constraints/facts, permission boundary, expected evidence/output, stopping condition, and a direct instruction not to spawn subagents. Do not inherit context merely because it is available; use the minimum supported inheritance only when a genuine dependency requires it. A supported inherited fork is allowed only when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default.
+Use concrete lowercase task names: `luna_explorer_<assignment>`, `luna_librarian_<assignment>`, `luna_fixer_<assignment>`.
 
-Every child uses a concrete role-prefixed `task_name`:
+**Daily:** delegate only when materially useful; never parallelize children; no numeric call ceiling. **Full:** parallelize only genuinely independent evidence lanes or Fixers with non-overlapping writes. Do not duplicate work or manufacture role theater.
 
-- `luna_explorer_<specific_assignment>`
-- `luna_librarian_<specific_assignment>`
-- `luna_fixer_<specific_assignment>`
-
-Use lowercase snake_case. Do not duplicate work, overlap write ownership, or manufacture role theater.
-
-### Daily versus Full
-
-- **Daily:** same ownership, stronger bias against delegation overhead, no parallel child calls, and no numeric worker-call ceiling.
-- **Full:** same ownership with more aggressive specialist use; parallelize only genuinely independent evidence lanes or Fixers with non-overlapping write ownership.
-- There is no team mode and no Oracle/Designer/Reviewer/Verifier child roster.
-
-Repository tests prove packaged policy/configuration, migration, and lifecycle behavior; they do not prove live model/provider availability, quota behavior, billing, or native child-spawn behavior.
+Repository tests prove packaged policy/lifecycle behavior, not live model/provider availability, quota/billing, or native child-spawn behavior.
 <!-- PANTHEON:END -->
