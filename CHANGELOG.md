@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+### Added
+
+- GPT-5.6 Sol as a supported main-thread Pantheon Orchestrator alongside GPT-6 Astra.
+- v0.7 architecture/release documentation and a sharp SVG diagram showing the interchangeable Astra/Sol Orchestrator above the three Luna specialist lanes.
+- Regression coverage for the model-neutral Orchestrator contract and minimum-context child assignments.
+
+### Changed
+
+- Pantheon now defines one shared **Orchestrator** role contract instead of coupling ownership semantics to Astra-specific wording.
+- Main-thread model selection remains native Codex state. Pantheon does not spawn a second Orchestrator, write a duplicate model preference, or pretend `$pantheon` changed the active model.
+- Explorer, Librarian, and Fixer prompts now report to the Orchestrator role and are compressed around bounded work, minimum sufficient evidence, and explicit stopping conditions.
+- Full, Daily, Plan, Review, managed-policy, repository-policy, user-guide, install, contribution, and release contracts are synchronized around Astra/Sol interchangeability.
+- `fork_turns: "none"` remains the default child context policy and the contract now more explicitly requires minimum self-contained context.
+- README architecture rendering now uses the versioned SVG asset rather than a raster architecture image.
+
+### Unchanged by design
+
+- `luna_explorer`, `luna_librarian`, and `luna_fixer` remain GPT-5.6 Luna High.
+- Daily and Full remain the only sticky delegation-intensity profiles.
+- Explorer/Librarian remain read-only; Fixer remains bounded workspace-write implementation.
+- Existing v0.4/v0.5 migration cleanup, safe lifecycle behavior, and native Windows support remain intact.
+
+### Not included
+
+- No `$pantheon-astra` / `$pantheon-sol` duplicate skills.
+- No Pantheon-owned model picker, persistent model state, model-router runtime, second Orchestrator child, token meter, daemon, scheduler, or worker-effort retuning.
+
 ## 0.6.0 — 2026-09-05
 
 ### Added
@@ -81,7 +108,7 @@
 
 ### Not included
 
-- No new agent role, cheaper duplicate roster, token accounting, quota polling, billing estimation, persistent budget state, daemon, scheduler, HUD, or custom orchestration runtime.
+- No new agent role, cheaper duplicate roster, token accounting, quota polling, billing estimation, persistent budget state, daemon, scheduler, HUD, or custom runtime.
 
 ## 0.3.0 — 2026-09-04
 
