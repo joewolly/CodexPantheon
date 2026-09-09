@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - VERSION
+      - .github/workflows/release.yml
 
 permissions:
   contents: write
@@ -26,7 +27,7 @@ jobs:
           VERSION_VALUE="$(tr -d '[:space:]' < VERSION)"
           test -n "$VERSION_VALUE"
           test -f "docs/V${VERSION_VALUE}.md"
-          grep -Fq "## ${VERSION_VALUE} —" CHANGELOG
+          grep -Fq "## ${VERSION_VALUE}" CHANGELOG.md
           ./tests/test.sh
           bash -n pantheon install.sh tests/test.sh
 
@@ -43,17 +44,31 @@ jobs:
 
           if gh release view "$TAG" >/dev/null 2>&1; then
             EXISTING_SHA="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" --jq '.object.sha')"
-            if [ "$EXISTING_SHA" != "$GITHUB_SHA" ]; then
-              echo "Release ${TAG} already exists but does not point at ${GITHUB_SHA}." >&2
-              exit 1
+            if [ "$EXISTING_SHA" = "$GITHUB_SHA" ]; then
+              echo "Release ${TAG} already exists at ${GITHUB_SHA}; nothing to do."
+              exit 0
             fi
-            echo "Release ${TAG} already exists at ${GITHUB_SHA}; nothing to do."
-            exit 0
+
+            if git diff --quiet "${GITHUB_SHA}^" "$GITHUB_SHA" -- VERSION; then
+              echo "Release ${TAG} already exists and VERSION did not change in this push; nothing to do."
+              exit 0
+            fi
+
+            echo "Release ${TAG} already exists but does not point at ${GITHUB_SHA}." >&2
+            exit 1
           fi
 
-          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
-            echo "Tag ${TAG} already exists without a matching GitHub release; refusing to overwrite it." >&2
-            exit 1
+          TAG_SHA="$(git ls-remote --tags origin "refs/tags/${TAG}" | awk '{print $1}')"
+          if [ -n "$TAG_SHA" ]; then
+            if [ "$TAG_SHA" != "$GITHUB_SHA" ]; then
+              echo "Tag ${TAG} already exists at ${TAG_SHA}, not ${GITHUB_SHA}; refusing to overwrite it." >&2
+              exit 1
+            fi
+            gh release create "$TAG" \
+              --verify-tag \
+              --title "$TITLE" \
+              --notes-file "$NOTES"
+            exit 0
           fi
 
           gh release create "$TAG" \

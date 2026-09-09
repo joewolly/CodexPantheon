@@ -74,7 +74,7 @@ Live model/subagent behavior must be verified separately when a release depends 
 
 ## 6. Publish from the merged release commit
 
-Release metadata is published by `.github/workflows/release.yml` when `VERSION` changes on `main`.
+Release metadata is published by `.github/workflows/release.yml` when `VERSION` changes on `main`. Changes to the publisher workflow itself also trigger it so publication fixes can recover a failed release without another version bump.
 
 The publication job:
 
@@ -84,6 +84,7 @@ The publication job:
 - creates tag `vX.Y.Z` at the exact merged commit;
 - creates the GitHub release using the versioned release-note file;
 - is idempotent when the matching release already exists;
+- treats a publisher-only change as a no-op when that version is already released;
 - fails closed rather than overwriting an existing mismatched tag/release.
 
 After merging the release PR, verify the **Publish release** workflow succeeds and confirm the GitHub release/tag both resolve to the intended merged commit.
