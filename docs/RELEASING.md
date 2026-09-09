@@ -7,7 +7,7 @@ This checklist keeps the source package, installed payload, documentation, migra
 - Start from the intended base branch and fetch current remote state.
 - Confirm only intended release changes are present.
 - Review user-visible behavior, compatibility, install/update migration, and uninstall behavior.
-- Confirm the Bash and PowerShell frontends still consume one shared payload rather than platform-specific copies.
+- Confirm Bash and PowerShell still consume one shared payload rather than platform-specific copies.
 
 ## 2. Synchronize the version
 
@@ -25,31 +25,27 @@ Historical release notes may intentionally describe prior architectures.
 
 ## 3. Synchronize the operating contract
 
-For v0.6+, inspect all of these when routing or role ownership changes:
+When routing or role ownership changes, inspect:
 
-- `agents/luna-explorer.toml`
-- `agents/luna-librarian.toml`
-- `agents/luna-fixer.toml`
-- `skills/pantheon/SKILL.md`
-- `skills/pantheon-daily/SKILL.md`
-- `skills/pantheon-plan/SKILL.md`
-- `skills/pantheon-review/SKILL.md`
+- all three `agents/luna-*.toml` files
+- all four `skills/*/SKILL.md` files
 - `policy/managed-block.md`
 - repository `AGENTS.md`
 - `README.md` and relevant docs
-- `tests/test.sh`
-- `tests/test.ps1`
+- both lifecycle test suites
 
-Confirm the core invariants:
+Confirm:
 
-- Astra remains the main-thread Orchestrator and is not installed as a child.
-- Astra owns architecture, product/tradeoff decisions, the implementation specification, integration, review, and final verification judgment.
-- `luna_explorer` and `luna_librarian` remain read-only evidence roles and do not create the solution plan.
-- `luna_fixer` remains the write-enabled implementation role and executes Astra's plan rather than independently replanning it.
-- Non-trivial implementation follows evidence when needed → Astra plan/specification → Fixer → Astra review/verification.
+- The current supported main-thread model is the Orchestrator; GPT-6 Astra and GPT-5.6 Sol share one model-neutral contract.
+- Pantheon does not spawn a separate Orchestrator or maintain a duplicate model preference.
+- Model selection remains native Codex state.
+- Explorer/Librarian remain read-only evidence roles and do not create the solution plan.
+- Fixer remains the write-enabled implementation role and executes the Orchestrator's specification rather than independently replanning it.
+- Non-trivial implementation follows evidence when needed → Orchestrator plan/specification → Fixer → Orchestrator review/verification.
+- `fork_turns: "none"` and minimum self-contained context remain the child defaults.
 - Daily changes delegation intensity only: no parallel children, no numeric worker ceiling, and no ownership inversion.
-- Full Pantheon may parallelize only genuinely independent lanes with non-overlapping writes.
-- No Oracle/Designer/Reviewer/Verifier roster, separate team mode, or custom orchestration runtime has accidentally reappeared.
+- Full Pantheon parallelizes only genuinely independent lanes with non-overlapping writes.
+- No old role roster, team mode, or custom runtime has reappeared.
 - v0.4/v0.5 cleanup remains deterministic.
 
 ## 4. Third-party attribution
@@ -72,9 +68,9 @@ Windows PowerShell:
 .\tests\test.ps1
 ```
 
-The GitHub Actions matrix must pass both the Linux lifecycle job and the Windows lifecycle job before release. The regression suites exercise install, update, doctor, bootstrap, migration cleanup, path defaults, user-owned configuration preservation, and uninstall with isolated temporary homes.
+The GitHub Actions matrix must pass Linux/Bash and Windows/PowerShell lifecycle jobs before release.
 
-Live model/subagent behavior must be verified separately when a release depends on it.
+Live model/subagent behavior must be verified separately when a release depends on it; static tests cannot prove backend availability.
 
 ## 6. Publish separately
 
