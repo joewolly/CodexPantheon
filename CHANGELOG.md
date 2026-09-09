@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.7.0 — 2026-09-09
+
 ### Added
 
 - GPT-5.6 Sol as a supported main-thread Pantheon Orchestrator alongside GPT-6 Astra.
@@ -74,7 +76,7 @@
 ### Changed
 
 - Pantheon now uses a two-role architecture: GPT-6 Astra remains the main-thread orchestrator and Luna is the only Pantheon child.
-- `$pantheon-daily` is now the conservative default philosophy: normally 0-1 Luna calls per request, no parallel workers, and a second sequential call only for a concrete unresolved blocker/evidence gap.
+- `$pantheon-daily` is now the conservative default philosophy: normally 0-1 Luna calls per user request, no parallel workers, and a second sequential call only for a concrete unresolved blocker/evidence gap.
 - Full `$pantheon` owns higher-intensity delegation and may use multiple or parallel Luna workers only for material, genuinely independent work.
 - Planning, architecture, prioritization, integration, review, final verification judgment, and merge/release verdicts stay with the parent/Astra thread.
 - `$pantheon-plan` uses Luna only as optional read-only research support; `$pantheon-review` uses Luna only as optional evidence support while Astra owns the review verdict.
