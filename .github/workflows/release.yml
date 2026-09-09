@@ -1,0 +1,62 @@
+name: Publish release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - VERSION
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate release package
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION_VALUE="$(tr -d '[:space:]' < VERSION)"
+          test -n "$VERSION_VALUE"
+          test -f "docs/V${VERSION_VALUE}.md"
+          grep -Fq "## ${VERSION_VALUE} —" CHANGELOG
+          ./tests/test.sh
+          bash -n pantheon install.sh tests/test.sh
+
+      - name: Publish tag and GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          VERSION_VALUE="$(tr -d '[:space:]' < VERSION)"
+          TAG="v${VERSION_VALUE}"
+          NOTES="docs/V${VERSION_VALUE}.md"
+          TITLE="$(sed -n '1s/^# //p' "$NOTES")"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            EXISTING_SHA="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" --jq '.object.sha')"
+            if [ "$EXISTING_SHA" != "$GITHUB_SHA" ]; then
+              echo "Release ${TAG} already exists but does not point at ${GITHUB_SHA}." >&2
+              exit 1
+            fi
+            echo "Release ${TAG} already exists at ${GITHUB_SHA}; nothing to do."
+            exit 0
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "Tag ${TAG} already exists without a matching GitHub release; refusing to overwrite it." >&2
+            exit 1
+          fi
+
+          gh release create "$TAG" \
+            --target "$GITHUB_SHA" \
+            --title "$TITLE" \
+            --notes-file "$NOTES"

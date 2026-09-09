@@ -6,7 +6,7 @@
 
 Codex Pantheon is a slim, explicit, Codex-native orchestration layer for a supported main-thread Orchestrator.
 
-**The v0.7 development line makes the Orchestrator interchangeable between GPT-6 Astra and GPT-5.6 Sol, removes model-specific prompt coupling, and further compresses parent/child context while preserving the v0.6 Explorer/Librarian/Fixer ownership model.**
+**v0.7.0 makes the Orchestrator interchangeable between GPT-6 Astra and GPT-5.6 Sol, removes model-specific prompt coupling, and further compresses parent/child context while preserving the Explorer/Librarian/Fixer ownership model.**
 
 > **Orchestrator decides. Luna specialists execute their lane.**
 
@@ -41,16 +41,16 @@ Pantheon deliberately does not maintain a second model selector.
 
 Pantheon does not switch the active main model, write a duplicate model preference, or spawn an Astra/Sol child. This keeps Codex as the source of truth, avoids an extra model hop, eliminates selector drift, and means switching between Astra and Sol never requires reinstalling Pantheon.
 
-## Why v0.7 is leaner
+## Why v0.7.0 is leaner
 
-v0.7 keeps the v0.6 role boundaries but removes unnecessary model-personality coupling:
+v0.7.0 keeps the role boundaries but removes unnecessary model-personality coupling:
 
 - The installed policy and all four skills refer to the **Orchestrator role**, not to Astra-specific ownership.
 - Luna receives assignments from the **Orchestrator**, so the same child prompts work unchanged under Astra or Sol.
 - Luna prompts are shorter and ask for the **minimum sufficient evidence** rather than broad output.
 - Child spawns still default to `fork_turns: "none"` and receive only a self-contained bounded assignment.
 - No second Orchestrator, model-router runtime, persistent selector, duplicate skill set, hidden state, or additional worker was added.
-- Luna remains GPT-5.6 Luna High in v0.7 so dual-Orchestrator behavior is not confounded with worker-effort tuning.
+- Luna remains GPT-5.6 Luna High so dual-Orchestrator behavior is not confounded with worker-effort tuning.
 
 ## Glanceable subagent titles
 
@@ -207,7 +207,7 @@ Uninstall removes Pantheon-owned current and legacy paths while preserving unrel
 - [Codex-assisted install guide](docs/CODEX_INSTALL.md)
 - [CLI reference](docs/CLI_REFERENCE.md)
 - [Design doctrine](docs/DESIGN_DOCTRINE.md)
-- [v0.7.0 release notes candidate](docs/V0.7.0.md)
+- [v0.7.0 release notes](docs/V0.7.0.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 - [Changelog](CHANGELOG.md)
 

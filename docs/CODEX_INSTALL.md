@@ -1,6 +1,6 @@
 # Install Codex Pantheon with Codex
 
-Pantheon v0.7 bootstraps through an ordinary Codex workspace. No separate orchestration or model-routing runtime is required.
+Pantheon v0.7.0 bootstraps through an ordinary Codex workspace. No separate orchestration or model-routing runtime is required.
 
 Pantheon uses one shared payload and two platform-native lifecycle frontends:
 
