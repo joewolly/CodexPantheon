@@ -1,35 +1,41 @@
 # Codex Pantheon User Guide
 
-Pantheon v0.6 has one orchestrator and three named Luna specialists. It stays inactive until you explicitly enable it.
+Pantheon v0.7 has one model-neutral Orchestrator contract and three named Luna specialists. It stays inactive until you explicitly enable it.
 
-## 1. Roles
+## 1. Choose the Orchestrator
+
+Select the main-thread model with Codex's native model control, then invoke Pantheon.
+
+Supported Orchestrators:
 
 | Role | Model | Responsibility |
 | --- | --- | --- |
-| Astra / main thread | GPT-6 Astra | Orchestrate, gather evidence, make architecture/product decisions, create implementation specs, reconcile, review, verify, communicate |
+| Orchestrator / main thread | GPT-6 Astra **or** GPT-5.6 Sol | Understand, plan, decide, delegate, reconcile, review, verify, communicate |
 | `luna_explorer` | GPT-5.6 Luna High | Read-only repository reconnaissance |
 | `luna_librarian` | GPT-5.6 Luna High | Read-only docs/API/upstream/reference research |
-| `luna_fixer` | GPT-5.6 Luna High | Implement Astra's scoped specification and run assigned focused validation |
+| `luna_fixer` | GPT-5.6 Luna High | Implement the Orchestrator's scoped specification and run assigned focused validation |
 
-Astra is not installed as a subagent and Pantheon does not automatically switch your selected main model.
+Pantheon does **not** automatically switch your selected main model and does not install a separate Astra or Sol child. The same installed payload works with either supported Orchestrator, so changing the selected model does not require reinstalling Pantheon.
 
-## 2. The ownership rule
+This is intentionally more reliable and cheaper than keeping a second Pantheon model selector: Codex remains the source of truth for which model is actually running.
+
+## 2. Ownership rule
 
 The normal implementation chain is:
 
 ```text
 Explorer/Librarian evidence when needed
               ↓
-       Astra creates plan
+    Orchestrator creates plan
               ↓
         Luna Fixer implements
               ↓
-       Astra reviews/verifies
+   Orchestrator reviews/verifies
 ```
 
-Explorer and Librarian do not create the solution plan. Fixer does not independently redesign it. Astra is not the default implementation worker.
+Explorer and Librarian do not create the solution plan. Fixer does not independently redesign it. The Orchestrator is not the default implementation worker.
 
-Astra may directly do one isolated, obvious, low-risk action when delegation overhead would exceed execution.
+The Orchestrator may directly do one isolated, obvious, low-risk action when delegation overhead would exceed execution.
 
 ## 3. Operating profiles
 
@@ -41,51 +47,51 @@ Every new thread starts in ordinary Codex mode.
 | Pantheon Daily | `$pantheon-daily` | Conservative specialist use, sequential only |
 | Full Pantheon | `$pantheon` | More aggressive specialist use, justified parallelism allowed |
 
-The selected profile is sticky only in the current thread. Nothing persists across threads.
+The selected Pantheon profile is sticky only inside the current thread. Nothing persists across threads.
 
 ### Daily
 
-Daily saves usage by avoiding unnecessary delegation. It does **not** use the old v0.5 `0-1` worker-call ceiling.
+Daily saves usage by avoiding unnecessary delegation. It has no numeric worker-call ceiling.
 
-- If Astra already understands the implementation: `Astra plan → Fixer → Astra review`.
-- If repository evidence is missing: `Explorer → Astra plan → Fixer → Astra review`.
-- If current external/reference evidence is missing: `Librarian → Astra plan → Fixer → Astra review`.
-- If both are necessary, use both sequentially, then Astra plans, then Fixer implements.
-- No parallel child calls in Daily.
+- Evidence already sufficient: `Orchestrator plan → Fixer → Orchestrator review`.
+- Repository evidence missing: `Explorer → Orchestrator plan → Fixer → Orchestrator review`.
+- External/reference evidence missing: `Librarian → Orchestrator plan → Fixer → Orchestrator review`.
+- Both necessary: use both sequentially, then plan, then Fixer.
+- No parallel child calls.
 
 ### Full Pantheon
 
-Full Pantheon uses the same ownership boundaries. Astra can parallelize genuinely independent Explorer/Librarian lanes and independent Fixer workstreams with non-overlapping write ownership.
+Full Pantheon uses the same ownership boundaries. It may parallelize genuinely independent Explorer/Librarian lanes and independent Fixer workstreams with non-overlapping write ownership.
 
-## 4. What each Luna agent may do
+## 4. Luna lanes
 
 ### `luna_explorer`
 
-Use for repository mapping, symbols, code paths, state transitions, dependencies, ownership, and finding exact implementation locations. It is hard read-only and reports evidence to Astra.
+Use for repository mapping, symbols, code paths, state transitions, dependencies, ownership, and exact implementation locations. It is hard read-only and returns compressed evidence to the Orchestrator.
 
 ### `luna_librarian`
 
-Use for official docs, API contracts, upstream repositories, standards, release notes, version-specific behavior, and authoritative examples. It is hard read-only and reports evidence to Astra.
+Use for official docs, API contracts, upstream repositories, standards, release notes, version-specific behavior, and authoritative examples. It is hard read-only and returns compressed evidence to the Orchestrator.
 
 ### `luna_fixer`
 
-Fixer receives Astra's implementation specification. It can inspect local code enough to execute the plan, choose exact edit points/order, make small tactical adaptations that preserve the plan, edit scoped files, and run assigned validation.
+Fixer receives the Orchestrator's implementation specification. It may inspect enough local code to execute that plan, choose exact edit points/order, make small tactical adaptations that preserve the plan, edit scoped files, and run assigned validation.
 
-If execution reveals a material architecture/product decision or contradicts Astra's plan, Fixer stops and returns the issue to Astra rather than silently replanning.
+If execution exposes a material architecture/product decision or contradicts the plan, Fixer stops and returns the issue instead of silently replanning.
 
 ## 5. Planning and review workflows
 
-`$pantheon-plan` is planning-only. Astra owns the plan and may use Explorer/Librarian for read-only evidence. Fixer is not used.
+`$pantheon-plan` is planning-only. The main-thread Orchestrator owns the plan and may use Explorer/Librarian for read-only evidence. Fixer is not used.
 
-`$pantheon-review` is review-only. Astra owns the review/verdict and may use Explorer/Librarian for read-only evidence. Fixer is not used unless you separately ask to leave review mode and implement fixes.
+`$pantheon-review` is review-only. The main-thread Orchestrator owns the review/verdict and may use Explorer/Librarian for read-only evidence. Fixer is not used unless you separately leave review mode and request fixes.
 
 These workflows do not activate a sticky Pantheon profile by themselves.
 
 ## 6. Context and visible task identity
 
-Every child spawn defaults to `fork_turns: "none"` with a self-contained bounded assignment. Astra gives the child only the objective, scope, constraints/context, permissions, expected evidence/output, stopping condition, and prohibition on subagents that it needs.
+Every child spawn defaults to `fork_turns: "none"` with a minimum self-contained bounded assignment: objective, scope, known constraints/facts, permissions, expected evidence/output, stopping condition, and a no-subagents instruction.
 
-Astra also gives every child a role-prefixed native `task_name`:
+Every child also gets a role-prefixed native `task_name`:
 
 ```text
 luna_explorer_<specific_assignment>
@@ -93,11 +99,9 @@ luna_librarian_<specific_assignment>
 luna_fixer_<specific_assignment>
 ```
 
-The assignment suffix must be concrete, concise, and distinguish simultaneous work. For example, use `luna_explorer_trace_guest_lifecycle` instead of `physics_evidence`. The conceptual label is `Luna Explorer · Trace guest lifecycle`; Codex's current task-name field uses lowercase snake_case, so Pantheon encodes that label in the supported form. This makes the Luna lane visible on Codex surfaces that display or humanize task names.
+Use concrete suffixes such as `luna_explorer_trace_guest_lifecycle`; avoid generic labels such as `research` or `implementation`. Never use full-history inheritance by default.
 
-Astra stays in the main thread; Pantheon does not spawn an Astra child just to add a label.
-
-Never use full-history inheritance by default.
+The Orchestrator remains the main thread; Pantheon does not spawn a display-only Orchestrator child.
 
 ## 7. Install, update, repair, remove
 
@@ -107,18 +111,18 @@ Ask Codex:
 Install Codex Pantheon for me.
 ```
 
-or run:
+or use the platform lifecycle command:
 
 ```bash
-./pantheon bootstrap   # install/update + doctor
-./pantheon doctor      # read-only verification
-./pantheon uninstall   # remove Pantheon-owned current + legacy paths
+./pantheon bootstrap
+```
+
+```powershell
+.\pantheon.ps1 bootstrap
 ```
 
 Lifecycle commands do not activate Pantheon.
 
-## 8. Upgrade from v0.5
+## 8. Upgrade from v0.6
 
-`./pantheon bootstrap` removes the v0.5 `pantheon-worker.toml`, installs `luna-explorer.toml`, `luna-librarian.toml`, and `luna-fixer.toml`, refreshes the four skills, and replaces the managed policy block.
-
-The older v0.4 Pantheon specialist filenames and `pantheon-team` are also removed as Pantheon-owned legacy paths. Unrelated Codex configuration remains untouched.
+v0.7 keeps the same three Luna files and four skills. Bootstrap refreshes their model-neutral, context-compacted contracts and the managed policy block while preserving unrelated Codex configuration. The Luna model/effort settings remain GPT-5.6 Luna High in this release so the Orchestrator change is isolated from worker-tuning changes.

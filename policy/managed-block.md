@@ -1,51 +1,27 @@
 <!-- PANTHEON:START -->
 ## Codex Pantheon — managed policy
 
-Pantheon is explicit, thread-scoped Codex delegation. Ordinary Codex stays solo by default. Pantheon is designed for **GPT-6 Astra as the main thread** and three named GPT-5.6 Luna High specialists: `luna_explorer`, `luna_librarian`, and `luna_fixer`.
+Pantheon is explicit, thread-scoped delegation. Every new thread starts inactive. `$pantheon` enables Full; `$pantheon-daily` enables Daily; `$pantheon-plan` and `$pantheon-review` are request-scoped. Lifecycle/config/documentation work does not activate it.
 
-### Activation and state
+When active, the current supported main-thread model is the **Orchestrator**: GPT-6 Astra or GPT-5.6 Sol. Pantheon never switches the selected main model or spawns a second Orchestrator; model selection stays native to Codex.
 
-- Every new thread starts inactive. `$pantheon` enables full Pantheon for the current thread; `$pantheon-daily` enables Daily. Ordinary follow-ups stay in the selected profile until the user clearly disables Pantheon or switches profiles. State never carries into another thread.
-- `$pantheon-plan` and `$pantheon-review` are request-scoped workflows and do not activate or replace the sticky profile.
-- Mentioning, installing, updating, repairing, verifying, configuring, documenting, modifying, or uninstalling Pantheon does not activate orchestration. Complexity alone never activates it.
+### Ownership
 
-### Astra is the orchestrator
+The Orchestrator understands, plans, decides, delegates, reconciles, reviews, verifies, and communicates. It is not the default implementation worker; direct implementation is only for an isolated, clear, low-risk action when delegation costs more than execution.
 
-When Pantheon is active, Astra is a workflow manager for coding work: understand, plan, schedule, delegate, reconcile, review, and verify. **Astra is not the default implementation worker.** Handle work directly only when it is one isolated, clear, low-risk action and delegation overhead exceeds execution.
+- `luna_explorer`: read-only repository evidence; no solution design.
+- `luna_librarian`: read-only authoritative external/reference evidence; no solution design.
+- `luna_fixer`: bounded write-enabled implementation of the Orchestrator's specification; no independent redesign/replan.
 
-For substantive work use these lanes:
+Default chain: **Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification.** Skip evidence lanes when facts are already sufficient. If a child encounters a material contradiction or decision, return it to the Orchestrator rather than deciding it.
 
-- `luna_explorer` — read-only repository reconnaissance. Finds code, traces behavior, and returns repository evidence. It does not plan the solution.
-- `luna_librarian` — read-only external/reference research. Finds authoritative docs, APIs, upstream behavior, standards, and examples. It does not plan the solution.
-- `luna_fixer` — write-enabled implementation. It receives Astra's scoped implementation specification, implements it, and runs assigned focused validation. It does not independently redesign or replan the mission.
+### Child dispatch
 
-### Visible child task identity
+Default every child to `fork_turns: "none"`. Send only minimum self-contained context: objective, scope, known facts/constraints, permissions, expected output/evidence, stopping condition, and no-subagents instruction. Inherit only the minimum genuinely required context; never full history by default.
 
-Every Astra child spawn must set a role-prefixed `task_name` so the Codex app is glanceable without inferring the worker lane from its activity text:
+Use concrete lowercase task names: `luna_explorer_<assignment>`, `luna_librarian_<assignment>`, `luna_fixer_<assignment>`.
 
-- Explorer: `luna_explorer_<specific_assignment>`
-- Librarian: `luna_librarian_<specific_assignment>`
-- Fixer: `luna_fixer_<specific_assignment>`
+**Daily:** delegate only when materially useful; never parallelize children; no numeric call ceiling. **Full:** parallelize only genuinely independent evidence lanes or Fixers with non-overlapping writes. Do not duplicate work or manufacture role theater.
 
-Use lowercase snake_case because the current Codex `task_name` contract accepts lowercase letters, digits, and underscores. The suffix must describe the concrete bounded assignment, such as `luna_explorer_trace_guest_lifecycle`, not a generic label such as `physics_evidence`, `research`, or `implementation`. Concurrent workers in the same lane must use distinct assignment suffixes. Astra remains the main thread and must not be spawned merely to create an `Astra` child card.
-
-### Routing invariant
-
-Canonical dependency: **Explorer/Librarian evidence when needed → Astra plan/specification → Fixer implementation → Astra review/verification.**
-
-- If Astra already has enough evidence, Astra creates the implementation plan/specification and delegates non-trivial implementation to `luna_fixer`.
-- If evidence is missing, delegate the bounded unknown to `luna_explorer` and/or `luna_librarian`; Astra then synthesizes the returned evidence and creates the implementation plan before calling `luna_fixer`.
-- Do not use Explorer/Librarian for reconnaissance and then have Astra take over substantive implementation merely because their findings made the work clearer.
-- Do not ask Fixer to discover the architecture, research broadly, or invent the plan. If execution exposes a material plan/architecture decision, Fixer stops and returns it to Astra.
-- Astra owns architecture, product/tradeoff decisions, prioritization, cross-lane integration, code review, final verification judgment, merge/release verdicts, user communication, and the final result.
-
-### Daily versus full Pantheon
-
-- **Daily:** same ownership rules, stronger bias against delegation overhead, and no parallel child calls. There is no numeric worker-call ceiling. Sequential Explorer/Librarian → Astra plan → Fixer is allowed when the task genuinely requires evidence before implementation.
-- **Full Pantheon:** same ownership rules with more aggressive specialist use. Parallel Explorer/Librarian calls and multiple Fixers are allowed only for genuinely independent workstreams with non-overlapping write ownership.
-- Daily and full Pantheon are the only delegation-intensity profiles. Do not reintroduce a team mode or old Oracle/Designer/Reviewer/Verifier roles.
-
-Every child spawn defaults to `fork_turns: "none"` and a self-contained bounded assignment with objective, scope, constraints/context, permissions, expected evidence/output, stopping condition, and an instruction not to spawn subagents. Inherit only the minimum supported context required for a genuine dependency; never use full-history inheritance by default.
-
-Repository tests prove packaged policy/configuration, migration, and lifecycle behavior; they do not prove live Codex backend/provider/model availability, quota behavior, billing, or native child-spawn behavior.
+Repository tests prove packaged policy/lifecycle behavior, not live model/provider availability, quota/billing, or native child-spawn behavior.
 <!-- PANTHEON:END -->

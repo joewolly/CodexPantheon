@@ -1,6 +1,6 @@
 # Install Codex Pantheon with Codex
 
-Pantheon v0.6 bootstraps through an ordinary Codex workspace. No separate orchestration runtime is required.
+Pantheon v0.7 bootstraps through an ordinary Codex workspace. No separate orchestration or model-routing runtime is required.
 
 Pantheon uses one shared payload and two platform-native lifecycle frontends:
 
@@ -19,7 +19,7 @@ WSL or Git Bash is not required for a native Windows install.
    Install Codex Pantheon for me.
    ```
 
-This lifecycle request does **not** activate Pantheon. `$pantheon` activates full Pantheon; `$pantheon-daily` activates Daily.
+This lifecycle request does **not** activate Pantheon. `$pantheon` activates Full Pantheon; `$pantheon-daily` activates Daily.
 
 The repository `AGENTS.md` tells Codex to run the platform-appropriate bootstrap command.
 
@@ -36,6 +36,12 @@ Windows PowerShell:
 ```
 
 `bootstrap` installs or updates Pantheon-owned files and immediately runs `doctor`.
+
+## Orchestrator selection
+
+Pantheon supports GPT-6 Astra and GPT-5.6 Sol as the main-thread Orchestrator. Select the model with Codex's native model control. Pantheon does not write a separate model preference, does not switch the active main model, and does not spawn a second Orchestrator.
+
+That separation is intentional: the same installed Pantheon payload works for either model and native Codex remains the source of truth for the active model.
 
 ## Manual install/update
 
@@ -69,7 +75,7 @@ The Windows frontend defaults to `%USERPROFILE%\.codex` for Codex state and `%US
 
 ## What Pantheon installs
 
-Pantheon owns these current logical paths:
+Pantheon owns:
 
 - `<Codex home>/agents/luna-explorer.toml`
 - `<Codex home>/agents/luna-librarian.toml`
@@ -88,13 +94,11 @@ Defaults:
 | macOS/Linux | `~/.codex` | `~/.agents/skills` |
 | Windows | `%USERPROFILE%\.codex` | `%USERPROFILE%\.agents\skills` |
 
-Same-named Pantheon paths are replaced on install/update and removed on uninstall. The Bash and PowerShell frontends both consume the same `agents/`, `skills/`, and `policy/` source files.
+Same-named Pantheon paths are replaced on install/update and removed on uninstall. Bash and PowerShell consume the same source payload.
 
 ## v0.5 migration cleanup
 
-v0.6 removes the former v0.5 `<Codex home>/agents/pantheon-worker.toml` during install/update/bootstrap/uninstall.
-
-It also continues to remove Pantheon's older v0.4 owned agent filenames:
+v0.7 continues removing the former v0.5 `<Codex home>/agents/pantheon-worker.toml` during install/update/bootstrap/uninstall, plus Pantheon's older v0.4 owned agent filenames:
 
 - `pantheon-explorer.toml`
 - `pantheon-librarian.toml`
@@ -110,7 +114,7 @@ If you placed unrelated personal content at one of those exact Pantheon-owned le
 
 ## Architecture note
 
-Astra is the intended main Codex model and is not installed by Pantheon. The three child definitions are `luna_explorer`, `luna_librarian`, and `luna_fixer`, all pinned to GPT-5.6 Luna High. Explorer/Librarian are read-only; Fixer is workspace-write.
+The selected supported main-thread model is the Orchestrator and is not installed by Pantheon. The children are `luna_explorer`, `luna_librarian`, and `luna_fixer`, all pinned to GPT-5.6 Luna High. Explorer/Librarian are read-only; Fixer is workspace-write.
 
 ## Fail-closed behavior
 
@@ -120,9 +124,9 @@ On Windows, Pantheon treats NTFS reparse points at protected managed paths as th
 
 ## Doctor and Codex discovery
 
-Both frontends validate the same static installation state. The Windows Doctor looks for Codex on PATH and in native Codex app/standalone locations under `%LOCALAPPDATA%`, including the current app runtime and standalone CLI layouts.
+Both frontends validate the same static installation state. Windows Doctor looks for Codex on PATH and in native Codex app/standalone locations under `%LOCALAPPDATA%`.
 
-Failure to discover an executable is a warning rather than a static Pantheon integrity failure; installed payload validation can still succeed.
+Failure to discover an executable is a warning rather than a static Pantheon integrity failure.
 
 ## Evidence boundary
 

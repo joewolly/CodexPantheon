@@ -5,24 +5,12 @@ description: Explicit Pantheon review workflow. Use only when the user invokes $
 
 # Pantheon Review
 
-This is a request-scoped, read-only review workflow. It does not activate Pantheon, replace the selected Daily/full profile, or become sticky. Do not modify production source as part of a review-only request.
+Run one read-only review request, then resume any previously active Daily/Full profile. This skill does not activate Pantheon, switch the main model, or modify production source.
 
-Astra performs the actual review and owns the verdict. Astra inspects the target behavior, diff, risk, static evidence, and validation evidence and decides what the evidence proves.
+The selected supported main-thread model is the Orchestrator and owns the review and verdict. Inspect target behavior, diff/static evidence, risk, and validation evidence. Use Explorer only for a material repository-evidence gap and Librarian only for a material authoritative external/reference gap. Both remain read-only; **do not use Fixer** during review-only work.
 
-## Optional evidence specialists
+The Orchestrator may run focused tests/builds/reproduction directly when needed for the verdict. Specialist agreement is not proof, and passing tests do not erase static correctness issues.
 
-Use `luna_explorer` for a bounded repository-evidence question such as mapping a code path, ownership boundary, or suspected regression surface. Use `luna_librarian` for a bounded authoritative external/reference requirement. Both are read-only and return evidence; neither owns the review judgment.
+For merge/release decisions return `PASS`, `PASS WITH NOTES`, or `FAIL / NO-MERGE` with blockers and material unverified gates.
 
-Do not use `luna_fixer` during a review-only request. If the user separately asks to apply fixes, finish or clearly exit the review decision, have Astra create the implementation specification, and route the implementation to Fixer under the active Pantheon profile or an explicit implementation request.
-
-Astra may run focused tests/builds/reproduction directly when needed for the review verdict. Agreement from a specialist is not proof, and a passing test does not erase a static correctness issue.
-
-Every child spawn defaults to `fork_turns: "none"` and receives a self-contained, bounded assignment with objective, review target/scope, constraints/context, explicit read-only permission, expected evidence/output, stopping condition, and a direct instruction not to spawn subagents.
-
-Every evidence child must use a role-prefixed `task_name`: `luna_explorer_<specific_assignment>` or `luna_librarian_<specific_assignment>`. Use lowercase letters, digits, and underscores only. The suffix must identify the actual bounded review question rather than a generic label such as `evidence` or `review`, so the Codex app exposes the worker lane at a glance. Concurrent evidence lanes must use distinct assignment suffixes. Astra remains the main thread and is not spawned as a display-only child.
-
-Do not inherit context merely because it is available. Use the minimum supported inheritance only when a genuine parent dependency requires it, with the sole exception of a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default.
-
-For a merge or release decision, return a clear `PASS`, `PASS WITH NOTES`, or `FAIL / NO-MERGE` verdict with blocking reasons and material unverified gates.
-
-Repository tests prove packaged policy/configuration, migration, and lifecycle behavior, not live backend/provider/model availability, quota behavior, billing, or native child-spawn behavior.
+All evidence dispatch follows the managed policy's minimum-context, `fork_turns: "none"`, bounded-assignment, no-subagents, and role-prefixed `task_name` contract.

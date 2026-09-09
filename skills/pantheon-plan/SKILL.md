@@ -5,24 +5,10 @@ description: Explicit Pantheon planning workflow. Use only when the user invokes
 
 # Pantheon Plan
 
-This is a planning-only, request-scoped workflow. It does not activate Pantheon, replace the selected Daily/full profile, or become sticky. If a sticky profile was active, resume it after this request.
+Run one planning-only request, then resume any previously active Daily/Full profile. This skill does not activate Pantheon, switch the main model, or modify production state.
 
-Astra owns the plan. Astra performs decomposition, architecture, tradeoff decisions, sequencing, risk analysis, validation design, and the final planning answer.
+The selected supported main-thread model is the Orchestrator and owns decomposition, architecture, tradeoffs, sequencing, risks, validation design, and the final plan. Use Explorer only for material repository unknowns and Librarian only for material authoritative external/reference unknowns. Both remain read-only evidence lanes; **do not use Fixer**.
 
-## Evidence specialists
+Gather only enough evidence to resolve the plan. The Orchestrator then returns one actionable plan covering behavior, approach, scope/ownership, sequencing, validation criteria, material risks, migration/rollback concerns when relevant, and unresolved decisions only where evidence cannot resolve them.
 
-Use `luna_explorer` when repository reconnaissance materially improves the plan. Use `luna_librarian` when authoritative external/reference research materially improves the plan. Both roles are read-only and return evidence to Astra; neither creates the implementation plan.
-
-Do **not** use `luna_fixer` in a planning-only request. Do not implement, edit production source, mutate project state, commit, push, merge, tag, or release.
-
-Astra should gather only the evidence needed to make the plan. Independent Explorer/Librarian lanes may be used when both are necessary, but do not manufacture research work for completeness.
-
-Every child spawn defaults to `fork_turns: "none"` and receives a self-contained, bounded assignment containing objective, scope, constraints/context, explicit read-only permission, expected evidence/output, stopping condition, and a direct instruction not to spawn subagents.
-
-Every evidence child must use a role-prefixed `task_name`: `luna_explorer_<specific_assignment>` or `luna_librarian_<specific_assignment>`. Use lowercase letters, digits, and underscores only. The suffix must identify the actual bounded question, not a generic label such as `evidence` or `research`, so the Codex app exposes the worker lane at a glance. Concurrent evidence lanes must use distinct assignment suffixes. Astra remains the main thread and is not spawned as a display-only child.
-
-Do not inherit context merely because it is available. Use the minimum supported inheritance only when a genuine parent dependency requires it, with the sole exception of a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default.
-
-After evidence returns, Astra synthesizes it and produces one actionable plan with behavior, approach, sequencing, ownership boundaries, validation criteria, material risks, migration/rollback concerns when relevant, and unresolved decisions only where evidence cannot resolve them.
-
-Repository tests prove packaged policy/configuration, migration, and lifecycle behavior, not live backend/provider/model availability, quota behavior, billing, or native child-spawn behavior.
+All evidence dispatch follows the managed policy's minimum-context, `fork_turns: "none"`, bounded-assignment, no-subagents, and role-prefixed `task_name` contract.
