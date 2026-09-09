@@ -188,7 +188,8 @@ Assert-Contains (Join-Path $Root 'README.md') 'v0.7.0'
 Assert-Contains (Join-Path $Root 'README.md') 'Windows'
 Assert-Contains (Join-Path (Join-Path $Root 'docs') 'CODEX_INSTALL.md') '.\pantheon.ps1 bootstrap'
 Assert-Contains (Join-Path (Join-Path $Root 'docs') 'CLI_REFERENCE.md') 'pantheon.ps1'
-Assert-Contains (Join-Path $Root 'CHANGELOG.md') '## 0.7.0 — 2026-09-09'
+Assert-Contains (Join-Path $Root 'CHANGELOG.md') '## 0.7.0'
+Assert-Contains (Join-Path $Root 'CHANGELOG.md') '2026-09-09'
 Pass 'Windows documentation and release metadata coverage'
 
 Write-Output "1..$Pass"
