@@ -13,12 +13,12 @@ assert_contains() { grep -Fq -- "$2" "$1" || fail "expected '$2' in $1"; }
 assert_not_contains() { ! grep -Fq -- "$2" "$1" || fail "did not expect '$2' in $1"; }
 assert_regular_not_symlink() { [ -f "$1" ] && [ ! -L "$1" ] || fail "expected regular non-symlink file: $1"; }
 assert_equal_files() { cmp -s "$1" "$2" || fail "files differ: $1 $2"; }
+words() { wc -w < "$1" | tr -d '[:space:]'; }
 
 bash -n "$PANTHEON" "$ROOT/install.sh" "$0"
 pass "shell syntax"
 
-# This development branch intentionally keeps the published v0.6.0 lifecycle
-# version until the v0.7 release cut.
+# Development branch keeps the published lifecycle version until release cut.
 assert_contains "$ROOT/VERSION" "0.6.0"
 assert_contains "$PANTHEON" 'VERSION="0.6.0"'
 pass "published lifecycle version remains v0.6.0 until release cut"
@@ -30,66 +30,55 @@ for agent in "$EXPLORER" "$LIBRARIAN" "$FIXER"; do
   assert_file "$agent"
   assert_contains "$agent" 'model = "gpt-5.6-luna"'
   assert_contains "$agent" 'model_reasoning_effort = "high"'
-  assert_contains "$agent" "Do not spawn, delegate to, or manage subagents"
-  assert_not_contains "$agent" "parent Astra thread"
+  assert_contains "$agent" "Orchestrator"
+  assert_contains "$agent" "delegate"
+  [ "$(words "$agent")" -lt 180 ] || fail "agent contract too large: $agent ($(words "$agent") words)"
 done
 assert_contains "$EXPLORER" 'name = "luna_explorer"'
 assert_contains "$EXPLORER" 'sandbox_mode = "read-only"'
 assert_contains "$EXPLORER" "minimum sufficient evidence"
-assert_contains "$EXPLORER" "the Orchestrator plans and decides; Luna Fixer implements"
 assert_contains "$LIBRARIAN" 'name = "luna_librarian"'
 assert_contains "$LIBRARIAN" 'sandbox_mode = "read-only"'
 assert_contains "$LIBRARIAN" "minimum sufficient authoritative evidence"
-assert_contains "$LIBRARIAN" "the Orchestrator plans and decides; Luna Fixer implements"
 assert_contains "$FIXER" 'name = "luna_fixer"'
 assert_contains "$FIXER" 'sandbox_mode = "workspace-write"'
-assert_contains "$FIXER" "The Orchestrator owns architecture"
-assert_contains "$FIXER" "stop and return the blocker to the Orchestrator"
-pass "Luna contracts stay High, bounded, model-neutral, and non-recursive"
+assert_contains "$FIXER" "smallest defensible change"
+assert_contains "$FIXER" "stop and return the blocker"
+pass "Luna contracts are bounded, model-neutral, non-recursive, and size-capped"
 
 LEGACY_AGENTS=(
-  pantheon-worker.toml
-  pantheon-explorer.toml
-  pantheon-librarian.toml
-  pantheon-oracle.toml
-  pantheon-fixer.toml
-  pantheon-designer.toml
-  pantheon-reviewer.toml
-  pantheon-verifier.toml
+  pantheon-worker.toml pantheon-explorer.toml pantheon-librarian.toml
+  pantheon-oracle.toml pantheon-fixer.toml pantheon-designer.toml
+  pantheon-reviewer.toml pantheon-verifier.toml
 )
 for legacy in "${LEGACY_AGENTS[@]}"; do assert_not_file "$ROOT/agents/$legacy"; done
 assert_not_file "$ROOT/skills/pantheon-team"
 pass "v0.4/v0.5 legacy source payload is absent"
 
 POLICY="$ROOT/policy/managed-block.md"
-POLICY_WORDS="$(wc -w < "$POLICY" | tr -d '[:space:]')"
-[ "$POLICY_WORDS" -lt 600 ] || fail "managed policy is too large (${POLICY_WORDS} words)"
+POLICY_WORDS="$(words "$POLICY")"
+[ "$POLICY_WORDS" -lt 400 ] || fail "always-on managed policy too large (${POLICY_WORDS} words)"
 for marker in \
   "Every new thread starts inactive" \
   "GPT-6 Astra" \
   "GPT-5.6 Sol" \
-  "never changes the selected main model" \
-  "The Orchestrator is not the default implementation worker" \
+  "never switches the selected main model" \
+  "It is not the default implementation worker" \
   '`luna_explorer`' \
   '`luna_librarian`' \
   '`luna_fixer`' \
-  'luna_explorer_<specific_assignment>' \
-  'luna_librarian_<specific_assignment>' \
-  'luna_fixer_<specific_assignment>' \
   "Explorer/Librarian evidence when needed" \
   "Orchestrator plan/specification" \
-  "Do not use Explorer/Librarian for reconnaissance and then have the Orchestrator take over substantive implementation" \
-  "no numeric worker-call ceiling" \
-  "no parallel child calls" \
-  "genuinely independent evidence lanes" \
-  'defaults to `fork_turns: "none"`' \
+  'fork_turns: "none"' \
   "minimum self-contained context" \
-  "Never use full-history inheritance by default" \
-  "Repository tests prove packaged policy/configuration"; do
+  "never full history by default" \
+  "never parallelize children" \
+  "non-overlapping writes" \
+  "Repository tests prove packaged policy/lifecycle behavior"; do
   assert_contains "$POLICY" "$marker"
 done
 for obsolete in \
-  "### Astra is the orchestrator" \
+  "Astra is the orchestrator" \
   "Every Astra child spawn" \
   'pantheon_worker` is the single' \
   'normally use 0-1 worker calls' \
@@ -100,41 +89,34 @@ for obsolete in \
   'pantheon_verifier'; do
   assert_not_contains "$POLICY" "$obsolete"
 done
-pass "managed policy is dual-Orchestrator, compact, and minimum-context"
+pass "always-on policy is compact, dual-Orchestrator, and minimum-context"
 
-for skill in pantheon pantheon-daily pantheon-plan pantheon-review; do
-  skill_file="$ROOT/skills/$skill/SKILL.md"
-  assert_file "$skill_file"
-  assert_contains "$skill_file" "GPT-6 Astra"
-  assert_contains "$skill_file" "GPT-5.6 Sol"
-  assert_contains "$skill_file" 'fork_turns: "none"'
-  assert_contains "$skill_file" "minimum"
-  assert_contains "$skill_file" "self-contained"
-  assert_contains "$skill_file" "bounded"
-  assert_contains "$skill_file" 'role-prefixed `task_name`'
-  assert_contains "$skill_file" 'luna_explorer_<specific_assignment>'
-  assert_contains "$skill_file" 'luna_librarian_<specific_assignment>'
-  assert_contains "$skill_file" "Do not inherit context merely because it is available"
-  assert_contains "$skill_file" "minimum supported inheritance"
-  assert_contains "$skill_file" "required dynamic tool unavailable"
-  assert_contains "$skill_file" "Never use full-history inheritance by default"
-  assert_contains "$skill_file" "not to spawn subagents"
-  assert_contains "$skill_file" "Repository tests prove packaged policy/configuration"
+FULL="$ROOT/skills/pantheon/SKILL.md"
+DAILY="$ROOT/skills/pantheon-daily/SKILL.md"
+PLAN="$ROOT/skills/pantheon-plan/SKILL.md"
+REVIEW="$ROOT/skills/pantheon-review/SKILL.md"
+for skill in "$FULL" "$DAILY" "$PLAN" "$REVIEW"; do
+  assert_file "$skill"
+  assert_contains "$skill" "managed policy"
+  assert_contains "$skill" 'fork_turns: "none"'
+  assert_contains "$skill" "minimum-context"
+  assert_contains "$skill" 'role-prefixed `task_name`'
+  assert_not_contains "$skill" "GPT-6 Astra"
+  assert_not_contains "$skill" "GPT-5.6 Sol"
 done
-assert_contains "$ROOT/skills/pantheon/SKILL.md" 'luna_fixer_<specific_assignment>'
-assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" 'luna_fixer_<specific_assignment>'
-assert_contains "$ROOT/skills/pantheon/SKILL.md" "not the default implementation worker"
-assert_contains "$ROOT/skills/pantheon/SKILL.md" "Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification"
-assert_contains "$ROOT/skills/pantheon/SKILL.md" "Multiple Fixers may run in parallel only with clear non-overlapping write ownership"
-assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "Daily changes delegation intensity, never role ownership"
-assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "no numeric worker-call ceiling"
-assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "do not parallelize child agents in Daily"
-assert_contains "$ROOT/skills/pantheon-daily/SKILL.md" "Orchestrator plan → Fixer → Orchestrator review"
-assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" "owns the plan"
-assert_contains "$ROOT/skills/pantheon-plan/SKILL.md" 'Do **not** use `luna_fixer`'
-assert_contains "$ROOT/skills/pantheon-review/SKILL.md" "performs the actual review"
-assert_contains "$ROOT/skills/pantheon-review/SKILL.md" 'Do not use `luna_fixer` during a review-only request'
-pass "four skills share one model-neutral Orchestrator contract"
+[ "$(words "$FULL")" -lt 300 ] || fail "Full skill too large ($(words "$FULL") words)"
+[ "$(words "$DAILY")" -lt 260 ] || fail "Daily skill too large ($(words "$DAILY") words)"
+[ "$(words "$PLAN")" -lt 230 ] || fail "Plan skill too large ($(words "$PLAN") words)"
+[ "$(words "$REVIEW")" -lt 240 ] || fail "Review skill too large ($(words "$REVIEW") words)"
+[ $((POLICY_WORDS + $(words "$FULL"))) -lt 650 ] || fail "Full active instruction hot path exceeds budget"
+[ $((POLICY_WORDS + $(words "$DAILY"))) -lt 620 ] || fail "Daily active instruction hot path exceeds budget"
+assert_contains "$FULL" "Multiple Fixers may run in parallel only with explicit non-overlapping write ownership"
+assert_contains "$DAILY" "Never parallelize children"
+assert_contains "$DAILY" "no numeric worker-call ceiling"
+assert_contains "$PLAN" "do not use Fixer"
+assert_contains "$REVIEW" "do not use Fixer"
+assert_contains "$REVIEW" "PASS WITH NOTES"
+pass "workflow skills are delta-only and protected by instruction-size budgets"
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
@@ -151,7 +133,6 @@ PRE
 printf 'do-not-touch\n' > "$CODEX_HOME/agents/user-custom.toml"
 mkdir -p "$PANTHEON_SKILLS_HOME/user-skill"
 printf '%s\n' 'user skill' > "$PANTHEON_SKILLS_HOME/user-skill/SKILL.md"
-
 for legacy in "${LEGACY_AGENTS[@]}"; do printf 'legacy\n' > "$CODEX_HOME/agents/$legacy"; done
 mkdir -p "$PANTHEON_SKILLS_HOME/pantheon-team"
 printf 'legacy team\n' > "$PANTHEON_SKILLS_HOME/pantheon-team/SKILL.md"
@@ -174,8 +155,7 @@ for skill in pantheon pantheon-daily pantheon-plan pantheon-review; do
 done
 assert_contains "$CODEX_HOME/AGENTS.md" "GPT-6 Astra"
 assert_contains "$CODEX_HOME/AGENTS.md" "GPT-5.6 Sol"
-assert_contains "$CODEX_HOME/AGENTS.md" "The Orchestrator is not the default implementation worker"
-assert_contains "$CODEX_HOME/AGENTS.md" "never changes the selected main model"
+assert_contains "$CODEX_HOME/AGENTS.md" "never switches the selected main model"
 pass "install refreshes dual-Orchestrator payload and preserves unrelated configuration"
 
 BEFORE="$(cksum "$CODEX_HOME/AGENTS.md")"
@@ -195,7 +175,7 @@ pass "doctor detects agent drift and update repairs it"
 printf 'drift\n' >> "$PANTHEON_SKILLS_HOME/pantheon-daily/SKILL.md"
 if "$PANTHEON" doctor >/dev/null 2>&1; then fail "doctor should fail on drifted Daily skill"; fi
 "$PANTHEON" update >/dev/null
-assert_equal_files "$ROOT/skills/pantheon-daily/SKILL.md" "$PANTHEON_SKILLS_HOME/pantheon-daily/SKILL.md"
+assert_equal_files "$DAILY" "$PANTHEON_SKILLS_HOME/pantheon-daily/SKILL.md"
 "$PANTHEON" doctor >/dev/null
 pass "doctor detects skill drift and update repairs it"
 
@@ -285,6 +265,6 @@ assert_contains "$ROOT/docs/CODEX_INSTALL.md" "Orchestrator selection"
 assert_contains "$ROOT/docs/V0.7.0.md" "Dual Orchestrator + context efficiency"
 assert_contains "$ROOT/CHANGELOG.md" "GPT-5.6 Sol as a supported main-thread Pantheon Orchestrator"
 assert_contains "$ROOT/THIRD_PARTY_NOTICES.md" "oh-my-opencode-slim"
-pass "v0.7 candidate documentation matches dual-Orchestrator architecture"
+pass "v0.7 candidate docs match dual-Orchestrator architecture"
 
 printf '1..%d\n' "$PASS"
