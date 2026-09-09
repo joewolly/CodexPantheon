@@ -5,21 +5,19 @@ description: Explicit Pantheon review workflow. Use only when the user invokes $
 
 # Pantheon Review
 
-This is a request-scoped, read-only review workflow. It does not activate Pantheon, replace the selected Daily/full profile, or become sticky. Do not modify production source as part of a review-only request.
+This is a request-scoped, read-only review workflow. It does not activate Pantheon, replace the selected Daily/Full profile, or become sticky. Do not modify production source during a review-only request.
 
-Astra performs the actual review and owns the verdict. Astra inspects the target behavior, diff, risk, static evidence, and validation evidence and decides what the evidence proves.
+The current supported main-thread model—GPT-6 Astra or GPT-5.6 Sol—is the Orchestrator and performs the actual review. It inspects behavior, diff, risk, static evidence, and validation evidence and owns the verdict. This workflow does not switch the main model.
 
-## Optional evidence specialists
+Use `luna_explorer` for a bounded repository-evidence question such as a code path, ownership boundary, or suspected regression surface. Use `luna_librarian` for a bounded authoritative external/reference requirement. Both are read-only; neither owns the review judgment.
 
-Use `luna_explorer` for a bounded repository-evidence question such as mapping a code path, ownership boundary, or suspected regression surface. Use `luna_librarian` for a bounded authoritative external/reference requirement. Both are read-only and return evidence; neither owns the review judgment.
+Do not use `luna_fixer` during a review-only request. If the user separately asks to apply fixes, clearly exit the review decision, create the implementation specification, and route non-trivial implementation to Fixer under the active Pantheon profile or explicit implementation request.
 
-Do not use `luna_fixer` during a review-only request. If the user separately asks to apply fixes, finish or clearly exit the review decision, have Astra create the implementation specification, and route the implementation to Fixer under the active Pantheon profile or an explicit implementation request.
+The Orchestrator may run focused tests/builds/reproduction directly when needed for the verdict. Agreement from a specialist is not proof, and a passing test does not erase a static correctness issue.
 
-Astra may run focused tests/builds/reproduction directly when needed for the review verdict. Agreement from a specialist is not proof, and a passing test does not erase a static correctness issue.
+Every child spawn defaults to `fork_turns: "none"` and receives only the minimum self-contained bounded assignment needed: objective, review target/scope, known constraints/facts, explicit read-only permission, expected evidence/output, stopping condition, and a direct instruction not to spawn subagents.
 
-Every child spawn defaults to `fork_turns: "none"` and receives a self-contained, bounded assignment with objective, review target/scope, constraints/context, explicit read-only permission, expected evidence/output, stopping condition, and a direct instruction not to spawn subagents.
-
-Every evidence child must use a role-prefixed `task_name`: `luna_explorer_<specific_assignment>` or `luna_librarian_<specific_assignment>`. Use lowercase letters, digits, and underscores only. The suffix must identify the actual bounded review question rather than a generic label such as `evidence` or `review`, so the Codex app exposes the worker lane at a glance. Concurrent evidence lanes must use distinct assignment suffixes. Astra remains the main thread and is not spawned as a display-only child.
+Every evidence child uses a concrete role-prefixed `task_name`: `luna_explorer_<specific_assignment>` or `luna_librarian_<specific_assignment>`. Use lowercase letters, digits, and underscores only.
 
 Do not inherit context merely because it is available. Use the minimum supported inheritance only when a genuine parent dependency requires it, with the sole exception of a supported inherited fork when `fork_turns: "none"` would make a required dynamic tool unavailable. Never use full-history inheritance by default.
 
