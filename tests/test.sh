@@ -18,10 +18,9 @@ words() { wc -w < "$1" | tr -d '[:space:]'; }
 bash -n "$PANTHEON" "$ROOT/install.sh" "$0"
 pass "shell syntax"
 
-# Development branch keeps the published lifecycle version until release cut.
-assert_contains "$ROOT/VERSION" "0.6.0"
-assert_contains "$PANTHEON" 'VERSION="0.6.0"'
-pass "published lifecycle version remains v0.6.0 until release cut"
+assert_contains "$ROOT/VERSION" "0.7.0"
+assert_contains "$PANTHEON" 'VERSION="0.7.0"'
+pass "release version is v0.7.0"
 
 EXPLORER="$ROOT/agents/luna-explorer.toml"
 LIBRARIAN="$ROOT/agents/luna-librarian.toml"
@@ -141,7 +140,7 @@ printf 'legacy team\n' > "$PANTHEON_SKILLS_HOME/pantheon-team/SKILL.md"
 assert_contains "$CODEX_HOME/AGENTS.md" "Keep this exact user-owned line."
 [ "$(grep -Fxc '<!-- PANTHEON:START -->' "$CODEX_HOME/AGENTS.md")" -eq 1 ] || fail "expected one Pantheon start marker"
 [ "$(grep -Fxc '<!-- PANTHEON:END -->' "$CODEX_HOME/AGENTS.md")" -eq 1 ] || fail "expected one Pantheon end marker"
-assert_contains "$CODEX_HOME/.pantheon-version" "0.6.0"
+assert_contains "$CODEX_HOME/.pantheon-version" "0.7.0"
 assert_file "$CODEX_HOME/agents/user-custom.toml"
 assert_file "$PANTHEON_SKILLS_HOME/user-skill/SKILL.md"
 for agent in luna-explorer.toml luna-librarian.toml luna-fixer.toml; do
@@ -245,7 +244,7 @@ export PANTHEON_SKILLS_HOME="$BOOT/skills"
 mkdir -p "$HOME" "$BOOT"
 BOOT_OUT="$BOOT/bootstrap.out"
 "$PANTHEON" bootstrap >"$BOOT_OUT" 2>&1
-assert_contains "$BOOT_OUT" "Pantheon-owned files synchronized to v0.6.0."
+assert_contains "$BOOT_OUT" "Pantheon-owned files synchronized to v0.7.0."
 assert_contains "$BOOT_OUT" "Status: HEALTHY"
 printf 'drift\n' >> "$CODEX_HOME/agents/luna-fixer.toml"
 "$PANTHEON" bootstrap >"$BOOT_OUT" 2>&1
@@ -259,12 +258,14 @@ assert_contains "$ROOT/AGENTS.md" "GPT-6 Astra and GPT-5.6 Sol"
 assert_contains "$ROOT/README.md" "Astra or Sol = Orchestrator"
 assert_contains "$ROOT/README.md" "native main-thread model control"
 assert_contains "$ROOT/README.md" "codex-pantheon-v0.7-architecture.svg"
+assert_contains "$ROOT/README.md" "v0.7.0"
 assert_contains "$ROOT/docs/USER_GUIDE.md" "Choose the Orchestrator"
 assert_contains "$ROOT/docs/DESIGN_DOCTRINE.md" "Model selection is native Codex state"
 assert_contains "$ROOT/docs/CODEX_INSTALL.md" "Orchestrator selection"
 assert_contains "$ROOT/docs/V0.7.0.md" "Dual Orchestrator + context efficiency"
-assert_contains "$ROOT/CHANGELOG.md" "GPT-5.6 Sol as a supported main-thread Pantheon Orchestrator"
+assert_not_contains "$ROOT/docs/V0.7.0.md" "candidate"
+assert_contains "$ROOT/CHANGELOG.md" "## 0.7.0 — 2026-09-09"
 assert_contains "$ROOT/THIRD_PARTY_NOTICES.md" "oh-my-opencode-slim"
-pass "v0.7 candidate docs match dual-Orchestrator architecture"
+pass "v0.7.0 release docs match dual-Orchestrator architecture"
 
 printf '1..%d\n' "$PASS"
