@@ -7,7 +7,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$Version = '0.6.0'
+$Version = '0.7.0'
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $StartMarker = '<!-- PANTHEON:START -->'
 $EndMarker = '<!-- PANTHEON:END -->'
