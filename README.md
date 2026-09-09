@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/codex-pantheon-banner.png" alt="Codex Pantheon" width="100%">
+  <img src="docs/codex-pantheon-banner.png" alt="Codex Pantheon — Astra or Sol, with three Luna specialists" width="100%">
 </p>
 
 # Codex Pantheon
@@ -13,8 +13,10 @@ Codex Pantheon is a slim, explicit, Codex-native orchestration layer for a suppo
 **Astra or Sol = Orchestrator. Luna = Explorer + Librarian + Fixer.**
 
 <p align="center">
-  <img src="docs/assets/codex-pantheon-v0.7-architecture.svg" alt="Codex Pantheon v0.7 — Astra or Sol Orchestrator with Luna Explorer, Librarian, and Fixer" width="100%">
+  <img src="docs/pantheon.png" alt="Codex Pantheon v0.7.0: choose Astra or Sol as one main-thread Orchestrator. Luna Explorer and Librarian gather read-only evidence; Luna Fixer implements the specification. The Orchestrator reviews and verifies." width="100%">
 </p>
+
+[View the detailed architecture diagram](docs/assets/codex-pantheon-v0.7-architecture.svg) · [Graphics and generation brief](docs/assets/GRAPHICS.md)
 
 ## Architecture
 

@@ -1,94 +1,104 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">Codex Pantheon v0.7 architecture</title>
-  <desc id="desc">GPT-6 Astra or GPT-5.6 Sol is the main-thread Orchestrator. Three GPT-5.6 Luna High specialists provide Explorer, Librarian, and Fixer lanes.</desc>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#07111f"/><stop offset=".52" stop-color="#0a1324"/><stop offset="1" stop-color="#07101b"/></linearGradient>
-    <linearGradient id="orch" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#152a55"/><stop offset="1" stop-color="#10213f"/></linearGradient>
-    <linearGradient id="exp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0a2735"/><stop offset="1" stop-color="#0d1d29"/></linearGradient>
-    <linearGradient id="lib" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#23183f"/><stop offset="1" stop-color="#171529"/></linearGradient>
-    <linearGradient id="fix" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a2213"/><stop offset="1" stop-color="#211710"/></linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#000" flood-opacity=".4"/></filter>
-    <marker id="arrow" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto" markerUnits="strokeWidth"><path d="M0 0 12 6 0 12z" fill="#7faaf7"/></marker>
-    <style>
-      .sans{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-      .title{font-size:64px;font-weight:800;letter-spacing:13px;fill:#f7fbff}
-      .subtitle{font-size:23px;font-weight:600;letter-spacing:5px;fill:#a9bedc}
-      .eyebrow{font-size:16px;font-weight:800;letter-spacing:4px}
-      .cardTitle{font-size:28px;font-weight:800;letter-spacing:3px;fill:#f7fbff}
-      .cardSub{font-size:17px;font-weight:700;letter-spacing:2px}
-      .body{font-size:18px;font-weight:500;fill:#d7e0ec}
-      .small{font-size:15px;font-weight:700;letter-spacing:1.3px}
-      .flow{font-size:17px;font-weight:800;letter-spacing:1.6px;fill:#dbe8ff}
-    </style>
-  </defs>
-  <rect width="1600" height="900" fill="url(#bg)"/>
-  <circle cx="250" cy="120" r="250" fill="#12315c" opacity=".11"/>
-  <circle cx="1370" cy="735" r="300" fill="#31215d" opacity=".08"/>
-  <path d="M80 188H1520" stroke="#24425f" opacity=".7"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1140" viewBox="0 0 1600 1140" role="img" aria-labelledby="title desc">
+<title id="title">Codex Pantheon v0.7.0 architecture</title>
+<desc id="desc">One main-thread Orchestrator, GPT-6 Astra or GPT-5.6 Sol, selected with native Codex controls. Luna Explorer and Librarian return read-only evidence when needed. The Orchestrator plans, Luna Fixer implements and validates the specification, and the Orchestrator reviews and verifies. All three specialists use GPT-5.6 Luna High. Daily delegates sequentially; Full permits justified parallelism. Pantheon activation is explicit and thread-scoped.</desc>
+<defs>
+  <linearGradient id="background" x2="1" y2="1"><stop stop-color="#030812"/><stop offset="1" stop-color="#080c1c"/></linearGradient>
+  <linearGradient id="rim"><stop stop-color="#85caff"/><stop offset=".5" stop-color="#e8eaf2"/><stop offset="1" stop-color="#efc476"/></linearGradient>
+  <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 8 4 0 8" fill="none" stroke="#91a5bf" stroke-width="1.5"/></marker>
+  <style>
+    text{font-family:Arial,Helvetica,sans-serif;fill:#eef1f8}
+    .brand{font-family:Arial,Helvetica,sans-serif;font-size:50px;letter-spacing:10px;font-weight:400}
+    .section{font-size:17px;letter-spacing:3px;font-weight:700;fill:#b4c3d8}
+    .heading{font-size:26px;font-weight:700;letter-spacing:1px}
+    .body{font-size:22px;fill:#d4deeb}
+    .small{font-size:18px;fill:#b4c3d8}
+    .model{font-size:19px;fill:#b4c3d8}
+    .rule{fill:none;stroke:#91a5bf;stroke-width:2;marker-end:url(#arrow)}
+  </style>
+</defs>
+<rect width="1600" height="1140" rx="24" fill="url(#background)"/>
+<path d="M80 136H1520" stroke="url(#rim)" opacity=".8"/>
+<text x="800" y="78" text-anchor="middle" class="brand">CODEX PANTHEON</text>
+<text x="800" y="115" text-anchor="middle" class="section">CODEX-NATIVE ORCHESTRATION · v0.7.0</text>
 
-  <g class="sans" text-anchor="middle">
-    <text x="800" y="92" class="title">PANTHEON</text>
-    <text x="800" y="132" class="subtitle">CODEX-NATIVE ORCHESTRATION · v0.7</text>
-    <text x="800" y="168" font-size="19" font-weight="650" fill="#d5dfec">Astra or Sol = Orchestrator · Luna = Explorer + Librarian + Fixer</text>
-  </g>
+<!-- The alternatives are enclosed by one shared Orchestrator boundary. -->
+<rect x="80" y="165" width="1440" height="285" rx="22" fill="#101d30" stroke="#637d9c" stroke-width="1.5"/>
+<text x="800" y="209" text-anchor="middle" class="heading">ONE MAIN-THREAD ORCHESTRATOR</text>
+<rect x="112" y="246" width="345" height="100" rx="14" fill="#142a44" stroke="#85caff"/>
+<text x="284" y="291" text-anchor="middle" class="heading" style="fill:#a6d9ff">ASTRA</text>
+<text x="284" y="324" text-anchor="middle" class="body">GPT-6</text>
+<text x="493" y="306" text-anchor="middle" class="heading">OR</text>
+<rect x="530" y="246" width="345" height="100" rx="14" fill="#2b251f" stroke="#efc476"/>
+<text x="702" y="291" text-anchor="middle" class="heading" style="fill:#efc476">SOL</text>
+<text x="702" y="324" text-anchor="middle" class="body">GPT-5.6</text>
+<text x="493" y="383" text-anchor="middle" class="body">Selected with native Codex controls</text>
+<text x="493" y="416" text-anchor="middle" class="small">One role contract. The selected model stays in the main thread.</text>
+<path d="M920 246V416" stroke="#34465c"/>
+<text x="958" y="274" class="body">Understands the goal and constraints</text>
+<text x="958" y="316" class="body">Plans, architects, and delegates</text>
+<text x="958" y="358" class="body">Integrates, reviews, and verifies</text>
+<text x="958" y="400" class="body">Owns decisions and the final answer</text>
 
-  <g filter="url(#shadow)" class="sans">
-    <rect x="350" y="218" width="900" height="194" rx="28" fill="url(#orch)" stroke="#4da3ff" stroke-width="3"/>
-    <circle cx="475" cy="315" r="55" fill="#18366d" stroke="#73b8ff" stroke-width="2"/>
-    <path d="M475 260 489 300 529 315 489 330 475 370 461 330 421 315 461 300z" fill="#a6c8ff"/>
-    <text x="570" y="294" class="cardTitle">ORCHESTRATOR</text>
-    <text x="570" y="328" class="cardSub" fill="#73b8ff">GPT-6 ASTRA · GPT-5.6 SOL</text>
-    <text x="570" y="358" class="small" fill="#a9cfff">NATIVE MAIN-THREAD MODEL</text>
-    <line x1="820" y1="258" x2="820" y2="372" stroke="#35527b" stroke-width="1.5"/>
-    <text x="865" y="278" class="body">Understands the goal and constraints</text>
-    <text x="865" y="309" class="body">Plans, architects, and decides</text>
-    <text x="865" y="340" class="body">Delegates, reconciles, reviews, verifies</text>
-    <text x="865" y="371" class="body">Not the default implementation worker</text>
-  </g>
-
-  <text x="800" y="458" class="sans eyebrow" text-anchor="middle" fill="#88a6d4">SPECIALIST LANES</text>
-  <path d="M800 412V475H275V508" fill="none" stroke="#6e92c7" stroke-width="3" marker-end="url(#arrow)"/>
-  <path d="M800 412V508" fill="none" stroke="#6e92c7" stroke-width="3" marker-end="url(#arrow)"/>
-  <path d="M800 475H1325V508" fill="none" stroke="#6e92c7" stroke-width="3" marker-end="url(#arrow)"/>
-
-  <g filter="url(#shadow)" class="sans">
-    <rect x="85" y="520" width="390" height="235" rx="24" fill="url(#exp)" stroke="#47d8ff" stroke-width="2.5"/>
-    <text x="120" y="566" class="cardTitle" font-size="24">LUNA EXPLORER</text>
-    <text x="120" y="596" class="cardSub" fill="#67e1ff">REPOSITORY EVIDENCE</text>
-    <text x="120" y="641" class="body">• Finds files, symbols, execution paths</text>
-    <text x="120" y="673" class="body">• Maps behavior and ownership</text>
-    <text x="120" y="705" class="body">• Returns minimum sufficient evidence</text>
-    <rect x="117" y="722" width="150" height="30" rx="15" fill="#102d3b" stroke="#47d8ff"/><text x="192" y="742" text-anchor="middle" class="small" fill="#79e9ff">LUNA HIGH</text>
-    <rect x="280" y="722" width="150" height="30" rx="15" fill="#102d3b" stroke="#47d8ff"/><text x="355" y="742" text-anchor="middle" class="small" fill="#79e9ff">READ-ONLY</text>
-  </g>
-
-  <g filter="url(#shadow)" class="sans">
-    <rect x="605" y="520" width="390" height="235" rx="24" fill="url(#lib)" stroke="#b485ff" stroke-width="2.5"/>
-    <text x="640" y="566" class="cardTitle" font-size="24">LUNA LIBRARIAN</text>
-    <text x="640" y="596" class="cardSub" fill="#c29aff">AUTHORITATIVE RESEARCH</text>
-    <text x="640" y="641" class="body">• Researches docs, APIs, upstream</text>
-    <text x="640" y="673" class="body">• Verifies version-sensitive facts</text>
-    <text x="640" y="705" class="body">• Returns minimum sufficient evidence</text>
-    <rect x="637" y="722" width="150" height="30" rx="15" fill="#271a40" stroke="#b485ff"/><text x="712" y="742" text-anchor="middle" class="small" fill="#d1b6ff">LUNA HIGH</text>
-    <rect x="800" y="722" width="150" height="30" rx="15" fill="#271a40" stroke="#b485ff"/><text x="875" y="742" text-anchor="middle" class="small" fill="#d1b6ff">READ-ONLY</text>
-  </g>
-
-  <g filter="url(#shadow)" class="sans">
-    <rect x="1125" y="520" width="390" height="235" rx="24" fill="url(#fix)" stroke="#ff9b4b" stroke-width="2.5"/>
-    <text x="1160" y="566" class="cardTitle" font-size="24">LUNA FIXER</text>
-    <text x="1160" y="596" class="cardSub" fill="#ffb06d">BOUNDED IMPLEMENTATION</text>
-    <text x="1160" y="641" class="body">• Receives Orchestrator specification</text>
-    <text x="1160" y="673" class="body">• Makes the smallest defensible change</text>
-    <text x="1160" y="705" class="body">• Runs focused assigned validation</text>
-    <rect x="1157" y="722" width="150" height="30" rx="15" fill="#3b2415" stroke="#ff9b4b"/><text x="1232" y="742" text-anchor="middle" class="small" fill="#ffc18d">LUNA HIGH</text>
-    <rect x="1320" y="722" width="150" height="30" rx="15" fill="#3b2415" stroke="#ff9b4b"/><text x="1395" y="742" text-anchor="middle" class="small" fill="#ffc18d">WORKSPACE-WRITE</text>
-  </g>
-
-  <g class="sans">
-    <rect x="95" y="796" width="1410" height="66" rx="20" fill="#0b1828" stroke="#294665" stroke-width="1.5"/>
-    <text x="170" y="835" class="flow">EVIDENCE</text><path d="M270 829H390" stroke="#668bbd" stroke-width="3" marker-end="url(#arrow)"/>
-    <text x="430" y="835" class="flow">ORCHESTRATOR PLAN</text><path d="M650 829H760" stroke="#668bbd" stroke-width="3" marker-end="url(#arrow)"/>
-    <text x="800" y="835" class="flow">FIXER IMPLEMENTS</text><path d="M995 829H1105" stroke="#668bbd" stroke-width="3" marker-end="url(#arrow)"/>
-    <text x="1145" y="835" class="flow">ORCHESTRATOR REVIEWS + VERIFIES</text>
-  </g>
+<!-- These connectors identify lanes; the ordered handoff is shown below. -->
+<path d="M800 450V484H312V520" class="rule"/>
+<path d="M800 484V520" class="rule"/>
+<path d="M800 484H1288V520" class="rule"/>
+<g>
+<rect x="80" y="528" width="464" height="250" rx="20" fill="#0e2432" stroke="#69d9f5" stroke-width="1.5"/>
+<text x="108" y="570" class="heading" style="fill:#69d9f5">LUNA EXPLORER</text>
+<text x="108" y="602" class="model">GPT-5.6 Luna High</text>
+<text x="108" y="643" class="body" font-weight="700">Repository evidence</text>
+<text x="108" y="680" class="small">Finds code and traces behavior</text>
+<text x="108" y="710" class="small">Returns minimum sufficient evidence</text>
+<path d="M108 733H516" stroke="#69d9f5" opacity=".3"/>
+<text x="108" y="760" class="small" style="fill:#69d9f5;font-weight:700;letter-spacing:2px">READ-ONLY</text>
+</g>
+<g>
+<rect x="568" y="528" width="464" height="250" rx="20" fill="#201c36" stroke="#c3a0ff" stroke-width="1.5"/>
+<text x="596" y="570" class="heading" style="fill:#c3a0ff">LUNA LIBRARIAN</text>
+<text x="596" y="602" class="model">GPT-5.6 Luna High</text>
+<text x="596" y="643" class="body" font-weight="700">Authoritative research</text>
+<text x="596" y="680" class="small">Checks docs, APIs, and references</text>
+<text x="596" y="710" class="small">Returns minimum sufficient evidence</text>
+<path d="M596 733H1004" stroke="#c3a0ff" opacity=".3"/>
+<text x="596" y="760" class="small" style="fill:#c3a0ff;font-weight:700;letter-spacing:2px">READ-ONLY</text>
+</g>
+<g>
+<rect x="1056" y="528" width="464" height="250" rx="20" fill="#2b211e" stroke="#f8b66a" stroke-width="1.5"/>
+<text x="1084" y="570" class="heading" style="fill:#f8b66a">LUNA FIXER</text>
+<text x="1084" y="602" class="model">GPT-5.6 Luna High</text>
+<text x="1084" y="643" class="body" font-weight="700">Bounded implementation</text>
+<text x="1084" y="680" class="small">Implements the specification</text>
+<text x="1084" y="710" class="small">Runs assigned focused validation</text>
+<path d="M1084 733H1492" stroke="#f8b66a" opacity=".3"/>
+<text x="1084" y="760" class="small" style="fill:#f8b66a;font-weight:700;letter-spacing:2px">WORKSPACE-WRITE</text>
+</g>
+<text x="800" y="824" text-anchor="middle" class="section">THE HANDOFF</text>
+<rect x="80" y="850" width="330" height="108" rx="14" fill="#101d30" stroke="#34465c"/>
+<text x="100" y="877" class="small" style="fill:#efc476">01</text>
+<text x="100" y="909" class="body" style="font-size:21px;font-weight:700">Evidence when needed</text>
+<text x="100" y="939" class="small">Explorer / Librarian</text>
+<path d="M416 904H442" class="rule"/>
+<rect x="450" y="850" width="330" height="108" rx="14" fill="#101d30" stroke="#34465c"/>
+<text x="470" y="877" class="small" style="fill:#efc476">02</text>
+<text x="470" y="909" class="body" style="font-size:21px;font-weight:700">Orchestrator plan</text>
+<text x="470" y="939" class="small">Specification and decisions</text>
+<path d="M786 904H812" class="rule"/>
+<rect x="820" y="850" width="330" height="108" rx="14" fill="#101d30" stroke="#34465c"/>
+<text x="840" y="877" class="small" style="fill:#efc476">03</text>
+<text x="840" y="909" class="body" style="font-size:21px;font-weight:700">Luna Fixer implements</text>
+<text x="840" y="939" class="small">Scoped work and validation</text>
+<path d="M1156 904H1182" class="rule"/>
+<rect x="1190" y="850" width="330" height="108" rx="14" fill="#101d30" stroke="#34465c"/>
+<text x="1210" y="877" class="small" style="fill:#efc476">04</text>
+<text x="1210" y="909" class="body" style="font-size:21px;font-weight:700">Orchestrator reviews</text>
+<text x="1210" y="939" class="small">Verifies and delivers</text>
+<path d="M80 989H1520" stroke="#34465c"/>
+<text x="80" y="1025" class="body">Explicit activation</text>
+<text x="80" y="1058" class="small">$pantheon or $pantheon-daily</text>
+<text x="570" y="1025" class="body">Daily: sequential delegation</text>
+<text x="570" y="1058" class="small">Full: justified parallelism, with bounded ownership</text>
+<text x="1130" y="1025" class="body">Minimum sufficient context</text>
+<text x="1130" y="1058" class="small">Default: fork_turns: &quot;none&quot;</text>
+<text x="800" y="1110" text-anchor="middle" class="small">Solo by default · Thread-scoped activation · Same roles under Astra or Sol</text>
 </svg>
