@@ -1,20 +1,22 @@
 # Codex Pantheon repository instructions
 
-Keep Pantheon slim, explicit, and Codex-native.
+Keep Pantheon slim, explicit, model-neutral at the Orchestrator layer, and Codex-native.
 
 - Prefer configuration, skills, and small scripts over custom runtime machinery.
-- Do not add automatic activation, prompt interception, background daemons, persistent mission state, or recursive child-agent orchestration without an explicit design decision changing the project doctrine.
+- Do not add automatic activation, prompt interception, background daemons, persistent mission state, recursive child-agent orchestration, or a model-switching runtime without an explicit design decision changing project doctrine.
 - Preserve solo-by-default behavior.
-- Preserve the v0.6 orchestration architecture: GPT-6 Astra remains the main-thread orchestrator; `luna_explorer`, `luna_librarian`, and `luna_fixer` are the only Pantheon child roles.
-- Astra owns planning, architecture, product/tradeoff decisions, prioritization, integration, review, final verification judgment, and the final response. Astra is not the default implementation worker.
-- Luna Explorer and Librarian are read-only evidence specialists. Luna Fixer implements Astra's scoped specification and must not independently redesign or replan the mission.
-- Every Astra child spawn must use a role-prefixed `task_name`: `luna_explorer_<assignment>`, `luna_librarian_<assignment>`, or `luna_fixer_<assignment>`. The assignment suffix must be concrete, concise, and unique enough to distinguish concurrent work; generic task names that omit the Luna lane are not acceptable.
-- For non-trivial implementation, preserve the dependency chain: Explorer/Librarian evidence when needed → Astra plan/specification → Fixer implementation → Astra review/verification.
-- Keep Daily and full Pantheon as the only delegation-intensity profiles. Daily may delegate less and does not parallelize children, but it must not alter role ownership or impose a numeric worker-call ceiling.
+- Preserve the v0.7 orchestration architecture: the current supported main-thread model is the Orchestrator; supported choices are GPT-6 Astra and GPT-5.6 Sol. `luna_explorer`, `luna_librarian`, and `luna_fixer` are the only Pantheon child roles.
+- Do not install or spawn a separate Astra/Sol Orchestrator. Pantheon must not pretend to switch the main-thread model; model selection stays with native Codex controls.
+- The Orchestrator owns planning, architecture, product/tradeoff decisions, prioritization, integration, review, final verification judgment, and the final response. It is not the default implementation worker.
+- Luna Explorer and Librarian are read-only evidence specialists. Luna Fixer implements the Orchestrator's scoped specification and must not independently redesign or replan the mission.
+- Every Orchestrator child spawn must use a role-prefixed `task_name`: `luna_explorer_<assignment>`, `luna_librarian_<assignment>`, or `luna_fixer_<assignment>`. The suffix must be concrete, concise, and unique enough to distinguish concurrent work.
+- For non-trivial implementation, preserve the dependency chain: Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification.
+- Keep Daily and Full Pantheon as the only delegation-intensity profiles. Daily may delegate less and does not parallelize children, but it must not alter role ownership or impose a numeric worker-call ceiling.
+- Preserve `fork_turns: "none"` as the default and pass only minimum self-contained context to children.
 - Preserve user-owned Codex configuration outside Pantheon-managed files/markers.
 - Custom agent roles must be installed as regular files, not symlinks/reparse points.
-- Keep one shared payload under `agents/`, `skills/`, and `policy/`; the Bash and PowerShell lifecycle frontends must not fork or duplicate that payload.
-- Run `./tests/test.sh` after lifecycle-script, policy, skill, migration, or agent changes. When Windows behavior changes, also run `./tests/test.ps1` on PowerShell/Windows or rely on the Windows CI job before merge.
+- Keep one shared payload under `agents/`, `skills/`, and `policy/`; Bash and PowerShell lifecycle frontends must not fork or duplicate it.
+- Run `./tests/test.sh` after lifecycle-script, policy, skill, migration, or agent changes. When Windows behavior changes, also run `./tests/test.ps1` on PowerShell/Windows or rely on Windows CI before merge.
 
 ## Codex-assisted lifecycle
 
