@@ -72,6 +72,18 @@ The GitHub Actions matrix must pass Linux/Bash and Windows/PowerShell lifecycle 
 
 Live model/subagent behavior must be verified separately when a release depends on it; static tests cannot prove backend availability.
 
-## 6. Publish separately
+## 6. Publish from the merged release commit
 
-After repository preparation is reviewed and merged, create the intended tag/GitHub release separately and verify it points to the intended commit.
+Release metadata is published by `.github/workflows/release.yml` when `VERSION` changes on `main`.
+
+The publication job:
+
+- checks out the exact merged `main` commit;
+- verifies a matching `docs/Vx.y.z.md` release-note file and changelog heading;
+- reruns the Bash package/lifecycle suite and shell syntax checks;
+- creates tag `vX.Y.Z` at the exact merged commit;
+- creates the GitHub release using the versioned release-note file;
+- is idempotent when the matching release already exists;
+- fails closed rather than overwriting an existing mismatched tag/release.
+
+After merging the release PR, verify the **Publish release** workflow succeeds and confirm the GitHub release/tag both resolve to the intended merged commit.
