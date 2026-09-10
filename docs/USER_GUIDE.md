@@ -87,19 +87,18 @@ If execution exposes a material architecture/product decision or contradicts the
 
 These workflows do not activate a sticky Pantheon profile by themselves.
 
-## 6. Context and visible task identity
+## 6. Context and child identity
 
-Every child spawn defaults to `fork_turns: "none"` with a minimum self-contained bounded assignment: objective, scope, known constraints/facts, permissions, expected evidence/output, stopping condition, and a no-subagents instruction.
+Pantheon uses the native multi-agent backend selected for the active main-thread model rather than pretending it can switch V1/V2 itself.
 
-Every child also gets a role-prefixed native `task_name`:
+- **V1:** the configured Luna role is selected with `agent_type`, and `fork_context: false` starts the child with only its bounded assignment.
+- **V2:** Pantheon uses `fork_turns: "none"` to avoid inheriting the parent transcript. Codex requires a `task_name`, but Pantheon treats that value only as canonical routing/path metadata, not as the child role.
 
-```text
-luna_explorer_<specific_assignment>
-luna_librarian_<specific_assignment>
-luna_fixer_<specific_assignment>
-```
+A task label such as `luna_fixer_something` does **not** prove that `luna_fixer` loaded. Pantheon no longer requires role-prefixed task names. Role identity must come from the configured agent selection. If the active spawn surface cannot actually select the requested Luna role, Pantheon reports that limitation instead of silently substituting a generic/inherited child.
 
-Use concrete suffixes such as `luna_explorer_trace_guest_lifecycle`; avoid generic labels such as `research` or `implementation`. Never use full-history inheritance by default.
+Every child receives a minimum self-contained bounded assignment: objective, scope, known constraints/facts, permissions, expected evidence/output, stopping condition, and a no-subagents instruction. Full-history inheritance is never the default.
+
+Whether a child has its own message composer is controlled by Codex Desktop/runtime. Pantheon does not claim a child is directly steerable unless the UI actually exposes that composer.
 
 The Orchestrator remains the main thread; Pantheon does not spawn a display-only Orchestrator child.
 
