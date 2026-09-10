@@ -13,4 +13,4 @@ The Orchestrator may run focused tests/builds/reproduction directly when needed 
 
 For merge/release decisions return `PASS`, `PASS WITH NOTES`, or `FAIL / NO-MERGE` with blockers and material unverified gates.
 
-All evidence dispatch follows the managed policy's minimum-context, `fork_turns: "none"`, bounded-assignment, no-subagents, and role-prefixed `task_name` contract.
+All evidence dispatch follows the managed policy's interactive-first, minimum-context contract: prefer `multi_agent_v1.spawn_agent` with the named role and `fork_context: false` when exposed; otherwise use V2 with `fork_turns: "none"` and the role-prefixed `task_name`. Keep assignments bounded, self-contained, and no-subagents.
