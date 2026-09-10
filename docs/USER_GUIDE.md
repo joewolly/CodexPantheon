@@ -35,7 +35,7 @@ Explorer/Librarian evidence when needed
 
 Explorer and Librarian do not create the solution plan. Fixer does not independently redesign it. The Orchestrator never implements repository changes.
 
-There is no small-change exception. Even a one-line or obvious implementation edit goes to Fixer. If Fixer cannot be spawned or complete the assignment, the Orchestrator rescop es, retries, redelegates, or reports the blocker instead of taking over implementation.
+There is no small-change exception. Even a one-line or obvious implementation edit goes to Fixer. If Fixer cannot be spawned or complete the assignment, the Orchestrator rescopes, retries, redelegates, or reports the blocker instead of taking over implementation.
 
 ## 3. Operating profiles
 
