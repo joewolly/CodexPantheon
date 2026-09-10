@@ -50,27 +50,18 @@ v0.7.0 keeps the role boundaries but removes unnecessary model-personality coupl
 - The installed policy and all four skills refer to the **Orchestrator role**, not to Astra-specific ownership.
 - Luna receives assignments from the **Orchestrator**, so the same child prompts work unchanged under Astra or Sol.
 - Luna prompts are shorter and ask for the **minimum sufficient evidence** rather than broad output.
-- Child spawns still default to `fork_turns: "none"` and receive only a self-contained bounded assignment.
+- Child context stays deliberately narrow: V1 uses `fork_context: false`; V2 uses `fork_turns: "none"`.
 - No second Orchestrator, model-router runtime, persistent selector, duplicate skill set, hidden state, or additional worker was added.
 - Luna remains GPT-5.6 Luna High so dual-Orchestrator behavior is not confounded with worker-effort tuning.
 
-## Glanceable subagent titles
+## Subagent identity and V1/V2
 
-Every child task name encodes its lane:
+Pantheon identifies workers by the configured agent role, not by a task label. Codex chooses the multi-agent backend exposed to the current model; Pantheon does not pretend to switch between V1 and V2.
 
-```text
-luna_explorer_<specific_assignment>
-luna_librarian_<specific_assignment>
-luna_fixer_<specific_assignment>
-```
-
-Examples:
-
-```text
-luna_explorer_trace_pve_guest_lifecycle
-luna_librarian_research_pve_api_behavior
-luna_fixer_repair_guest_creation_flow
-```
+- **V1:** `agent_type` selects `luna_explorer`, `luna_librarian`, or `luna_fixer`; Pantheon uses `fork_context: false` so the child starts with its bounded assignment rather than the parent transcript.
+- **V2:** Codex requires a `task_name`. Pantheon treats it only as canonical routing/path metadata and keeps it short and task-specific. A Luna-looking `task_name` is never treated as proof that a Luna role loaded.
+- If the active spawn surface cannot actually select the configured Luna role, Pantheon reports that runtime limitation rather than silently substituting a generic/inherited child under a Luna-looking label.
+- Direct child steering is a Codex Desktop/runtime capability. Some parented children expose their own composer; others, including V2 surfaces in some current builds, may be output-only.
 
 The Orchestrator stays in the main thread and is never spawned merely to create a display-only child card.
 
@@ -123,9 +114,9 @@ These workflows do not activate a sticky Pantheon profile by themselves.
 
 ## Context discipline
 
-Every Pantheon child spawn defaults to native `fork_turns: "none"` with a minimum self-contained bounded assignment. Inherit only the minimum supported context required by a genuine dependency. Full-history inheritance is never the default.
+Pantheon uses the narrowest fresh-child behavior provided by the active native backend: V1 uses `fork_context: false`; V2 uses `fork_turns: "none"`. Full-history inheritance is never the default.
 
-Assignments contain the objective, scope, known constraints/facts, permission boundary, expected evidence/output, stopping condition, and a prohibition on spawning subagents.
+Every child receives a minimum self-contained bounded assignment containing the objective, scope, known constraints/facts, permission boundary, expected evidence/output, stopping condition, and a prohibition on spawning subagents.
 
 ## Platform support
 
