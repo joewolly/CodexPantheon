@@ -50,27 +50,20 @@ v0.7.0 keeps the role boundaries but removes unnecessary model-personality coupl
 - The installed policy and all four skills refer to the **Orchestrator role**, not to Astra-specific ownership.
 - Luna receives assignments from the **Orchestrator**, so the same child prompts work unchanged under Astra or Sol.
 - Luna prompts are shorter and ask for the **minimum sufficient evidence** rather than broad output.
-- Child spawns still default to `fork_turns: "none"` and receive only a self-contained bounded assignment.
+- Every Pantheon child explicitly selects a configured Luna role instead of inheriting the Orchestrator model.
+- Child context stays deliberately narrow: a V1 parent surface uses `fork_context: false`; a V2 parent surface uses `fork_turns: "none"`.
 - No second Orchestrator, model-router runtime, persistent selector, duplicate skill set, hidden state, or additional worker was added.
-- Luna remains GPT-5.6 Luna High so dual-Orchestrator behavior is not confounded with worker-effort tuning.
 
-## Glanceable subagent titles
+## Luna is the worker model
 
-Every child task name encodes its lane:
+Pantheon workers are always `luna_explorer`, `luna_librarian`, or `luna_fixer`. Those installed role files pin **GPT-5.6 Luna High**, and current Codex model metadata marks GPT-5.6 Luna as **MultiAgent V1**.
 
-```text
-luna_explorer_<specific_assignment>
-luna_librarian_<specific_assignment>
-luna_fixer_<specific_assignment>
-```
+Astra/Sol may expose a V2 `spawn_agent` tool because that is the **parent Orchestrator's** collaboration surface. That does not make the worker a V2 Astra/Sol child. Pantheon must explicitly pass the configured Luna `agent_type`, so the spawned worker resolves to GPT-5.6 Luna rather than inheriting the parent model.
 
-Examples:
-
-```text
-luna_explorer_trace_pve_guest_lifecycle
-luna_librarian_research_pve_api_behavior
-luna_fixer_repair_guest_creation_flow
-```
+- **V1 parent transport:** select the Luna `agent_type` and use `fork_context: false`.
+- **V2 parent transport:** select the Luna `agent_type`, use `fork_turns: "none"`, and provide the concise `task_name` required by Codex as routing/path metadata only.
+- A task name never establishes worker identity. If Codex cannot expose or honor configured-role selection, Pantheon reports the limitation rather than silently creating a generic/inherited child.
+- Whether the Luna child gets its own user-editable composer remains a Codex Desktop/runtime behavior; Pantheon does not fake that capability.
 
 The Orchestrator stays in the main thread and is never spawned merely to create a display-only child card.
 
@@ -123,9 +116,9 @@ These workflows do not activate a sticky Pantheon profile by themselves.
 
 ## Context discipline
 
-Every Pantheon child spawn defaults to native `fork_turns: "none"` with a minimum self-contained bounded assignment. Inherit only the minimum supported context required by a genuine dependency. Full-history inheritance is never the default.
+Every Pantheon worker is explicitly selected as a Luna role. The parent transport then uses the narrowest fresh-child behavior available: V1 uses `fork_context: false`; V2 uses `fork_turns: "none"`. Full-history inheritance is never the default.
 
-Assignments contain the objective, scope, known constraints/facts, permission boundary, expected evidence/output, stopping condition, and a prohibition on spawning subagents.
+Every child receives a minimum self-contained bounded assignment containing the objective, scope, known constraints/facts, permission boundary, expected evidence/output, stopping condition, and a prohibition on spawning subagents.
 
 ## Platform support
 

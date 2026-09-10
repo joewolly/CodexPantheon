@@ -17,9 +17,16 @@ Default chain: **Explorer/Librarian evidence when needed → Orchestrator plan/s
 
 ### Child dispatch
 
-Default every child to `fork_turns: "none"`. Send only minimum self-contained context: objective, scope, known facts/constraints, permissions, expected output/evidence, stopping condition, and no-subagents instruction. Inherit only the minimum genuinely required context; never full history by default.
+Pantheon workers are always the configured Luna roles, which pin `model = "gpt-5.6-luna"`. Current Codex metadata marks Luna as MultiAgent V1. Never allow a Pantheon child to inherit the Astra/Sol parent model merely because the parent exposes a V2 spawn surface.
 
-Use concrete lowercase task names: `luna_explorer_<assignment>`, `luna_librarian_<assignment>`, `luna_fixer_<assignment>`.
+Every spawn must explicitly select `luna_explorer`, `luna_librarian`, or `luna_fixer` with `agent_type`. The parent-side transport follows the Orchestrator's native surface:
+
+- **V1 parent surface:** use `agent_type` plus `fork_context: false`.
+- **V2 parent surface:** use `agent_type` plus `fork_turns: "none"`; the required `task_name` is concise routing/path metadata only.
+
+A V2 call made by Astra/Sol is only the parent dispatch mechanism; it must still resolve the child to GPT-5.6 Luna, not create a generic/inherited V2 worker. If Codex cannot expose or honor configured-role selection, do not impersonate Luna with a task label; report the runtime limitation.
+
+Every assignment uses minimum self-contained context: objective, scope, known facts/constraints, permissions, expected output/evidence, stopping condition, and no-subagents instruction; never full history by default.
 
 **Daily:** delegate only when materially useful; never parallelize children; no numeric call ceiling. **Full:** parallelize only genuinely independent evidence lanes or Fixers with non-overlapping writes. Do not duplicate work or manufacture role theater.
 

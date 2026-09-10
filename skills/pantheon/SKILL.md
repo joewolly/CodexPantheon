@@ -16,4 +16,4 @@ For each request:
 
 Do not spend an evidence call and then move substantive implementation back to the Orchestrator merely because the path became clear. Do not duplicate work or manufacture parallelism.
 
-All child dispatch follows the managed policy's minimum-context, `fork_turns: "none"`, bounded-assignment, no-subagents, and role-prefixed `task_name` contract.
+All child dispatch follows the managed policy's minimum-context contract. Explicitly select the configured Luna role with `agent_type`; never inherit the Astra/Sol model. Parent transport may be V1 or V2: V1 uses `fork_context: false`; V2 uses `fork_turns: "none"` plus only required concise task metadata. Do not require a role-prefixed `task_name`; the resulting worker must resolve to GPT-5.6 Luna. If configured-role selection cannot be honored, fail visibly rather than creating a generic child. Keep assignments bounded, self-contained, and no-subagents.
