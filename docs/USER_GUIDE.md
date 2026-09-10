@@ -10,7 +10,7 @@ Supported Orchestrators:
 
 | Role | Model | Responsibility |
 | --- | --- | --- |
-| Orchestrator / main thread | GPT-6 Astra **or** GPT-5.6 Sol | Understand, plan, decide, delegate, reconcile, review, verify, communicate |
+| Orchestrator / main thread | GPT-6 Astra **or** GPT-5.6 Sol | Understand, plan, decide, schedule, delegate, reconcile, review, verify, communicate; never implement repository changes |
 | `luna_explorer` | GPT-5.6 Luna High | Read-only repository reconnaissance |
 | `luna_librarian` | GPT-5.6 Luna High | Read-only docs/API/upstream/reference research |
 | `luna_fixer` | GPT-5.6 Luna High | Implement the Orchestrator's scoped specification and run assigned focused validation |
@@ -21,7 +21,7 @@ This is intentionally more reliable and cheaper than keeping a second Pantheon m
 
 ## 2. Ownership rule
 
-The normal implementation chain is:
+The implementation chain is:
 
 ```text
 Explorer/Librarian evidence when needed
@@ -33,9 +33,9 @@ Explorer/Librarian evidence when needed
    Orchestrator reviews/verifies
 ```
 
-Explorer and Librarian do not create the solution plan. Fixer does not independently redesign it. The Orchestrator is not the default implementation worker.
+Explorer and Librarian do not create the solution plan. Fixer does not independently redesign it. The Orchestrator never implements repository changes.
 
-The Orchestrator may directly do one isolated, obvious, low-risk action when delegation overhead would exceed execution.
+There is no small-change exception. Even a one-line or obvious implementation edit goes to Fixer. If Fixer cannot be spawned or complete the assignment, the Orchestrator rescop es, retries, redelegates, or reports the blocker instead of taking over implementation.
 
 ## 3. Operating profiles
 
@@ -51,7 +51,7 @@ The selected Pantheon profile is sticky only inside the current thread. Nothing 
 
 ### Daily
 
-Daily saves usage by avoiding unnecessary delegation. It has no numeric worker-call ceiling.
+Daily saves usage by avoiding unnecessary evidence delegation. It has no numeric worker-call ceiling; Fixer remains mandatory for implementation.
 
 - Evidence already sufficient: `Orchestrator plan → Fixer → Orchestrator review`.
 - Repository evidence missing: `Explorer → Orchestrator plan → Fixer → Orchestrator review`.
