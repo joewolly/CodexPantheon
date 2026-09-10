@@ -61,18 +61,22 @@ for marker in \
   "Every new thread starts inactive" \
   "GPT-6 Astra" \
   "GPT-5.6 Sol" \
-  "never switches the selected main model" \
-  "It is not the default implementation worker" \
+  "MultiAgent V2" \
+  "never switches it" \
+  "never implements repository changes" \
   '`luna_explorer`' \
   '`luna_librarian`' \
   '`luna_fixer`' \
   'model = "gpt-5.6-luna"' \
-  "Never allow a Pantheon child to inherit the Astra/Sol parent model" \
-  "Every spawn must explicitly select" \
+  'Every V2 `spawn_agent` explicitly selects' \
   '`agent_type`' \
-  'fork_context: false' \
   'fork_turns: "none"' \
   "routing/path metadata only" \
+  '`send_message`' \
+  '`followup_task`' \
+  '`send_message_to_thread`' \
+  "Never steer a Pantheon child through generic task/thread delegation" \
+  "Do not use non-V2 agent tools as fallbacks" \
   "minimum self-contained context" \
   "never full history by default" \
   "never parallelize children" \
@@ -89,10 +93,12 @@ for obsolete in \
   'pantheon_oracle' \
   'pantheon_designer' \
   'pantheon_reviewer' \
-  'pantheon_verifier'; do
+  'pantheon_verifier' \
+  'fork_context: false' \
+  'send_input'; do
   assert_not_contains "$POLICY" "$obsolete"
 done
-pass "always-on policy enforces dual-Orchestrator ownership and explicit Luna child selection"
+pass "always-on policy enforces V2-only dual-Orchestrator control and explicit Luna child selection"
 
 FULL="$ROOT/skills/pantheon/SKILL.md"
 DAILY="$ROOT/skills/pantheon-daily/SKILL.md"
@@ -101,13 +107,18 @@ REVIEW="$ROOT/skills/pantheon-review/SKILL.md"
 for skill in "$FULL" "$DAILY" "$PLAN" "$REVIEW"; do
   assert_file "$skill"
   assert_contains "$skill" "managed policy"
-  assert_contains "$skill" "minimum-context"
+  assert_contains "$skill" "V2-only minimum-context"
+  assert_contains "$skill" "MultiAgent V2"
   assert_contains "$skill" '`agent_type`'
-  assert_contains "$skill" 'fork_context: false'
   assert_contains "$skill" 'fork_turns: "none"'
-  assert_contains "$skill" 'Do not require a role-prefixed `task_name`'
+  assert_contains "$skill" '`task_name`'
   assert_contains "$skill" "resulting worker must resolve to GPT-5.6 Luna"
+  assert_contains "$skill" '`send_message`/`followup_task`'
+  assert_contains "$skill" '`send_message_to_thread`'
+  assert_contains "$skill" "non-V2 agent tools as fallbacks"
   assert_contains "$skill" "fail visibly"
+  assert_not_contains "$skill" "fork_context"
+  assert_not_contains "$skill" "send_input"
   assert_not_contains "$skill" "GPT-6 Astra"
   assert_not_contains "$skill" "GPT-5.6 Sol"
 done
@@ -123,7 +134,7 @@ assert_contains "$DAILY" "no numeric worker-call ceiling"
 assert_contains "$PLAN" "do not use Fixer"
 assert_contains "$REVIEW" "do not use Fixer"
 assert_contains "$REVIEW" "PASS WITH NOTES"
-pass "workflow skills require explicit Luna roles and preserve context/size budgets"
+pass "workflow skills require explicit Luna roles, V2 child control, and context/size budgets"
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
@@ -162,11 +173,13 @@ for skill in pantheon pantheon-daily pantheon-plan pantheon-review; do
 done
 assert_contains "$CODEX_HOME/AGENTS.md" "GPT-6 Astra"
 assert_contains "$CODEX_HOME/AGENTS.md" "GPT-5.6 Sol"
-assert_contains "$CODEX_HOME/AGENTS.md" "never switches the selected main model"
-assert_contains "$CODEX_HOME/AGENTS.md" "Every spawn must explicitly select"
+assert_contains "$CODEX_HOME/AGENTS.md" "MultiAgent V2"
+assert_contains "$CODEX_HOME/AGENTS.md" 'Every V2 `spawn_agent` explicitly selects'
 assert_contains "$CODEX_HOME/AGENTS.md" '`agent_type`'
 assert_contains "$CODEX_HOME/AGENTS.md" 'model = "gpt-5.6-luna"'
-pass "install refreshes explicit-Luna dual-Orchestrator payload and preserves unrelated configuration"
+assert_contains "$CODEX_HOME/AGENTS.md" '`send_message`'
+assert_contains "$CODEX_HOME/AGENTS.md" '`followup_task`'
+pass "install refreshes explicit-Luna V2-only dual-Orchestrator payload and preserves unrelated configuration"
 
 BEFORE="$(cksum "$CODEX_HOME/AGENTS.md")"
 "$PANTHEON" install >/dev/null
@@ -266,20 +279,24 @@ pass "bootstrap remains migration-aware and idempotent"
 
 assert_contains "$ROOT/AGENTS.md" "Preserve the v0.7 orchestration architecture"
 assert_contains "$ROOT/AGENTS.md" "GPT-6 Astra and GPT-5.6 Sol"
-assert_contains "$ROOT/AGENTS.md" "Every spawn must explicitly set"
+assert_contains "$ROOT/AGENTS.md" "native MultiAgent V2"
+assert_contains "$ROOT/AGENTS.md" "Every spawn must use the native V2"
+assert_contains "$ROOT/AGENTS.md" '`send_message`'
+assert_contains "$ROOT/AGENTS.md" '`followup_task`'
 assert_contains "$ROOT/README.md" "Astra or Sol = Orchestrator"
 assert_contains "$ROOT/README.md" "native main-thread model control"
+assert_contains "$ROOT/README.md" "V2-only agent control"
 assert_contains "$ROOT/README.md" "codex-pantheon-v0.7-architecture.svg"
 assert_contains "$ROOT/README.md" "v0.7.0"
-assert_contains "$ROOT/README.md" "explicitly selects"
+assert_contains "$ROOT/README.md" "explicitly set"
 assert_contains "$ROOT/docs/USER_GUIDE.md" "Choose the Orchestrator"
-assert_contains "$ROOT/docs/USER_GUIDE.md" "explicitly selects"
-assert_contains "$ROOT/docs/DESIGN_DOCTRINE.md" "Model selection is native Codex state"
+assert_contains "$ROOT/docs/USER_GUIDE.md" "V2 control plane and Luna workers"
+assert_contains "$ROOT/docs/DESIGN_DOCTRINE.md" "One agent control plane"
 assert_contains "$ROOT/docs/CODEX_INSTALL.md" "Orchestrator selection"
 assert_contains "$ROOT/docs/V0.7.0.md" "Dual Orchestrator + context efficiency"
 assert_not_contains "$ROOT/docs/V0.7.0.md" "candidate"
 assert_contains "$ROOT/CHANGELOG.md" "## 0.7.0 — 2026-09-09"
 assert_contains "$ROOT/THIRD_PARTY_NOTICES.md" "oh-my-opencode-slim"
-pass "v0.7.0 release docs match explicit-Luna dual-Orchestrator architecture"
+pass "current docs match explicit-Luna V2-only dual-Orchestrator architecture"
 
 printf '1..%d\n' "$PASS"

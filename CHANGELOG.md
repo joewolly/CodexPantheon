@@ -7,6 +7,9 @@
 - The Astra/Sol Orchestrator contract now follows the `oh-my-opencode-slim` workflow-manager shape more closely: understand, build a dependency-aware work graph, delegate, reconcile, and verify.
 - The Orchestrator is now implementation-free. Every repository implementation edit routes to `luna_fixer`, including tiny, obvious, or low-risk changes; there is no delegation-overhead escape hatch.
 - Full and Daily share the same hard implementation ownership. If Fixer cannot be spawned or complete an assignment, the Orchestrator must rescope, retry, redelegate, or report the blocker rather than taking over the edit.
+- Pantheon now requires the Orchestrator's native MultiAgent V2 control plane for child spawning and coordination.
+- Post-spawn Luna coordination uses V2 `send_message`/`followup_task`; generic task/thread messaging is not a Pantheon child-control fallback.
+- Luna Explorer, Librarian, and Fixer remain GPT-5.6 Luna High with the same ownership boundaries; this change removes legacy control-plane compatibility, not the Luna worker roles.
 - User-facing doctrine and upstream attribution now document the stricter Pantheon divergence from `oh-my-opencode-slim`.
 
 ## 0.7.0 — 2026-09-09

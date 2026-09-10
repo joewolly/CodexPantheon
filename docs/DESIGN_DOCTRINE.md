@@ -23,11 +23,12 @@ Pantheon v0.7 keeps the Orchestrator contract model-neutral between GPT-6 Astra 
 13. **Daily changes intensity, not ownership.** Daily may skip unnecessary evidence lanes, never parallelizes child calls, and has no numeric worker-call ceiling. Fixer is still mandatory for implementation.
 14. **Full Pantheon earns parallelism.** Parallel evidence lanes and multiple Fixers are allowed only for genuinely independent work with non-overlapping writes.
 15. **No role theater.** There is no Oracle, Designer, Reviewer, Verifier, Council, or separate Team role in core Pantheon.
-16. **Context is a cost.** Child spawns start with `fork_turns: "none"`. Pass the minimum self-contained context that makes the bounded task executable; do not replay thread history by default.
-17. **Bounded children.** Every specialist gets an objective, scope, known constraints/facts, permission boundary, expected output/evidence, stopping condition, and a prohibition on recursive delegation.
-18. **Thin workflows.** `$pantheon*` skills are routing/instruction recipes, not a model router or custom runtime.
-19. **Stateless by default.** No databases, persistent budgets, hidden mission state, task queues, daemons, or background schedulers in core Pantheon.
-20. **Safe lifecycle.** Pantheon owns only its named files and marked `AGENTS.md` block; removal preserves unrelated configuration.
+16. **One agent control plane.** Pantheon requires native MultiAgent V2. Spawn with V2 `spawn_agent`; continue through V2 `send_message`/`followup_task`. Never fall back to legacy agent APIs or generic task/thread messaging to steer a Pantheon child.
+17. **Context is a cost.** Child spawns use `fork_turns: "none"`. Pass the minimum self-contained context that makes the bounded task executable; do not replay thread history by default.
+18. **Bounded children.** Every specialist gets an objective, scope, known constraints/facts, permission boundary, expected output/evidence, stopping condition, and a prohibition on recursive delegation.
+19. **Thin workflows.** `$pantheon*` skills are routing/instruction recipes, not a model router or custom runtime.
+20. **Stateless by default.** No databases, persistent budgets, hidden mission state, task queues, daemons, or background schedulers in core Pantheon.
+21. **Safe lifecycle.** Pantheon owns only its named files and marked `AGENTS.md` block; removal preserves unrelated configuration.
 
 ## Canonical flows
 
@@ -65,6 +66,7 @@ Before adding a feature, ask:
 - Does it work identically under Astra and Sol unless a documented model capability requires otherwise?
 - Does it preserve planning/architecture in the main thread and every implementation edit in Fixer?
 - Does it preserve hard read-only boundaries for Explorer and Librarian?
+- Does it keep child spawn and follow-up traffic on the native V2 agent control plane?
 - Does Daily remain meaningfully lighter without corrupting ownership?
 - Does it minimize child context and avoid duplicate model hops?
 - Does it avoid a new runtime, scheduler, database, or persistent state?
