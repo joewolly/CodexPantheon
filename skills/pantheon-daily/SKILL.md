@@ -1,19 +1,21 @@
 ---
 name: pantheon-daily
-description: Explicit, thread-scoped quota-conscious Pantheon profile. Uses the same Orchestrator/Explorer/Librarian/Fixer ownership as Full with conservative sequential delegation.
+description: Explicit, thread-scoped quota-conscious Pantheon profile. Uses Full's ownership with conservative sequential delegation.
 ---
 
 # Pantheon Daily
 
-Activate Daily for the current thread; follow-ups remain Daily until the user disables Pantheon or invokes `$pantheon`. Do not persist activation across threads or silently escalate to Full. This skill never switches the main model.
+Activate Daily for the current thread; follow-ups remain Daily until disabled or `$pantheon` is invoked. Do not persist activation across threads or silently escalate to Full. This skill never switches the main model.
 
 Daily changes delegation intensity, never ownership:
-- Delegate only when a specialist materially reduces parent context, uncertainty, or execution effort.
+- Explorer/Librarian are optional and used only for material evidence gaps.
+- Fixer is mandatory for every repository implementation edit, including tiny or obvious changes.
 - Never parallelize children. There is no numeric worker-call ceiling.
-- Skip Explorer/Librarian when evidence is already sufficient.
-- When evidence is needed, use only the necessary lane(s) sequentially; then the Orchestrator plans and Fixer implements.
-- Do not collapse open-ended research, planning, and implementation into one Fixer call merely to save a spawn.
+- When evidence is needed, use only necessary lanes sequentially; then the Orchestrator plans and Fixer implements.
+- Do not collapse open-ended research, planning, and implementation into one Fixer call to save a spawn.
 
-Typical shapes: `Orchestrator plan → Fixer → Orchestrator review`; add Explorer and/or Librarian before the plan only when evidence is missing.
+Typical shapes: `Orchestrator plan → Fixer → Orchestrator review`; add Explorer/Librarian before the plan only when evidence is missing.
 
-All child dispatch follows the managed policy's minimum-context contract. Explicitly select the configured Luna role with `agent_type`; never inherit the Astra/Sol model. V1 parent transport uses `fork_context: false`; V2 parent transport uses `fork_turns: "none"` plus only required concise task metadata. Do not require a role-prefixed `task_name`; the resulting worker must resolve to GPT-5.6 Luna. If configured-role selection cannot be honored, fail visibly rather than creating a generic child. Keep assignments bounded, self-contained, and no-subagents.
+The Orchestrator never implements or fixes repository contents. If Fixer cannot be spawned or complete the assignment, rescope, retry, redelegate, or report the blocker; never fall back to direct Orchestrator implementation.
+
+All child dispatch follows the managed policy's minimum-context contract. Explicitly select the configured Luna role with `agent_type`; never inherit the Astra/Sol model. V1 uses `fork_context: false`; V2 uses `fork_turns: "none"` plus concise task metadata. Do not require a role-prefixed `task_name`; the resulting worker must resolve to GPT-5.6 Luna. If configured-role selection cannot be honored, fail visibly rather than creating a generic child. Keep assignments bounded, self-contained, and no-subagents.
