@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run Bash lifecycle suite
         run: ./tests/test.sh
-      - name: Verify Orchestrator ownership contract
+      - name: Verify Pantheon role ownership contracts
         run: bash ./tests/test-orchestrator-contract.sh
 
   windows:
