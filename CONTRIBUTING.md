@@ -39,7 +39,9 @@ The test suite uses temporary Codex/skill homes and does not modify the normal i
 - The Orchestrator owns planning, architecture, product/tradeoff decisions, sequencing, implementation specifications, integration, review, final verification judgment, and user communication.
 - Fixer implements the Orchestrator's scoped specification; do not turn it into an autonomous planner/researcher.
 - Preserve the non-trivial chain: evidence when needed → Orchestrator plan/specification → Fixer → Orchestrator review/verification.
-- Preserve `fork_turns: "none"` and minimum self-contained child context by default.
+- Require the Orchestrator's native MultiAgent V2 control plane. Spawn with `spawn_agent`, explicit Luna `agent_type`, and `fork_turns: "none"`.
+- Keep post-spawn worker coordination on V2 `send_message`/`followup_task`; never use generic task/thread messaging or legacy/non-V2 agent primitives as Pantheon fallbacks.
+- Preserve minimum self-contained child context by default.
 - Daily may reduce delegation but must not invert role ownership, parallelize children, or add a numeric worker-call ceiling.
 - Full Pantheon may parallelize only independent work with non-overlapping writes.
 - Install custom agents as regular files, never symlinks/reparse points.
@@ -56,6 +58,7 @@ When changing the operating contract, keep these aligned:
 - `AGENTS.md`
 - `README.md`
 - `docs/USER_GUIDE.md`
+- `docs/DESIGN_DOCTRINE.md`
 - `tests/test.sh`
 
 For a release, follow [docs/RELEASING.md](docs/RELEASING.md).
@@ -70,7 +73,7 @@ git diff --check
 
 Also run `./tests/test.ps1` on Windows/PowerShell when relevant or require the Windows CI job before release.
 
-A passing `doctor` proves static installed integrity, not live child spawning or model/provider availability.
+A passing `doctor` proves static installed integrity, not live child spawning or V2 communication. Before merging a control-plane change, validate at least one live Astra/Sol V2 → configured Luna spawn and a V2 follow-up/message round trip in Codex.
 
 ## Pull requests
 

@@ -17,7 +17,7 @@ Supported Orchestrators:
 
 Pantheon does **not** automatically switch your selected main model and does not install a separate Astra or Sol child. The same installed payload works with either supported Orchestrator, so changing the selected model does not require reinstalling Pantheon.
 
-This is intentionally more reliable and cheaper than keeping a second Pantheon model selector: Codex remains the source of truth for which model is actually running.
+Pantheon requires the selected Orchestrator/runtime to expose native **MultiAgent V2**. If V2 is unavailable, Pantheon fails visibly instead of switching to another control plane.
 
 ## 2. Ownership rule
 
@@ -87,22 +87,31 @@ If execution exposes a material architecture/product decision or contradicts the
 
 These workflows do not activate a sticky Pantheon profile by themselves.
 
-## 6. Luna V1 workers and parent transport
+## 6. V2 control plane and Luna workers
 
-Pantheon workers are always explicitly selected configured Luna roles. Pantheon dispatch explicitly selects the requested Luna role on every spawn. Their role files pin `model = "gpt-5.6-luna"`, and current Codex model metadata marks GPT-5.6 Luna as MultiAgent V1.
+Pantheon uses one control plane: the selected Astra/Sol Orchestrator's native MultiAgent V2 surface.
 
-Astra or Sol can still expose a V2 `spawn_agent` call because V1/V2 on that call describes the **parent Orchestrator's collaboration surface**. It does not mean the child should inherit Astra/Sol.
+Every spawn:
 
-- Every spawn explicitly sets `agent_type` to `luna_explorer`, `luna_librarian`, or `luna_fixer`.
-- On a **V1 parent surface**, Pantheon uses `fork_context: false`.
-- On a **V2 parent surface**, Pantheon uses `fork_turns: "none"` and supplies the required concise `task_name` only as routing/path metadata.
-- Pantheon never omits configured-role selection or allows the child to inherit the Astra/Sol parent model.
+- uses native V2 `spawn_agent`;
+- explicitly sets `agent_type` to `luna_explorer`, `luna_librarian`, or `luna_fixer`;
+- uses `fork_turns: "none"`;
+- supplies only the concise `task_name` required as routing/path metadata.
 
-A task label such as `luna_fixer_something` does **not** make a child Luna. Role/model identity comes from the configured agent selection. If Codex cannot expose or honor the requested Luna role, Pantheon reports that limitation instead of silently substituting a generic/inherited worker.
+The configured role files pin `model = "gpt-5.6-luna"` and high reasoning, so Luna remains the worker model. A `task_name` does not select the role or model.
+
+After spawn, parent-mediated coordination stays on the V2 agent plane:
+
+- `send_message` passes information to a running worker without treating it as a normal Desktop task;
+- `followup_task` gives an existing worker another unit of work and triggers the appropriate turn.
+
+Pantheon does not use generic task/thread delegation such as `send_message_to_thread`, `create_thread`, `fork_thread`, or direct task turn/resume calls to steer a Pantheon child. It does not fall back to legacy/non-V2 agent primitives.
+
+If V2 configured-role selection or V2 communication cannot be honored, Pantheon reports the runtime limitation. It does not silently substitute another control path or blindly respawn work that may already have executed.
 
 Every child receives a minimum self-contained bounded assignment: objective, scope, known constraints/facts, permissions, expected evidence/output, stopping condition, and a no-subagents instruction. Full-history inheritance is never the default.
 
-Whether the resulting Luna child has its own message composer is controlled by Codex Desktop/runtime. Pantheon does not claim direct steering unless the UI actually exposes that composer.
+A separate child composer is optional Codex Desktop UI behavior. Pantheon coordinates through the parent and does not depend on a user-editable child composer.
 
 The Orchestrator remains the main thread; Pantheon does not spawn a display-only Orchestrator child.
 

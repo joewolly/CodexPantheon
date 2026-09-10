@@ -10,11 +10,13 @@ Keep Pantheon slim, explicit, model-neutral at the Orchestrator layer, and Codex
 - The Orchestrator is an exclusive workflow manager. It owns planning, architecture, product/tradeoff decisions, prioritization, scheduling, delegation, integration, review, final verification judgment, and the final response. It never implements repository changes.
 - Luna Explorer and Librarian are read-only evidence specialists. Luna Fixer implements the Orchestrator's scoped specification and must not independently redesign or replan the mission.
 - Every repository implementation edit routes to Luna Fixer regardless of size, obviousness, or delegation overhead. If Fixer cannot be spawned or complete the assignment, rescope/retry/redelegate or report the blocker; never fall back to direct Orchestrator implementation.
-- Pantheon workers must always resolve to the configured `luna_explorer`, `luna_librarian`, or `luna_fixer` role. Those role files pin `model = "gpt-5.6-luna"`; current Codex metadata marks Luna as MultiAgent V1.
-- Every spawn must explicitly set `agent_type` to the configured Luna role. Never omit role selection and allow the Astra/Sol parent model to be inherited.
-- The Orchestrator's native spawn surface is transport, not worker identity. On a V1 parent surface use `fork_context: false`; on a V2 parent surface use `fork_turns: "none"` and only the required concise `task_name` routing metadata. A V2 Astra/Sol spawn must still produce a Luna child.
+- Pantheon requires the selected Orchestrator/runtime to expose native MultiAgent V2. If V2 is unavailable, fail visibly; do not substitute a legacy control plane.
+- Pantheon workers must always resolve to the configured `luna_explorer`, `luna_librarian`, or `luna_fixer` role. Those role files pin `model = "gpt-5.6-luna"` and `model_reasoning_effort = "high"`.
+- Every spawn must use the native V2 `spawn_agent`, explicitly set `agent_type` to the configured Luna role, set `fork_turns: "none"`, and use only the required concise `task_name` routing/path metadata. Never omit role selection and allow the Astra/Sol parent model to be inherited.
 - Never treat a task name as a custom-agent selector. If Codex cannot actually select the requested Luna role/model, fail visibly instead of spawning a generic/inherited child under a Luna-looking label.
-- Direct child steering is a runtime/UI capability. Do not promise an interactive composer unless Codex exposes one for that spawned child.
+- Keep Pantheon worker coordination on the V2 agent control plane: use `send_message` for a running worker and `followup_task` to assign another task/turn. Never use generic task/thread delegation such as `send_message_to_thread`, `create_thread`, `fork_thread`, or direct task turn/resume calls to steer a Pantheon child.
+- Do not use legacy/non-V2 multi-agent primitives as compatibility fallbacks.
+- Parent-mediated steering is the supported coordination model. A child composer is optional Codex UI; Pantheon does not depend on or promise one.
 - Preserve the dependency chain for implementation: Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification.
 - Keep Daily and Full Pantheon as the only delegation-intensity profiles. Daily may use fewer evidence specialists and does not parallelize children, but it must not alter implementation ownership or impose a numeric worker-call ceiling.
 - Preserve minimum self-contained child context and never inherit full parent history by default.

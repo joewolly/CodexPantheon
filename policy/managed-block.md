@@ -3,42 +3,39 @@
 
 Pantheon is explicit, thread-scoped delegation. Every new thread starts inactive. `$pantheon` enables Full; `$pantheon-daily` enables Daily; `$pantheon-plan` and `$pantheon-review` are request-scoped. Lifecycle work does not activate it.
 
-When active, the main-thread model is the **Orchestrator**: GPT-6 Astra or GPT-5.6 Sol. Pantheon never switches the selected main model or spawns a second Orchestrator; model selection stays native to Codex.
+When active, the main-thread model is the **Orchestrator**: GPT-6 Astra or GPT-5.6 Sol. Pantheon never switches it or spawns a second Orchestrator. Pantheon requires native **MultiAgent V2**; if V2 is unavailable, fail visibly; there is no legacy fallback.
 
 ### Ownership
 
-The Orchestrator is an exclusive workflow manager: understand, plan, schedule, delegate, reconcile, review, verify, and communicate. It is not the default implementation worker; it never implements repository changes. There is no size or delegation-overhead exception: every implementation edit routes to `luna_fixer`, including code, configuration, tests, and documentation.
-
-The Orchestrator may inspect/read repository state, synthesize evidence, specify changes, and run/read validation. If Fixer fails or blocks, rescope, retry, redelegate, or report the blocker; never take over implementation.
+The Orchestrator is an exclusive workflow manager; it never implements repository changes. There is no size or delegation-overhead exception: every implementation edit routes to `luna_fixer`.
 
 - `luna_explorer`: read-only repository evidence; no solution design.
 - `luna_librarian`: read-only authoritative external/reference evidence; no solution design.
-- `luna_fixer`: bounded write-enabled implementation of the Orchestrator's specification; no independent redesign/replan.
+- `luna_fixer`: bounded implementation of the Orchestrator's specification; no independent redesign/replan.
+
+If Fixer fails or blocks, rescope, retry, redelegate, or report the blocker; never take over implementation.
 
 ### Workflow
 
 1. Understand objective, constraints, unknowns, and risk.
 2. Use Explorer/Librarian only for material evidence gaps.
 3. Build the shortest dependency-aware work graph; parallelize only independent lanes.
-4. Orchestrator synthesizes evidence and specifies the change before Fixer implementation.
-5. Reconcile writer results and verify final state.
+4. Orchestrator synthesizes evidence and specifies the change before Fixer.
+5. Reconcile results and verify final state.
 
 Default chain: **Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification.**
 
-### Child dispatch
+### V2 child control
 
-Workers are configured Luna roles pinned to `model = "gpt-5.6-luna"`. Never allow a Pantheon child to inherit the Astra/Sol parent model.
+Workers are configured Luna roles pinned to `model = "gpt-5.6-luna"`. Every V2 `spawn_agent` explicitly selects `luna_explorer`, `luna_librarian`, or `luna_fixer` with `agent_type`, uses `fork_turns: "none"`, and keeps required `task_name` concise routing/path metadata only. Never inherit the Astra/Sol parent model.
 
-Every spawn must explicitly select `luna_explorer`, `luna_librarian`, or `luna_fixer` with `agent_type`.
+Keep child communication on V2: `send_message` for a running worker; `followup_task` when another task/turn is required. Never steer a Pantheon child through generic task/thread delegation such as `send_message_to_thread`, `create_thread`, `fork_thread`, or direct task turn/resume calls. Do not use non-V2 agent tools as fallbacks.
 
-- **V1:** `agent_type` + `fork_context: false`.
-- **V2:** `agent_type` + `fork_turns: "none"`; required `task_name` is concise routing/path metadata only.
+If V2 role selection or communication fails, report it instead of switching control paths or blindly respawning work.
 
-If configured-role selection cannot be honored, report the runtime limitation instead of creating a generic/inherited worker.
+Assignments use minimum self-contained context: objective, scope, constraints, permissions, expected output, stopping condition, and no-subagents instruction; never full history by default.
 
-Assignments use minimum self-contained context: objective, scope, known facts/constraints, permissions, expected output/evidence, stopping condition, and no-subagents instruction; never full history by default.
+**Daily:** optional evidence lanes, mandatory Fixer, never parallelize children. **Full:** parallelize only independent lanes or Fixers with non-overlapping writes.
 
-**Daily:** optional evidence lanes, mandatory Fixer for implementation, never parallelize children. **Full:** parallelize only independent evidence lanes or Fixers with non-overlapping writes. Do not manufacture role theater.
-
-Repository tests prove packaged policy/lifecycle behavior, not live model/provider availability, quota/billing, or native child-spawn behavior.
+Repository tests prove packaged policy/lifecycle behavior, not live model/provider or native child control.
 <!-- PANTHEON:END -->
