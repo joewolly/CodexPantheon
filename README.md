@@ -50,18 +50,20 @@ v0.7.0 keeps the role boundaries but removes unnecessary model-personality coupl
 - The installed policy and all four skills refer to the **Orchestrator role**, not to Astra-specific ownership.
 - Luna receives assignments from the **Orchestrator**, so the same child prompts work unchanged under Astra or Sol.
 - Luna prompts are shorter and ask for the **minimum sufficient evidence** rather than broad output.
-- Child context stays deliberately narrow: V1 uses `fork_context: false`; V2 uses `fork_turns: "none"`.
+- Every Pantheon child explicitly selects a configured Luna role instead of inheriting the Orchestrator model.
+- Child context stays deliberately narrow: a V1 parent surface uses `fork_context: false`; a V2 parent surface uses `fork_turns: "none"`.
 - No second Orchestrator, model-router runtime, persistent selector, duplicate skill set, hidden state, or additional worker was added.
-- Luna remains GPT-5.6 Luna High so dual-Orchestrator behavior is not confounded with worker-effort tuning.
 
-## Subagent identity and V1/V2
+## Luna is the worker model
 
-Pantheon identifies workers by the configured agent role, not by a task label. Codex chooses the multi-agent backend exposed to the current model; Pantheon does not pretend to switch between V1 and V2.
+Pantheon workers are always `luna_explorer`, `luna_librarian`, or `luna_fixer`. Those installed role files pin **GPT-5.6 Luna High**, and current Codex model metadata marks GPT-5.6 Luna as **MultiAgent V1**.
 
-- **V1:** `agent_type` selects `luna_explorer`, `luna_librarian`, or `luna_fixer`; Pantheon uses `fork_context: false` so the child starts with its bounded assignment rather than the parent transcript.
-- **V2:** Codex requires a `task_name`. Pantheon treats it only as canonical routing/path metadata and keeps it short and task-specific. A Luna-looking `task_name` is never treated as proof that a Luna role loaded.
-- If the active spawn surface cannot actually select the configured Luna role, Pantheon reports that runtime limitation rather than silently substituting a generic/inherited child under a Luna-looking label.
-- Direct child steering is a Codex Desktop/runtime capability. Some parented children expose their own composer; others, including V2 surfaces in some current builds, may be output-only.
+Astra/Sol may expose a V2 `spawn_agent` tool because that is the **parent Orchestrator's** collaboration surface. That does not make the worker a V2 Astra/Sol child. Pantheon must explicitly pass the configured Luna `agent_type`, so the spawned worker resolves to GPT-5.6 Luna rather than inheriting the parent model.
+
+- **V1 parent transport:** select the Luna `agent_type` and use `fork_context: false`.
+- **V2 parent transport:** select the Luna `agent_type`, use `fork_turns: "none"`, and provide the concise `task_name` required by Codex as routing/path metadata only.
+- A task name never establishes worker identity. If Codex cannot expose or honor configured-role selection, Pantheon reports the limitation rather than silently creating a generic/inherited child.
+- Whether the Luna child gets its own user-editable composer remains a Codex Desktop/runtime behavior; Pantheon does not fake that capability.
 
 The Orchestrator stays in the main thread and is never spawned merely to create a display-only child card.
 
@@ -114,7 +116,7 @@ These workflows do not activate a sticky Pantheon profile by themselves.
 
 ## Context discipline
 
-Pantheon uses the narrowest fresh-child behavior provided by the active native backend: V1 uses `fork_context: false`; V2 uses `fork_turns: "none"`. Full-history inheritance is never the default.
+Every Pantheon worker is explicitly selected as a Luna role. The parent transport then uses the narrowest fresh-child behavior available: V1 uses `fork_context: false`; V2 uses `fork_turns: "none"`. Full-history inheritance is never the default.
 
 Every child receives a minimum self-contained bounded assignment containing the objective, scope, known constraints/facts, permission boundary, expected evidence/output, stopping condition, and a prohibition on spawning subagents.
 
