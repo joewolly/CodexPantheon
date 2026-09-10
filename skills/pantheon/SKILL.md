@@ -16,4 +16,4 @@ For each request:
 
 Do not spend an evidence call and then move substantive implementation back to the Orchestrator merely because the path became clear. Do not duplicate work or manufacture parallelism.
 
-All child dispatch follows the managed policy's minimum-context, `fork_turns: "none"`, bounded-assignment, no-subagents, and role-prefixed `task_name` contract.
+All child dispatch follows the managed policy's interactive-first, minimum-context contract: prefer `multi_agent_v1.spawn_agent` with the named role and `fork_context: false` when that surface is exposed; otherwise use V2 with `fork_turns: "none"` and the role-prefixed `task_name`. Keep assignments bounded, self-contained, and no-subagents. Do not silently treat an output-only V2 child as directly steerable.
