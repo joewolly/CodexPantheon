@@ -66,9 +66,13 @@ for marker in \
   '`luna_explorer`' \
   '`luna_librarian`' \
   '`luna_fixer`' \
-  "Explorer/Librarian evidence when needed" \
-  "Orchestrator plan/specification" \
+  'model = "gpt-5.6-luna"' \
+  "Never allow a Pantheon child to inherit the Astra/Sol parent model" \
+  "Every spawn must explicitly select" \
+  '`agent_type`' \
+  'fork_context: false' \
   'fork_turns: "none"' \
+  "routing/path metadata only" \
   "minimum self-contained context" \
   "never full history by default" \
   "never parallelize children" \
@@ -88,7 +92,7 @@ for obsolete in \
   'pantheon_verifier'; do
   assert_not_contains "$POLICY" "$obsolete"
 done
-pass "always-on policy is compact, dual-Orchestrator, and minimum-context"
+pass "always-on policy enforces dual-Orchestrator ownership and explicit Luna child selection"
 
 FULL="$ROOT/skills/pantheon/SKILL.md"
 DAILY="$ROOT/skills/pantheon-daily/SKILL.md"
@@ -97,9 +101,13 @@ REVIEW="$ROOT/skills/pantheon-review/SKILL.md"
 for skill in "$FULL" "$DAILY" "$PLAN" "$REVIEW"; do
   assert_file "$skill"
   assert_contains "$skill" "managed policy"
-  assert_contains "$skill" 'fork_turns: "none"'
   assert_contains "$skill" "minimum-context"
-  assert_contains "$skill" 'role-prefixed `task_name`'
+  assert_contains "$skill" '`agent_type`'
+  assert_contains "$skill" 'fork_context: false'
+  assert_contains "$skill" 'fork_turns: "none"'
+  assert_contains "$skill" 'Do not require a role-prefixed `task_name`'
+  assert_contains "$skill" "resulting worker must resolve to GPT-5.6 Luna"
+  assert_contains "$skill" "fail visibly"
   assert_not_contains "$skill" "GPT-6 Astra"
   assert_not_contains "$skill" "GPT-5.6 Sol"
 done
@@ -115,7 +123,7 @@ assert_contains "$DAILY" "no numeric worker-call ceiling"
 assert_contains "$PLAN" "do not use Fixer"
 assert_contains "$REVIEW" "do not use Fixer"
 assert_contains "$REVIEW" "PASS WITH NOTES"
-pass "workflow skills are delta-only and protected by instruction-size budgets"
+pass "workflow skills require explicit Luna roles and preserve context/size budgets"
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
@@ -155,7 +163,10 @@ done
 assert_contains "$CODEX_HOME/AGENTS.md" "GPT-6 Astra"
 assert_contains "$CODEX_HOME/AGENTS.md" "GPT-5.6 Sol"
 assert_contains "$CODEX_HOME/AGENTS.md" "never switches the selected main model"
-pass "install refreshes dual-Orchestrator payload and preserves unrelated configuration"
+assert_contains "$CODEX_HOME/AGENTS.md" "Every spawn must explicitly select"
+assert_contains "$CODEX_HOME/AGENTS.md" '`agent_type`'
+assert_contains "$CODEX_HOME/AGENTS.md" 'model = "gpt-5.6-luna"'
+pass "install refreshes explicit-Luna dual-Orchestrator payload and preserves unrelated configuration"
 
 BEFORE="$(cksum "$CODEX_HOME/AGENTS.md")"
 "$PANTHEON" install >/dev/null
@@ -255,17 +266,20 @@ pass "bootstrap remains migration-aware and idempotent"
 
 assert_contains "$ROOT/AGENTS.md" "Preserve the v0.7 orchestration architecture"
 assert_contains "$ROOT/AGENTS.md" "GPT-6 Astra and GPT-5.6 Sol"
+assert_contains "$ROOT/AGENTS.md" "Every spawn must explicitly set"
 assert_contains "$ROOT/README.md" "Astra or Sol = Orchestrator"
 assert_contains "$ROOT/README.md" "native main-thread model control"
 assert_contains "$ROOT/README.md" "codex-pantheon-v0.7-architecture.svg"
 assert_contains "$ROOT/README.md" "v0.7.0"
+assert_contains "$ROOT/README.md" "explicitly selects"
 assert_contains "$ROOT/docs/USER_GUIDE.md" "Choose the Orchestrator"
+assert_contains "$ROOT/docs/USER_GUIDE.md" "explicitly selects"
 assert_contains "$ROOT/docs/DESIGN_DOCTRINE.md" "Model selection is native Codex state"
 assert_contains "$ROOT/docs/CODEX_INSTALL.md" "Orchestrator selection"
 assert_contains "$ROOT/docs/V0.7.0.md" "Dual Orchestrator + context efficiency"
 assert_not_contains "$ROOT/docs/V0.7.0.md" "candidate"
 assert_contains "$ROOT/CHANGELOG.md" "## 0.7.0 — 2026-09-09"
 assert_contains "$ROOT/THIRD_PARTY_NOTICES.md" "oh-my-opencode-slim"
-pass "v0.7.0 release docs match dual-Orchestrator architecture"
+pass "v0.7.0 release docs match explicit-Luna dual-Orchestrator architecture"
 
 printf '1..%d\n' "$PASS"
