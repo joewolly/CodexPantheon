@@ -26,7 +26,7 @@ Every spawn must explicitly select `luna_explorer`, `luna_librarian`, or `luna_f
 
 A V2 call made by Astra/Sol is only the parent dispatch mechanism; it must still resolve the child to GPT-5.6 Luna, not create a generic/inherited V2 worker. If Codex cannot expose or honor configured-role selection, do not impersonate Luna with a task label; report the runtime limitation.
 
-Every assignment uses minimum self-contained context: objective, scope, known facts/constraints, permissions, expected output/evidence, stopping condition, and no-subagents instruction. Never inherit full history by default.
+Every assignment uses minimum self-contained context: objective, scope, known facts/constraints, permissions, expected output/evidence, stopping condition, and no-subagents instruction; never full history by default.
 
 **Daily:** delegate only when materially useful; never parallelize children; no numeric call ceiling. **Full:** parallelize only genuinely independent evidence lanes or Fixers with non-overlapping writes. Do not duplicate work or manufacture role theater.
 
