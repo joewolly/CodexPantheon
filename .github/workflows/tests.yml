@@ -17,6 +17,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run Bash lifecycle suite
         run: ./tests/test.sh
+      - name: Verify Pantheon role ownership contracts
+        run: bash ./tests/test-orchestrator-contract.sh
 
   windows:
     name: Windows PowerShell 5.1 lifecycle

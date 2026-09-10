@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Changed
+
+- The Astra/Sol Orchestrator contract now follows the `oh-my-opencode-slim` workflow-manager shape more closely: understand, build a dependency-aware work graph, delegate, reconcile, and verify.
+- The Orchestrator is now implementation-free. Every repository implementation edit routes to `luna_fixer`, including tiny, obvious, or low-risk changes; there is no delegation-overhead escape hatch.
+- Full and Daily share the same hard implementation ownership. If Fixer cannot be spawned or complete an assignment, the Orchestrator must rescope, retry, redelegate, or report the blocker rather than taking over the edit.
+- User-facing doctrine and upstream attribution now document the stricter Pantheon divergence from `oh-my-opencode-slim`.
+
 ## 0.7.0 — 2026-09-09
 
 ### Added
