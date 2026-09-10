@@ -16,4 +16,4 @@ Daily changes delegation intensity, never ownership:
 
 Typical shapes: `Orchestrator plan → Fixer → Orchestrator review`; add Explorer and/or Librarian before the plan only when evidence is missing.
 
-All child dispatch follows the managed policy's backend-native minimum-context contract: V1 uses the configured role with `fork_context: false`; V2 uses `fork_turns: "none"` and only required task-name metadata. Do not require a role-prefixed `task_name`; role identity comes from configured agent selection. If the requested Luna role cannot actually be selected, fail visibly rather than impersonating it. Keep assignments bounded, self-contained, and no-subagents.
+Every child dispatch explicitly selects the configured Luna role with `agent_type`; never inherit the Astra/Sol model. V1 parent transport uses `fork_context: false`; V2 parent transport uses `fork_turns: "none"` plus only required concise task metadata. The resulting worker must resolve to GPT-5.6 Luna. If configured-role selection cannot be honored, fail visibly rather than creating a generic child. Keep assignments bounded, self-contained, and no-subagents.
