@@ -2,7 +2,7 @@
 
 ## oh-my-opencode-slim
 
-Codex Pantheon v0.6 adapts portions of the Orchestrator/Explorer/Librarian/Fixer role descriptions and routing semantics from [`alvinunreal/oh-my-opencode-slim`](https://github.com/alvinunreal/oh-my-opencode-slim). The OpenCode runtime/plugin implementation is not included.
+Codex Pantheon adapts portions of the Orchestrator/Explorer/Librarian/Fixer role descriptions and orchestration/routing semantics from [`alvinunreal/oh-my-opencode-slim`](https://github.com/alvinunreal/oh-my-opencode-slim), including workflow decomposition, delegation, parallelization, reconciliation, and verification concepts. Pantheon intentionally diverges by making the Astra/Sol Orchestrator implementation-free: all repository implementation edits route to Luna Fixer. The OpenCode runtime/plugin implementation is not included.
 
 Upstream license:
 
