@@ -96,7 +96,7 @@ Astra or Sol can still expose a V2 `spawn_agent` call because V1/V2 on that call
 - Every spawn explicitly sets `agent_type` to `luna_explorer`, `luna_librarian`, or `luna_fixer`.
 - On a **V1 parent surface**, Pantheon uses `fork_context: false`.
 - On a **V2 parent surface**, Pantheon uses `fork_turns: "none"` and supplies the required concise `task_name` only as routing/path metadata.
-- Pantheon never omits configured-role selection and allows the child to inherit the Astra/Sol parent model.
+- Pantheon never omits configured-role selection or allows the child to inherit the Astra/Sol parent model.
 
 A task label such as `luna_fixer_something` does **not** make a child Luna. Role/model identity comes from the configured agent selection. If Codex cannot expose or honor the requested Luna role, Pantheon reports that limitation instead of silently substituting a generic/inherited worker.
 
