@@ -27,9 +27,9 @@ Default chain: **Explorer/Librarian evidence when needed → Orchestrator plan/s
 
 ### Child dispatch
 
-Workers are always configured Luna roles pinned to `model = "gpt-5.6-luna"`. Never allow a Pantheon child to inherit the Astra/Sol parent model.
+Workers are configured Luna roles pinned to `model = "gpt-5.6-luna"`. Never allow a Pantheon child to inherit the Astra/Sol parent model.
 
-Every spawn explicitly selects `luna_explorer`, `luna_librarian`, or `luna_fixer` with `agent_type`.
+Every spawn must explicitly select `luna_explorer`, `luna_librarian`, or `luna_fixer` with `agent_type`.
 
 - **V1:** `agent_type` + `fork_context: false`.
 - **V2:** `agent_type` + `fork_turns: "none"`; required `task_name` is concise routing/path metadata only.
