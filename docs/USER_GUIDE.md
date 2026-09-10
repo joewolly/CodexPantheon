@@ -89,7 +89,7 @@ These workflows do not activate a sticky Pantheon profile by themselves.
 
 ## 6. Luna V1 workers and parent transport
 
-Pantheon workers are always explicitly selected configured Luna roles. Their role files pin `model = "gpt-5.6-luna"`, and current Codex model metadata marks GPT-5.6 Luna as MultiAgent V1.
+Pantheon workers are always explicitly selected configured Luna roles. Pantheon dispatch explicitly selects the requested Luna role on every spawn. Their role files pin `model = "gpt-5.6-luna"`, and current Codex model metadata marks GPT-5.6 Luna as MultiAgent V1.
 
 Astra or Sol can still expose a V2 `spawn_agent` call because V1/V2 on that call describes the **parent Orchestrator's collaboration surface**. It does not mean the child should inherit Astra/Sol.
 
