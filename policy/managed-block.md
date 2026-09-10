@@ -17,9 +17,12 @@ Default chain: **Explorer/Librarian evidence when needed → Orchestrator plan/s
 
 ### Child dispatch
 
-Prefer the directly interactive parented-child surface when Codex exposes it. When `multi_agent_v1.spawn_agent` is available, use it for Pantheon children: select the named Luna role with `agent_type`, set `fork_context: false`, and send only minimum self-contained context. When both V1 and V2 spawn surfaces are available, prefer V1; do not select V2 merely to obtain a `task_name`.
+Use the native multi-agent surface exposed by the selected main-thread model; Pantheon does not force or pretend to switch V1/V2.
 
-If V1 is unavailable, use the native V2 spawn surface with `fork_turns: "none"` and a role-prefixed `task_name`: `luna_explorer_<assignment>`, `luna_librarian_<assignment>`, or `luna_fixer_<assignment>`. V2 children may be output-only in Codex Desktop, so do not claim that direct child steering is available unless the UI actually exposes a composer.
+- **V1:** select the configured Luna role with `agent_type`, set `fork_context: false`, and send only minimum self-contained context.
+- **V2:** set `fork_turns: "none"`. A V2 `task_name` is required native routing metadata only; keep it concise and task-specific. It is not role selection and must not be used to impersonate `luna_explorer`, `luna_librarian`, or `luna_fixer`.
+
+When the active spawn surface exposes `agent_type`, use it to select the configured Luna role. If Codex cannot actually select the configured role, do not silently spawn a generic/inherited child and label it as Luna; report the runtime limitation. V1 may expose a directly steerable child composer while V2 may expose an output-only child, so never claim direct child steering unless the UI actually provides it.
 
 Every assignment stays bounded and self-contained: objective, scope, known facts/constraints, permissions, expected output/evidence, stopping condition, and no-subagents instruction. Inherit only the minimum genuinely required context; never full history by default.
 
