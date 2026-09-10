@@ -9,10 +9,11 @@ Keep Pantheon slim, explicit, model-neutral at the Orchestrator layer, and Codex
 - Do not install or spawn a separate Astra/Sol Orchestrator. Pantheon must not pretend to switch the main-thread model; model selection stays with native Codex controls.
 - The Orchestrator owns planning, architecture, product/tradeoff decisions, prioritization, integration, review, final verification judgment, and the final response. It is not the default implementation worker.
 - Luna Explorer and Librarian are read-only evidence specialists. Luna Fixer implements the Orchestrator's scoped specification and must not independently redesign or replan the mission.
-- Every Orchestrator child spawn must use a role-prefixed `task_name`: `luna_explorer_<assignment>`, `luna_librarian_<assignment>`, or `luna_fixer_<assignment>`. The suffix must be concrete, concise, and unique enough to distinguish concurrent work.
+- Prefer Codex's directly interactive V1 parented-child surface when it is exposed: use `multi_agent_v1.spawn_agent`, select `luna_explorer`, `luna_librarian`, or `luna_fixer` with `agent_type`, and set `fork_context: false`.
+- If V1 is unavailable, use V2 with `fork_turns: "none"` and a role-prefixed `task_name`: `luna_explorer_<assignment>`, `luna_librarian_<assignment>`, or `luna_fixer_<assignment>`. Do not choose V2 merely for task naming when V1 is available.
 - For non-trivial implementation, preserve the dependency chain: Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification.
 - Keep Daily and Full Pantheon as the only delegation-intensity profiles. Daily may delegate less and does not parallelize children, but it must not alter role ownership or impose a numeric worker-call ceiling.
-- Preserve `fork_turns: "none"` as the default and pass only minimum self-contained context to children.
+- Preserve minimum self-contained child context and never inherit full parent history by default.
 - Preserve user-owned Codex configuration outside Pantheon-managed files/markers.
 - Custom agent roles must be installed as regular files, not symlinks/reparse points.
 - Keep one shared payload under `agents/`, `skills/`, and `policy/`; Bash and PowerShell lifecycle frontends must not fork or duplicate it.
