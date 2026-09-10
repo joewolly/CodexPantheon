@@ -17,9 +17,11 @@ Default chain: **Explorer/Librarian evidence when needed → Orchestrator plan/s
 
 ### Child dispatch
 
-Default every child to `fork_turns: "none"`. Send only minimum self-contained context: objective, scope, known facts/constraints, permissions, expected output/evidence, stopping condition, and no-subagents instruction. Inherit only the minimum genuinely required context; never full history by default.
+Prefer the directly interactive parented-child surface when Codex exposes it. When `multi_agent_v1.spawn_agent` is available, use it for Pantheon children: select the named Luna role with `agent_type`, set `fork_context: false`, and send only minimum self-contained context. When both V1 and V2 spawn surfaces are available, prefer V1; do not select V2 merely to obtain a `task_name`.
 
-Use concrete lowercase task names: `luna_explorer_<assignment>`, `luna_librarian_<assignment>`, `luna_fixer_<assignment>`.
+If V1 is unavailable, use the native V2 spawn surface with `fork_turns: "none"` and a role-prefixed `task_name`: `luna_explorer_<assignment>`, `luna_librarian_<assignment>`, or `luna_fixer_<assignment>`. V2 children may be output-only in Codex Desktop, so do not claim that direct child steering is available unless the UI actually exposes a composer.
+
+Every assignment stays bounded and self-contained: objective, scope, known facts/constraints, permissions, expected output/evidence, stopping condition, and no-subagents instruction. Inherit only the minimum genuinely required context; never full history by default.
 
 **Daily:** delegate only when materially useful; never parallelize children; no numeric call ceiling. **Full:** parallelize only genuinely independent evidence lanes or Fixers with non-overlapping writes. Do not duplicate work or manufacture role theater.
 
