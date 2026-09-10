@@ -9,8 +9,10 @@ Keep Pantheon slim, explicit, model-neutral at the Orchestrator layer, and Codex
 - Do not install or spawn a separate Astra/Sol Orchestrator. Pantheon must not pretend to switch the main-thread model; model selection stays with native Codex controls.
 - The Orchestrator owns planning, architecture, product/tradeoff decisions, prioritization, integration, review, final verification judgment, and the final response. It is not the default implementation worker.
 - Luna Explorer and Librarian are read-only evidence specialists. Luna Fixer implements the Orchestrator's scoped specification and must not independently redesign or replan the mission.
-- Prefer Codex's directly interactive V1 parented-child surface when it is exposed: use `multi_agent_v1.spawn_agent`, select `luna_explorer`, `luna_librarian`, or `luna_fixer` with `agent_type`, and set `fork_context: false`.
-- If V1 is unavailable, use V2 with `fork_turns: "none"` and a role-prefixed `task_name`: `luna_explorer_<assignment>`, `luna_librarian_<assignment>`, or `luna_fixer_<assignment>`. Do not choose V2 merely for task naming when V1 is available.
+- Use the native multi-agent surface exposed by the selected main-thread model; Pantheon must not pretend it can force V1 or V2.
+- On V1, select the configured Luna role with `agent_type` and use `fork_context: false`. On V2, use `fork_turns: "none"`; `task_name` is required routing metadata only, not role identity.
+- Never treat a V2 task name as a custom-agent selector. If Codex cannot actually select `luna_explorer`, `luna_librarian`, or `luna_fixer`, fail visibly instead of spawning a generic/inherited child under a Luna-looking label.
+- Direct child steering is a runtime/UI capability. Do not promise an interactive composer unless Codex exposes one for that spawned child.
 - For non-trivial implementation, preserve the dependency chain: Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification.
 - Keep Daily and Full Pantheon as the only delegation-intensity profiles. Daily may delegate less and does not parallelize children, but it must not alter role ownership or impose a numeric worker-call ceiling.
 - Preserve minimum self-contained child context and never inherit full parent history by default.
