@@ -16,4 +16,4 @@ For each request:
 
 Do not spend an evidence call and then move substantive implementation back to the Orchestrator merely because the path became clear. Do not duplicate work or manufacture parallelism.
 
-All child dispatch follows the managed policy's interactive-first, minimum-context contract: prefer `multi_agent_v1.spawn_agent` with the named role and `fork_context: false` when that surface is exposed; otherwise use V2 with `fork_turns: "none"` and the role-prefixed `task_name`. Keep assignments bounded, self-contained, and no-subagents. Do not silently treat an output-only V2 child as directly steerable.
+All child dispatch follows the managed policy's backend-native minimum-context contract: V1 uses the configured role with `fork_context: false`; V2 uses `fork_turns: "none"` and only the task-name metadata its native schema requires. Do not require a role-prefixed `task_name`; role identity comes from the configured agent selection, never the label. If the requested Luna role cannot actually be selected, fail visibly rather than impersonating it. Keep assignments bounded, self-contained, and no-subagents.
