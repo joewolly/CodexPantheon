@@ -58,6 +58,34 @@ foreach ($agent in @($Explorer, $Librarian, $Fixer)) {
 }
 Pass 'Windows consumes the shared Luna payload'
 
+$Policy = Join-Path (Join-Path $Root 'policy') 'managed-block.md'
+$WorkflowSkills = @(
+    (Join-Path (Join-Path (Join-Path $Root 'skills') 'pantheon') 'SKILL.md'),
+    (Join-Path (Join-Path (Join-Path $Root 'skills') 'pantheon-daily') 'SKILL.md'),
+    (Join-Path (Join-Path (Join-Path $Root 'skills') 'pantheon-plan') 'SKILL.md'),
+    (Join-Path (Join-Path (Join-Path $Root 'skills') 'pantheon-review') 'SKILL.md')
+)
+Assert-Contains $Policy 'native **MultiAgent V2**'
+Assert-Contains $Policy 'Every V2 `spawn_agent` explicitly selects'
+Assert-Contains $Policy '`send_message` for a running worker'
+Assert-Contains $Policy '`followup_task` when another task/turn is required'
+Assert-Contains $Policy 'Never steer a Pantheon child through generic task/thread delegation such as `send_message_to_thread`'
+Assert-Contains $Policy 'Do not use non-V2 agent tools as fallbacks.'
+Assert-NotContains $Policy 'fork_context: false'
+Assert-NotContains $Policy 'V1 parent'
+foreach ($skill in $WorkflowSkills) {
+    Assert-Contains $skill 'V2-only minimum-context contract'
+    Assert-Contains $skill 'MultiAgent V2 `spawn_agent`'
+    Assert-Contains $skill '`agent_type`'
+    Assert-Contains $skill 'fork_turns: "none"'
+    Assert-Contains $skill '`send_message`/`followup_task`'
+    Assert-Contains $skill '`send_message_to_thread`'
+    Assert-Contains $skill 'non-V2 agent tools as fallbacks'
+    Assert-NotContains $skill 'fork_context: false'
+    Assert-NotContains $skill 'V1 parent'
+}
+Pass 'Windows source contract enforces V2-only child control'
+
 $Temp = Join-Path ([System.IO.Path]::GetTempPath()) ('pantheon-windows-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $Temp -Force | Out-Null
 $Original = @{
@@ -113,8 +141,24 @@ try {
     foreach ($legacy in $LegacyAgents) { Assert-NoPath (Join-Path (Join-Path $env:CODEX_HOME 'agents') $legacy) }
     Assert-NoPath $LegacyTeam
     foreach ($skill in @('pantheon', 'pantheon-daily', 'pantheon-plan', 'pantheon-review')) {
-        Assert-EqualFiles (Join-Path (Join-Path (Join-Path $Root 'skills') $skill) 'SKILL.md') (Join-Path (Join-Path $env:PANTHEON_SKILLS_HOME $skill) 'SKILL.md')
+        $InstalledSkill = Join-Path (Join-Path $env:PANTHEON_SKILLS_HOME $skill) 'SKILL.md'
+        Assert-EqualFiles (Join-Path (Join-Path (Join-Path $Root 'skills') $skill) 'SKILL.md') $InstalledSkill
+        Assert-Contains $InstalledSkill 'V2-only minimum-context contract'
+        Assert-Contains $InstalledSkill 'MultiAgent V2 `spawn_agent`'
+        Assert-Contains $InstalledSkill '`send_message`/`followup_task`'
+        Assert-Contains $InstalledSkill '`send_message_to_thread`'
+        Assert-NotContains $InstalledSkill 'fork_context: false'
+        Assert-NotContains $InstalledSkill 'V1 parent'
     }
+    Assert-Contains $AgentsFile 'native **MultiAgent V2**'
+    Assert-Contains $AgentsFile 'Every V2 `spawn_agent` explicitly selects'
+    Assert-Contains $AgentsFile '`send_message` for a running worker'
+    Assert-Contains $AgentsFile '`followup_task` when another task/turn is required'
+    Assert-Contains $AgentsFile '`send_message_to_thread`'
+    Assert-Contains $AgentsFile 'Do not use non-V2 agent tools as fallbacks.'
+    Assert-NotContains $AgentsFile 'fork_context: false'
+    Assert-NotContains $AgentsFile 'V1 parent'
+    Pass 'install preserves the V2-only child-control contract on Windows'
     Pass 'install migrates legacy state and preserves user-owned Windows configuration'
 
     $before = (Get-FileHash -LiteralPath $AgentsFile -Algorithm SHA256).Hash
