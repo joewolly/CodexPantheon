@@ -9,7 +9,7 @@ Activate Daily for the current thread; follow-ups remain Daily until disabled or
 
 Daily changes delegation intensity, never ownership:
 - Explorer/Librarian are optional and used only for material evidence gaps.
-- Fixer is mandatory for every repository implementation edit.
+- Fixer is mandatory for every repository implementation edit, including tiny or obvious changes.
 - Never parallelize children. There is no numeric worker-call ceiling.
 - When evidence is needed, use only necessary lanes sequentially; then the Orchestrator plans and Fixer implements.
 - Do not collapse open-ended research, planning, and implementation into one Fixer call to save a spawn.

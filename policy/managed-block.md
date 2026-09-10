@@ -7,7 +7,7 @@ When active, the main-thread model is the **Orchestrator**: GPT-6 Astra or GPT-5
 
 ### Ownership
 
-The Orchestrator plans, delegates, reconciles, reviews, verifies, and communicates. It never implements repository changes. Every implementation edit routes to `luna_fixer`; no size/obviousness exception.
+The Orchestrator is an exclusive workflow manager; it never implements repository changes. There is no size or delegation-overhead exception: every implementation edit routes to `luna_fixer`.
 
 - `luna_explorer`: read-only repository evidence; no solution design.
 - `luna_librarian`: read-only authoritative external/reference evidence; no solution design.
