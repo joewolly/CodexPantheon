@@ -20,7 +20,7 @@ Codex Pantheon is a slim, explicit, Codex-native orchestration layer for a suppo
 
 ## Architecture
 
-- **GPT-6 Astra or GPT-5.6 Sol — main thread / Orchestrator.** Understands the request, gathers evidence when needed, makes architecture/product decisions, creates the implementation specification, delegates, reconciles, reviews, verifies, and owns the final answer.
+- **GPT-6 Astra or GPT-5.6 Sol — main thread / Orchestrator.** Understands the request, gathers evidence when needed, makes architecture/product decisions, creates the implementation specification, schedules/delegates work, reconciles results, reviews, verifies, and owns the final answer. It never implements repository changes.
 - **GPT-5.6 Luna High — `luna_explorer`.** Read-only repository reconnaissance. Finds files, symbols, execution paths, ownership, and code evidence. It does not design the solution.
 - **GPT-5.6 Luna High — `luna_librarian`.** Read-only documentation/API/upstream/reference research. It does not design the solution.
 - **GPT-5.6 Luna High — `luna_fixer`.** Write-enabled implementation specialist. Executes the Orchestrator's scoped specification and assigned validation. It does not independently replan or redesign the mission.
@@ -31,7 +31,7 @@ The core dependency is:
 Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification
 ```
 
-The Orchestrator may directly handle one isolated, clear, low-risk action when delegation would cost more than execution. It is **not** the default implementation worker for substantive work.
+Every implementation edit goes through Luna Fixer, even a tiny or obvious change. If Fixer cannot be spawned or complete the assignment, the Orchestrator rescop es, retries, redelegates, or reports the blocker; it never takes over implementation.
 
 ## Selecting Astra or Sol
 
@@ -79,7 +79,7 @@ Both Pantheon profiles are sticky only inside the current thread. Invoke the oth
 
 ### Pantheon Daily
 
-Daily protects usage by changing **how readily the Orchestrator delegates**, not who owns planning or implementation. There is no numeric worker-call ceiling.
+Daily protects usage by changing how often optional evidence specialists are used, never who owns implementation. There is no numeric worker-call ceiling.
 
 Known implementation:
 
@@ -93,7 +93,7 @@ Unknown implementation:
 Luna Explorer and/or Librarian → Orchestrator plan → Luna Fixer → Orchestrator review
 ```
 
-Daily never parallelizes children.
+Daily never parallelizes children. Luna Fixer remains mandatory for implementation.
 
 ### Full Pantheon
 
