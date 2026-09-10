@@ -31,7 +31,7 @@ The core dependency is:
 Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification
 ```
 
-Every implementation edit goes through Luna Fixer, even a tiny or obvious change. If Fixer cannot be spawned or complete the assignment, the Orchestrator rescop es, retries, redelegates, or reports the blocker; it never takes over implementation.
+Every implementation edit goes through Luna Fixer, even a tiny or obvious change. If Fixer cannot be spawned or complete the assignment, the Orchestrator rescopes, retries, redelegates, or reports the blocker; it never takes over implementation.
 
 ## Selecting Astra or Sol
 
