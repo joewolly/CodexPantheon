@@ -27,7 +27,7 @@ Default chain: **Explorer/Librarian evidence when needed → Orchestrator plan/s
 
 ### V2 child control
 
-Workers are configured Luna roles pinned to `model = "gpt-5.6-luna"`. Every V2 `spawn_agent` explicitly selects `luna_explorer`, `luna_librarian`, or `luna_fixer` with `agent_type`, uses `fork_turns: "none"`, and keeps required `task_name` concise routing/path metadata only. Never inherit the Astra/Sol parent model.
+Workers are configured Luna roles pinned to `model = "gpt-5.6-luna"`. Every V2 `spawn_agent` explicitly selects `luna_explorer`, `luna_librarian`, or `luna_fixer` with `agent_type`, uses `fork_turns: "none"`, and uses `task_name` `<role>_<slug>` routing/path metadata only (`explorer`/`librarian`/`fixer` matching `agent_type`). Never inherit the Astra/Sol parent model.
 
 Keep child communication on V2: `send_message` for a running worker; `followup_task` when another task/turn is required. Never steer a Pantheon child through generic task/thread delegation such as `send_message_to_thread`, `create_thread`, `fork_thread`, or direct task turn/resume calls. Do not use non-V2 agent tools as fallbacks.
 

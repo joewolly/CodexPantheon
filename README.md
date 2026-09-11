@@ -53,7 +53,9 @@ Every Pantheon worker is created through native V2 `spawn_agent` with:
 - `fork_turns: "none"`;
 - only the concise `task_name` required as routing/path metadata.
 
-The configured role pins the actual worker to **GPT-5.6 Luna High**. `task_name` never selects or impersonates a role.
+Pantheon formats that V2 `task_name` as `<role>_<concise_task_slug>` so the current Codex Subagents UI exposes the worker lane at a glance. Examples: `fixer_v020_implement`, `explorer_v020_versions`, and `librarian_v020_release_map`.
+
+The configured role pins the actual worker to **GPT-5.6 Luna High**. `agent_type` remains authoritative; the `explorer` / `librarian` / `fixer` task-name prefix is display/path metadata only and never selects or impersonates a role or model.
 
 After spawn, the Orchestrator keeps coordination on the native V2 agent plane:
 
