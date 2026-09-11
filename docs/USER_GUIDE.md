@@ -98,7 +98,15 @@ Every spawn:
 - uses `fork_turns: "none"`;
 - supplies only the concise `task_name` required as routing/path metadata.
 
-The configured role files pin `model = "gpt-5.6-luna"` and high reasoning, so Luna remains the worker model. A `task_name` does not select the role or model.
+Pantheon formats the V2 `task_name` as `<role>_<concise_task_slug>` so Codex's current Subagents list makes the worker lane visible. Use `explorer`, `librarian`, or `fixer` to match the selected `agent_type`, for example:
+
+```text
+fixer_v020_implement
+explorer_v020_versions
+librarian_v020_release_map
+```
+
+The configured role files pin `model = "gpt-5.6-luna"` and high reasoning, so Luna remains the worker model. `agent_type` is authoritative; the role prefix in `task_name` is display/path metadata only and does not select the role or model.
 
 After spawn, parent-mediated coordination stays on the V2 agent plane:
 
