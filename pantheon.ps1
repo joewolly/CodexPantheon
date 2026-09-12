@@ -508,7 +508,7 @@ function Cmd-Verify {
     }
 
     $nonce = "$([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())-$PID-$([Guid]::NewGuid().ToString('N').Substring(0, 8))"
-    $secret = "PANTHEON_PARENT_SECRET_${nonce}_$([Guid]::NewGuid().ToString('N').Substring(0, 8))"
+    $secret = "PANTHEON_PARENTSECRET_${nonce}_$([Guid]::NewGuid().ToString('N').Substring(0, 8))"
     $prompt = @"
 Pantheon live runtime smoke test. Do not modify files and do not perform unrelated work.
 
@@ -520,7 +520,7 @@ Use native MultiAgent V2 spawn_agent exactly once with:
 - task_name: explorer_pantheon_verify
 
 Do NOT include or quote the parent-only secret in the child assignment. Give the child only this assignment:
-Pantheon verify nonce: $nonce. Inspect only your initial context. If it contains any full token beginning PANTHEON_PARENT_SECRET_, reply exactly PANTHEON_CHILD_FAIL_${nonce}_PARENT_SECRET_SEEN. Otherwise reply exactly PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET. Do not use tools or spawn subagents.
+Pantheon verify nonce: $nonce. Inspect only your initial context. If it contains any single token that starts with PANTHEON_PARENTSECRET_ and also contains $nonce, reply exactly PANTHEON_CHILD_FAIL_${nonce}_PARENT_SECRET_SEEN. Otherwise reply exactly PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET. Do not use tools or spawn subagents.
 
 Wait for that child to complete. If its exact reply is PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET, reply exactly PANTHEON_VERIFY_OK_$nonce. Otherwise reply exactly PANTHEON_VERIFY_FAIL_$nonce.
 "@
