@@ -9,7 +9,7 @@ Run one read-only review request, then resume any previously active Daily/Full p
 
 The selected supported main-thread model is the Orchestrator and owns the review and verdict. Inspect target behavior, diff/static evidence, risk, and validation evidence. Use Explorer only for a material repository-evidence gap and Librarian only for a material authoritative external/reference gap. Both remain read-only; **do not use Fixer** during review-only work.
 
-The Orchestrator may run focused tests/builds/reproduction directly when needed for the verdict. Specialist agreement is not proof, and passing tests do not erase static correctness issues.
+Treat each required evidence result as a hard dependency barrier: do not finalize any dependent finding, merge/release judgment, or overall verdict until that result has returned and the Orchestrator has reconciled it. Independent read-only evidence lanes may run in parallel. The Orchestrator may run focused tests/builds/reproduction directly when needed for the verdict. Specialist agreement is not proof, and passing tests do not erase static correctness issues.
 
 For merge/release decisions return `PASS`, `PASS WITH NOTES`, or `FAIL / NO-MERGE` with blockers and material unverified gates.
 
