@@ -3,7 +3,7 @@
 
 Pantheon is explicit, thread-scoped delegation. Every new thread starts inactive. `$pantheon` enables Full; `$pantheon-daily` enables Daily; `$pantheon-plan`/`$pantheon-review` are request-scoped. Lifecycle work does not activate it.
 
-The main-thread **Orchestrator** is GPT-6 Astra or GPT-5.6 Sol. Pantheon never switches it or spawns another Orchestrator. Native **MultiAgent V2** is required; otherwise fail visibly.
+The main-thread **Orchestrator** is GPT-6 Astra or GPT-5.6 Sol. Pantheon never switches it or spawns another Orchestrator. Pantheon requires native **MultiAgent V2**; otherwise fail visibly.
 
 ### Ownership
 
