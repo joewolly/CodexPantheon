@@ -57,7 +57,9 @@ contains "$INSTALL" "session rollouts"
 
 contains "$CLI" '`verify` | Creates normal Codex parent/child session rollouts'
 contains "$CLI" '`codex exec --output-last-message`'
-contains "$CLI" 'one real parent-rollout `spawn_agent` function call'
+contains "$CLI" 'exactly one total parent-rollout `spawn_agent` function call'
+contains "$CLI" 'at least one real parent-rollout `wait_agent` call'
+contains "$CLI" 'one terminal child `task_complete` event'
 contains "$CLI" 'effective `gpt-5.6-luna` with `high` reasoning'
 contains "$CLI" "Prompt text or other raw substring co-occurrence is not accepted as proof"
 contains "$CLI" "Normal Codex parent/child session rollouts created by the real turn remain"
