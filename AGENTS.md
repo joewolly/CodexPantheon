@@ -21,13 +21,14 @@ Keep Pantheon slim, explicit, model-neutral at the Orchestrator layer, and Codex
 - Parent-mediated steering is the supported coordination model. A child composer is optional Codex UI; Pantheon does not depend on or promise one.
 - Preserve the dependency chain for each implementation work item: Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification.
 - Treat required child results as hard dependency barriers. The Orchestrator must not proceed with or finalize a dependent decision/stage until the required result has returned and been reconciled. In Full, genuinely independent work items may overlap across Explorer/Librarian/Fixer only when unfinished evidence cannot change an already-issued Fixer specification; parallel Fixers still require non-overlapping writes. Daily remains fully sequential.
+- Request-scoped `$pantheon-plan` and `$pantheon-review` preserve the prior sticky profile's parallelism: if Daily was active, their evidence lanes remain sequential; Full or no prior sticky Pantheon profile may parallelize genuinely independent evidence.
 - Keep Daily and Full Pantheon as the only delegation-intensity profiles. Daily may use fewer evidence specialists and does not parallelize children, but it must not alter implementation ownership or impose a numeric worker-call ceiling.
 - Preserve minimum self-contained child context and never inherit full parent history by default.
 - Preserve user-owned Codex configuration outside Pantheon-managed files/markers.
 - Custom agent roles must be installed as regular files, not symlinks/reparse points.
 - Keep one shared payload under `agents/`, `skills/`, and `policy/`; Bash and PowerShell lifecycle frontends must not fork or duplicate it.
 - `doctor` remains static/read-only installation validation. `verify` is the explicit opt-in live runtime smoke test and may consume a real Codex/model turn; never run it implicitly from install/update/bootstrap/doctor.
-- Run `./tests/test.sh` after lifecycle-script, policy, skill, migration, or agent changes. When Windows behavior changes, also run `./tests/test.ps1` on PowerShell/Windows or rely on Windows CI before merge.
+- Run `./tests/test.sh`, `bash ./tests/test-orchestrator-contract.sh`, `bash ./tests/test-doc-contract.sh`, and `bash ./tests/test-verify.sh` after lifecycle-script, policy, skill, migration, agent, verifier, or documentation-contract changes. When Windows behavior changes, also run `.\tests\test.ps1` and `.\tests\test-verify.ps1` on PowerShell/Windows or rely on Windows CI before merge.
 
 ## Codex-assisted lifecycle
 

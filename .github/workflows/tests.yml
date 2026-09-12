@@ -19,6 +19,8 @@ jobs:
         run: ./tests/test.sh
       - name: Verify Pantheon role ownership contracts
         run: bash ./tests/test-orchestrator-contract.sh
+      - name: Verify public documentation contracts
+        run: bash ./tests/test-doc-contract.sh
       - name: Verify live-smoke command contract
         run: bash ./tests/test-verify.sh
 

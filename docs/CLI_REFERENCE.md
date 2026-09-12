@@ -24,7 +24,7 @@ The two frontends implement the same lifecycle contract and consume the same `ag
 | `install` | Yes | Install the current source package and perform migration cleanup |
 | `update` | Yes | Replace Pantheon-owned files with the current source package and perform migration cleanup |
 | `doctor` | No persistent changes | Check source completeness, current payload, legacy absence, policy, drift, and Codex discovery |
-| `verify` | No repository/config changes; consumes a live Codex turn | Run the real parent→Luna Explorer V2 routing/context-isolation/round-trip smoke test |
+| `verify` | Creates normal Codex parent/child session rollouts; no repository/config changes | Run the real parent→Luna Explorer V2 routing/context-isolation/round-trip smoke test; consumes live model usage |
 | `uninstall` | Yes | Remove current and legacy Pantheon-owned files, skills, policy block, and version marker |
 | `version` | No | Print the Pantheon version |
 | `help` | No | Print usage and environment-variable help |
@@ -35,7 +35,7 @@ Convenience installer entrypoints are `./install.sh` on macOS/Linux and `.\insta
 
 | Variable | macOS/Linux default | Windows default | Controls |
 | --- | --- | --- | --- |
-| `CODEX_HOME` | `~/.codex` | `%USERPROFILE%\.codex` | Agent definitions, managed `AGENTS.md` block, version marker, Codex session rollouts used by `verify` |
+| `CODEX_HOME` | `~/.codex` | `%USERPROFILE%\.codex` | Agent definitions, managed `AGENTS.md` block, version marker, and Codex session rollouts used by `verify` |
 | `PANTHEON_SKILLS_HOME` | `~/.agents/skills` | `%USERPROFILE%\.agents\skills` | Pantheon workflow skills |
 
 ## Current owned paths
@@ -49,6 +49,8 @@ Convenience installer entrypoints are `./install.sh` on macOS/Linux and `.\insta
 - `<skills home>/pantheon-review/`
 - the single `<!-- PANTHEON:START -->` through `<!-- PANTHEON:END -->` block in `<Codex home>/AGENTS.md`
 - `<Codex home>/.pantheon-version`
+
+Codex's own session rollouts are **not Pantheon-owned lifecycle files**. `verify` creates ordinary parent/child Codex session records under the configured Codex home because it executes a real turn; uninstall does not remove those records.
 
 ## Legacy paths owned for migration/removal
 
@@ -90,9 +92,26 @@ Windows PowerShell:
 .\pantheon.ps1 verify
 ```
 
-`verify` first runs the static Doctor preflight, then executes one real read-only Codex parent turn. The parent must use native MultiAgent V2 to spawn exactly one `luna_explorer` with `fork_turns: "none"` and task name `explorer_pantheon_verify`. Pantheon then checks the Codex session rollouts to prove the configured Explorer role was used, the child resolved through the Luna agent definition, the parent received the child result, and a parent-only sentinel did not leak into the child context.
+`verify` first runs the static Doctor preflight, then executes one real read-only Codex parent turn. The parent must use native MultiAgent V2 to spawn exactly one `luna_explorer` with `fork_turns: "none"` and task name `explorer_pantheon_verify`, then wait for that child through native `wait_agent` before finalizing.
 
-A successful run ends with `Status: VERIFIED`. Failure is visible and non-fallback: missing authentication/provider/model availability, unavailable V2 control, wrong role/task metadata, failed round trip, or context-isolation failure all make `verify` fail. The command does not run automatically from `install`, `update`, `bootstrap`, or `doctor` because it consumes live model usage.
+The verifier fails closed. It requires all of the following evidence from the same run:
+
+- the parent's **exact** final reply from `codex exec --output-last-message`;
+- the exact parent thread ID from Codex's JSON event stream;
+- exactly one total parent-rollout `spawn_agent` function call, with the expected agent type, task name, `fork_turns` value, and verification nonce;
+- one correlated function-call result for that spawn;
+- at least one real parent-rollout `wait_agent` call whose correlated result reports `timed_out: false`;
+- exactly one correlated child rollout whose `session_meta` records the matching parent, Luna Explorer role, and task path;
+- child `turn_context` showing effective `gpt-5.6-luna` with `high` reasoning;
+- one exact child assistant `output_text` verification reply;
+- one terminal child `task_complete` event carrying that same expected final message;
+- absence of the concrete parent-only sentinel from the child rollout.
+
+Prompt text or other raw substring co-occurrence is not accepted as proof. The verifier identifies the exact parent rollout by thread ID, correlates spawn/wait calls to their actual outputs, and identifies the child by the current parent thread ID plus Luna Explorer role/task-path provenance rather than filesystem timestamps or content-scanning the user's entire session store.
+
+A successful run ends with `Status: VERIFIED`. Failure is visible and non-fallback: missing authentication/provider/model availability, unavailable V2 control, wrong role/task metadata, an extra or missing spawn, a missing correlated spawn result, no non-timeout `wait_agent` mailbox update, missing terminal child completion, wrong effective model/effort, failed round trip, or context-isolation failure all make `verify` fail.
+
+The command does not run automatically from `install`, `update`, `bootstrap`, or `doctor` because it consumes live model usage. Temporary verifier artifacts are deleted on success or failure. Normal Codex parent/child session rollouts created by the real turn remain in the Codex session store under normal Codex retention behavior.
 
 ### Codex discovery
 

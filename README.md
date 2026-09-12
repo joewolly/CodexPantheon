@@ -6,7 +6,7 @@
 
 Codex Pantheon is a slim, explicit, Codex-native orchestration layer for a supported main-thread Orchestrator.
 
-**v0.7.0 makes the Orchestrator interchangeable between GPT-6 Astra and GPT-5.6 Sol, removes model-specific prompt coupling, and further compresses parent/child context while preserving the Explorer/Librarian/Fixer ownership model.**
+**v0.7.0 makes the Orchestrator interchangeable between GPT-6 Astra and GPT-5.6 Sol, removes model-specific prompt coupling, and further compresses parent/child context while preserving the Explorer/Librarian/Fixer ownership model. Current `main` additionally hardens dependency reconciliation, Fixer completion evidence, and opt-in live runtime verification.**
 
 > **Orchestrator decides. Luna specialists execute their lane.**
 
@@ -23,13 +23,15 @@ Codex Pantheon is a slim, explicit, Codex-native orchestration layer for a suppo
 - **GPT-6 Astra or GPT-5.6 Sol — main thread / Orchestrator.** Understands the request, gathers evidence when needed, makes architecture/product decisions, creates the implementation specification, schedules/delegates work, reconciles results, reviews, verifies, and owns the final answer. It never implements repository changes.
 - **GPT-5.6 Luna High — `luna_explorer`.** Read-only repository reconnaissance. Finds files, symbols, execution paths, ownership, and code evidence. It does not design the solution.
 - **GPT-5.6 Luna High — `luna_librarian`.** Read-only documentation/API/upstream/reference research. It does not design the solution.
-- **GPT-5.6 Luna High — `luna_fixer`.** Write-enabled implementation specialist. Executes the Orchestrator's scoped specification and assigned validation. It does not independently replan or redesign the mission.
+- **GPT-5.6 Luna High — `luna_fixer`.** Write-enabled implementation specialist. Executes the Orchestrator's scoped specification and assigned validation. It does not independently replan or redesign the mission. Every return includes a structured implementation receipt with status, files/changes, validation evidence, deviations/blockers, and explicit parent-verification obligations.
 
-The core dependency is:
+The default dependency is:
 
 ```text
 Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification
 ```
+
+Every required child result is a **hard dependency barrier** for the work that depends on it. The Orchestrator does not proceed with or finalize a dependent plan, specification, implementation assignment, review conclusion, or final verdict until the required result has returned and been reconciled.
 
 Every implementation edit goes through Luna Fixer, even a tiny or obvious change. If Fixer cannot be spawned or complete the assignment, the Orchestrator rescopes, retries, redelegates, or reports the blocker; it never takes over implementation.
 
@@ -66,24 +68,11 @@ Pantheon never falls back to generic task/thread delegation such as `send_messag
 
 Parent-mediated steering is the supported coordination model. A separate composer on a child card is optional Codex UI behavior and is not required by Pantheon.
 
-## Why v0.7.0 is leaner
+## Context discipline
 
-v0.7.0 keeps the role boundaries but removes unnecessary model-personality coupling:
+Every Pantheon worker is explicitly selected as a Luna role through V2 `spawn_agent`. Child spawns use `fork_turns: "none"`; full-history inheritance is never the default.
 
-- The installed policy and all four skills refer to the **Orchestrator role**, not to Astra-specific ownership.
-- Luna receives assignments from the **Orchestrator**, so the same child prompts work unchanged under Astra or Sol.
-- Luna prompts are shorter and ask for the **minimum sufficient evidence** rather than broad output.
-- Every Pantheon child explicitly selects a configured Luna role instead of inheriting the Orchestrator model.
-- Child context stays deliberately narrow with `fork_turns: "none"`.
-- No second Orchestrator, model-router runtime, persistent selector, duplicate skill set, hidden state, or additional worker was added.
-
-## Luna is the worker model
-
-Pantheon workers are always `luna_explorer`, `luna_librarian`, or `luna_fixer`. Those installed role files pin **GPT-5.6 Luna High**.
-
-The V2 collaboration surface belongs to the parent Orchestrator. Pantheon explicitly passes the configured Luna `agent_type`, so the worker runs the Luna role rather than inheriting Astra/Sol.
-
-The Orchestrator stays in the main thread and is never spawned merely to create a display-only child card.
+Every child receives a minimum self-contained bounded assignment containing the objective, scope, known constraints/facts, permission boundary, expected evidence/output, stopping condition, and a prohibition on spawning subagents.
 
 ## Operating profiles
 
@@ -91,7 +80,7 @@ The Orchestrator stays in the main thread and is never spawned merely to create 
 | --- | --- | --- |
 | Ordinary Codex | default | Pantheon does nothing; normal Codex behavior |
 | Pantheon Daily | `$pantheon-daily` | Same role ownership, conservative delegation, no parallel child calls |
-| Full Pantheon | `$pantheon` | Same role ownership, more aggressive specialist use and justified parallelism |
+| Full Pantheon | `$pantheon` | Same role ownership, more aggressive specialist use and dependency-safe parallelism |
 
 Both Pantheon profiles are sticky only inside the current thread. Invoke the other profile to switch. Say `Stop using Pantheon.` to return to ordinary Codex. Nothing persists across threads.
 
@@ -111,13 +100,28 @@ Unknown implementation:
 Luna Explorer and/or Librarian → Orchestrator plan → Luna Fixer → Orchestrator review
 ```
 
-Daily never parallelizes children. Luna Fixer remains mandatory for implementation.
+Daily never parallelizes children. Required results are consumed sequentially before the dependent stage begins. Luna Fixer remains mandatory for implementation.
 
 ### Full Pantheon
 
-Full Pantheon uses the same ownership boundaries with fewer delegation constraints. It may parallelize independent Explorer/Librarian lanes and may use multiple Fixers only when write ownership is clearly non-overlapping.
+Full Pantheon uses the same ownership boundaries with fewer delegation constraints. It may overlap Explorer, Librarian, and Fixer work **across genuinely independent work items** when no unfinished evidence can change an already-issued Fixer specification. Multiple Fixers may run in parallel only with explicit non-overlapping write ownership.
+
+This is not speculative execution across unresolved dependencies: if a Fixer specification depends on an Explorer/Librarian result, that result must return and be reconciled first.
 
 There is no `$pantheon-team`, no fast/normal/deep layer, and no Oracle/Designer/Reviewer/Verifier child roster.
+
+## Fixer implementation receipts
+
+A Fixer completion claim is not enough by itself. Each `luna_fixer` return is required to provide:
+
+- **Status:** `completed`, `partial`, or `blocked`;
+- **Summary:** concise implementation result;
+- **Files/changes:** every touched file and material change;
+- **Validation:** each check with `PASS`, `FAIL`, `SKIPPED`, or `UNKNOWN` and concise evidence;
+- **Deviations/blockers:** divergence from the specification, unresolved ambiguity, or `none`;
+- **Parent verification:** what the Orchestrator must independently inspect or verify.
+
+The Orchestrator reconciles that receipt against actual repository state before final review or user-facing completion.
 
 ## Request-scoped workflows
 
@@ -126,17 +130,11 @@ $pantheon-plan Plan the migration without implementing it.
 $pantheon-review Review this branch against main and give me a merge verdict.
 ```
 
-`$pantheon-plan` keeps the plan with the main-thread Orchestrator and may use only read-only Explorer/Librarian evidence. Fixer is not used.
+`$pantheon-plan` keeps the plan with the main-thread Orchestrator and may use only read-only Explorer/Librarian evidence. Fixer is not used. Required evidence remains a hard barrier for the dependent portion of the plan.
 
-`$pantheon-review` keeps the review and verdict with the main-thread Orchestrator and may use only read-only Explorer/Librarian evidence. A review-only request does not use Fixer or modify production source.
+`$pantheon-review` keeps the review and verdict with the main-thread Orchestrator and may use only read-only Explorer/Librarian evidence. A review-only request does not use Fixer or modify production source. Required evidence must be reconciled before the dependent finding or verdict is finalized.
 
 These workflows do not activate a sticky Pantheon profile by themselves.
-
-## Context discipline
-
-Every Pantheon worker is explicitly selected as a Luna role through V2 `spawn_agent`. Child spawns use `fork_turns: "none"`; full-history inheritance is never the default.
-
-Every child receives a minimum self-contained bounded assignment containing the objective, scope, known constraints/facts, permission boundary, expected evidence/output, stopping condition, and a prohibition on spawning subagents.
 
 ## Platform support
 
@@ -199,6 +197,24 @@ Windows:
 ```
 
 Doctor is read-only. It checks package/install integrity and Codex executable discovery. It does not prove live model/provider availability or a successful native V2 child spawn/communication round trip.
+
+## Live verification
+
+Use `verify` when you explicitly want to exercise the installed Codex runtime:
+
+```bash
+./pantheon verify
+```
+
+```powershell
+.\pantheon.ps1 verify
+```
+
+`verify` consumes one real parent turn plus one Luna Explorer child turn. It fails closed unless it can prove an exact parent success reply, one actual/correlated V2 `spawn_agent` call, matching child provenance, effective **GPT-5.6 Luna High** execution, the expected child reply, and `fork_turns: "none"` isolation of a parent-only sentinel.
+
+The check does not run automatically from install/update/bootstrap/doctor. Temporary verifier artifacts are cleaned on success and failure. Because this is a real Codex turn, normal parent/child session rollouts are created in the user's Codex session store and remain subject to normal Codex retention behavior.
+
+See [CLI reference](docs/CLI_REFERENCE.md) for the exact evidence contract.
 
 ## Uninstall
 

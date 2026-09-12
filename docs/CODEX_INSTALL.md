@@ -35,7 +35,7 @@ Windows PowerShell:
 .\pantheon.ps1 bootstrap
 ```
 
-`bootstrap` installs or updates Pantheon-owned files and immediately runs `doctor`.
+`bootstrap` installs or updates Pantheon-owned files and immediately runs static `doctor` validation.
 
 ## Orchestrator selection
 
@@ -116,6 +116,8 @@ If you placed unrelated personal content at one of those exact Pantheon-owned le
 
 The selected supported main-thread model is the Orchestrator and is not installed by Pantheon. The children are `luna_explorer`, `luna_librarian`, and `luna_fixer`, all pinned to GPT-5.6 Luna High. Explorer/Librarian are read-only; Fixer is workspace-write.
 
+Required child evidence/results are dependency barriers for the work that depends on them. Full Pantheon may overlap independent Explorer/Librarian/Fixer work items only when unfinished evidence cannot change an already-issued Fixer specification. Daily remains sequential. Fixer returns a structured implementation receipt that the Orchestrator must reconcile against actual state.
+
 ## Fail-closed behavior
 
 If Pantheon detects malformed/duplicate managed markers, a protected `AGENTS.md` symlink/reparse point, missing source payload, legacy source files that should have been removed, or another integrity problem, bootstrap stops. Do not bypass the safeguard by manually overwriting user-owned configuration.
@@ -128,6 +130,24 @@ Both frontends validate the same static installation state. Windows Doctor looks
 
 Failure to discover an executable is a warning rather than a static Pantheon integrity failure.
 
-## Evidence boundary
+## Evidence boundary: `doctor` versus `verify`
 
-Repository tests validate packaged policy/configuration, migration logic, and lifecycle safeguards. `doctor` validates static installed state. Neither proves live Codex backend/provider behavior, model availability, quota use, billing, or successful native child spawning.
+Repository tests validate packaged policy/configuration, migration logic, lifecycle safeguards, and the verifier's fail-closed parser behavior. `doctor` validates static installed state. Neither repository CI nor `doctor` can prove that the user's authenticated live Codex runtime can actually spawn the configured Luna child.
+
+For an explicit live runtime check, run:
+
+macOS/Linux:
+
+```bash
+./pantheon verify
+```
+
+Windows PowerShell:
+
+```powershell
+.\pantheon.ps1 verify
+```
+
+`verify` consumes a real parent model turn plus one Luna Explorer child turn. It requires exact/correlated V2 spawn evidence from the parent rollout, matching child provenance, effective `gpt-5.6-luna` with `high` reasoning, an exact child/parent round trip, and proof that `fork_turns: "none"` kept a parent-only sentinel out of the child context.
+
+The command is intentionally not part of bootstrap/install/update/doctor because it depends on authentication, provider/model availability, native MultiAgent V2, and live quota. It creates normal Codex parent/child session rollouts under the configured Codex home. Pantheon deletes only its temporary verifier artifacts; normal Codex session records remain subject to Codex's own retention behavior.

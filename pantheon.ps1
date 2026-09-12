@@ -328,6 +328,19 @@ function Find-Codex {
     $null
 }
 
+function ConvertFrom-JsonLine([string]$Line) {
+    if ([string]::IsNullOrWhiteSpace($Line)) { return $null }
+    try { $Line | ConvertFrom-Json -ErrorAction Stop }
+    catch { return $null }
+}
+
+function Get-PropertyValue($Object, [string]$Name) {
+    if ($null -eq $Object) { return $null }
+    $property = $Object.PSObject.Properties[$Name]
+    if ($null -eq $property) { return $null }
+    $property.Value
+}
+
 function Cmd-Install {
     Install-Payload
     Say "Codex Pantheon $Version installed."
@@ -490,9 +503,12 @@ function Cmd-Verify {
     if (-not [regex]::IsMatch($explorerText, '(?m)^model\s*=\s*"gpt-5\.6-luna"\s*$')) {
         Fail 'Installed luna-explorer.toml does not pin GPT-5.6 Luna.'
     }
+    if (-not [regex]::IsMatch($explorerText, '(?m)^model_reasoning_effort\s*=\s*"high"\s*$')) {
+        Fail 'Installed luna-explorer.toml does not pin High reasoning.'
+    }
 
     $nonce = "$([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())-$PID-$([Guid]::NewGuid().ToString('N').Substring(0, 8))"
-    $secret = "PANTHEON_PARENT_SECRET_${nonce}_$([Guid]::NewGuid().ToString('N').Substring(0, 8))"
+    $secret = "PANTHEON_PARENTSECRET_${nonce}_$([Guid]::NewGuid().ToString('N').Substring(0, 8))"
     $prompt = @"
 Pantheon live runtime smoke test. Do not modify files and do not perform unrelated work.
 
@@ -504,70 +520,184 @@ Use native MultiAgent V2 spawn_agent exactly once with:
 - task_name: explorer_pantheon_verify
 
 Do NOT include or quote the parent-only secret in the child assignment. Give the child only this assignment:
-Pantheon verify nonce: $nonce. Inspect only your initial context. If it contains any full token beginning PANTHEON_PARENT_SECRET_, reply exactly PANTHEON_CHILD_FAIL_${nonce}_PARENT_SECRET_SEEN. Otherwise reply exactly PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET. Do not use tools or spawn subagents.
+Pantheon verify nonce: $nonce. Inspect only your initial context. If it contains any single token that starts with PANTHEON_PARENTSECRET_ and also contains $nonce, reply exactly PANTHEON_CHILD_FAIL_${nonce}_PARENT_SECRET_SEEN. Otherwise reply exactly PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET. Do not use tools or spawn subagents.
 
-Wait for that child to complete. If its exact reply is PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET, reply exactly PANTHEON_VERIFY_OK_$nonce. Otherwise reply exactly PANTHEON_VERIFY_FAIL_$nonce.
+After spawning, use native MultiAgent V2 wait_agent and do not finalize until a wait result reports timed_out false. Then use the child's exact final reply. If it is PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET, reply exactly PANTHEON_VERIFY_OK_$nonce. Otherwise reply exactly PANTHEON_VERIFY_FAIL_$nonce.
 "@
 
-    Say
-    Say 'Live V2 round trip'
-    $codexArgs = @('exec', '--json', '--skip-git-repo-check', '--sandbox', 'read-only', '-C', $ScriptDir, $prompt)
-    $outputLines = @(& $codexBin @codexArgs 2>&1)
-    $exitCode = $LASTEXITCODE
-    $outputText = (($outputLines | ForEach-Object { [string]$_ }) -join [Environment]::NewLine)
-    if ($exitCode -ne 0) {
-        if (-not [string]::IsNullOrWhiteSpace($outputText)) { [Console]::Error.WriteLine($outputText) }
-        Fail 'Codex live verification turn failed.'
-    }
-    if (-not $outputText.Contains("PANTHEON_VERIFY_OK_$nonce")) {
-        if (-not [string]::IsNullOrWhiteSpace($outputText)) { [Console]::Error.WriteLine($outputText) }
-        Fail 'Parent did not confirm the expected Luna child result.'
-    }
-    Ok 'Parent received and reconciled the child result'
+    $verifyTemp = Join-Path ([System.IO.Path]::GetTempPath()) ('pantheon-verify-' + [Guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Path $verifyTemp -Force | Out-Null
+    $lastMessage = Join-Path $verifyTemp 'last-message.txt'
 
-    $sessionsDir = Join-Path $CodexHomeDir 'sessions'
-    if (-not (Test-Path -LiteralPath $sessionsDir -PathType Container)) {
-        Fail "Codex session rollouts were not found under $sessionsDir; cannot verify native spawn metadata."
-    }
-
-    $parentTrace = $null
-    $childTrace = $null
-    $sessionFiles = @(Get-ChildItem -LiteralPath $sessionsDir -Recurse -File -Filter '*.jsonl' -ErrorAction SilentlyContinue)
-    foreach ($sessionFile in $sessionFiles) {
-        $text = Read-Text $sessionFile.FullName
-        if (-not $text.Contains($nonce)) { continue }
-        if ($null -eq $parentTrace -and
-            $text.Contains('spawn_agent') -and
-            $text.Contains('luna_explorer') -and
-            $text.Contains('explorer_pantheon_verify') -and
-            $text.Contains('fork_turns') -and
-            $text.Contains('none')) {
-            $parentTrace = $sessionFile.FullName
+    try {
+        Say
+        Say 'Live V2 round trip'
+        $codexArgs = @('exec', '--json', '--output-last-message', $lastMessage, '--skip-git-repo-check', '--sandbox', 'read-only', '-C', $ScriptDir, $prompt)
+        $previousErrorActionPreference = $ErrorActionPreference
+        try {
+            $ErrorActionPreference = 'Continue'
+            $outputLines = @(& $codexBin @codexArgs 2>&1)
+            $exitCode = $LASTEXITCODE
         }
-        if ($null -eq $childTrace -and
-            $text.Contains('subagent.thread_spawn') -and
-            $text.Contains('luna-explorer.toml')) {
-            $childTrace = $sessionFile.FullName
+        finally {
+            $ErrorActionPreference = $previousErrorActionPreference
         }
+        $outputText = (@($outputLines | ForEach-Object { [string]$_ }) -join [Environment]::NewLine)
+        if ($exitCode -ne 0) {
+            if (-not [string]::IsNullOrWhiteSpace($outputText)) { [Console]::Error.WriteLine($outputText) }
+            Fail 'Codex live verification turn failed.'
+        }
+        if (-not (Test-Path -LiteralPath $lastMessage -PathType Leaf)) {
+            if (-not [string]::IsNullOrWhiteSpace($outputText)) { [Console]::Error.WriteLine($outputText) }
+            Fail 'Codex did not write the requested final-message artifact.'
+        }
+        $parentReply = ([System.IO.File]::ReadAllText($lastMessage)).TrimEnd("`r", "`n")
+        if ($parentReply -cne "PANTHEON_VERIFY_OK_$nonce") {
+            if (-not [string]::IsNullOrWhiteSpace($outputText)) { [Console]::Error.WriteLine($outputText) }
+            Fail 'Parent final reply was not the exact expected Luna child result.'
+        }
+
+        $parentThreadId = $null
+        foreach ($line in $outputLines) {
+            $record = ConvertFrom-JsonLine ([string]$line)
+            if ($null -eq $record) { continue }
+            if ((Get-PropertyValue $record 'type') -ceq 'thread.started') {
+                $candidate = [string](Get-PropertyValue $record 'thread_id')
+                if (-not [string]::IsNullOrWhiteSpace($candidate)) { $parentThreadId = $candidate; break }
+            }
+        }
+        if ([string]::IsNullOrWhiteSpace($parentThreadId)) { Fail 'Could not read the parent thread id from Codex JSON output.' }
+
+        $sessionsDir = Join-Path $CodexHomeDir 'sessions'
+        if (-not (Test-Path -LiteralPath $sessionsDir -PathType Container)) {
+            Fail "Codex session rollouts were not found under $sessionsDir; cannot verify native spawn metadata."
+        }
+
+        $parentMatches = @(Get-ChildItem -LiteralPath $sessionsDir -Recurse -File -Filter "*$parentThreadId.jsonl" -ErrorAction SilentlyContinue)
+        if ($parentMatches.Count -ne 1) { Fail "Expected exactly one parent rollout for thread $parentThreadId; found $($parentMatches.Count)." }
+        $parentTrace = $parentMatches[0].FullName
+        $parentRecords = @([System.IO.File]::ReadAllLines($parentTrace) | ForEach-Object { ConvertFrom-JsonLine $_ } | Where-Object { $null -ne $_ })
+
+        $parentMetaMatches = @($parentRecords | Where-Object {
+            (Get-PropertyValue $_ 'type') -ceq 'session_meta' -and
+            [string](Get-PropertyValue (Get-PropertyValue $_ 'payload') 'id') -ceq $parentThreadId
+        })
+        if ($parentMetaMatches.Count -ne 1) { Fail 'Parent rollout session metadata does not match the Codex thread id.' }
+
+        $spawnCalls = @($parentRecords | Where-Object {
+            if ((Get-PropertyValue $_ 'type') -cne 'response_item') { return $false }
+            $payload = Get-PropertyValue $_ 'payload'
+            ((Get-PropertyValue $payload 'type') -ceq 'function_call' -and (Get-PropertyValue $payload 'name') -ceq 'spawn_agent')
+        })
+        if ($spawnCalls.Count -ne 1) { Fail "Expected exactly one total spawn_agent function call; found $($spawnCalls.Count)." }
+        $spawnCall = Get-PropertyValue $spawnCalls[0] 'payload'
+        $arguments = ConvertFrom-JsonLine ([string](Get-PropertyValue $spawnCall 'arguments'))
+        if ($null -eq $arguments) { Fail 'Could not parse spawn_agent arguments.' }
+        if (-not ([string](Get-PropertyValue $arguments 'message')).Contains($nonce)) { Fail 'spawn_agent assignment did not contain the verification nonce.' }
+        if ((Get-PropertyValue $arguments 'agent_type') -cne 'luna_explorer') { Fail 'spawn_agent did not request agent_type luna_explorer.' }
+        if ((Get-PropertyValue $arguments 'fork_turns') -cne 'none') { Fail 'spawn_agent did not request fork_turns none.' }
+        if ((Get-PropertyValue $arguments 'task_name') -cne 'explorer_pantheon_verify') { Fail 'spawn_agent did not use explorer_pantheon_verify.' }
+        $callId = [string](Get-PropertyValue $spawnCall 'call_id')
+        if ([string]::IsNullOrWhiteSpace($callId)) { Fail 'Could not correlate the spawn_agent call to its result.' }
+
+        $spawnOutputMatches = @($parentRecords | Where-Object {
+            if ((Get-PropertyValue $_ 'type') -cne 'response_item') { return $false }
+            $payload = Get-PropertyValue $_ 'payload'
+            ((Get-PropertyValue $payload 'type') -ceq 'function_call_output' -and [string](Get-PropertyValue $payload 'call_id') -ceq $callId)
+        })
+        if ($spawnOutputMatches.Count -ne 1) { Fail "Expected exactly one correlated spawn_agent result; found $($spawnOutputMatches.Count)." }
+        $spawnOutputText = [string](Get-PropertyValue (Get-PropertyValue $spawnOutputMatches[0] 'payload') 'output')
+        if (-not $spawnOutputText.Contains('explorer_pantheon_verify')) { Fail 'Correlated spawn_agent result does not identify the requested task.' }
+        Ok 'V2 spawn used luna_explorer, fork_turns none, and explorer_pantheon_verify'
+
+        $waitCalls = @($parentRecords | Where-Object {
+            if ((Get-PropertyValue $_ 'type') -cne 'response_item') { return $false }
+            $payload = Get-PropertyValue $_ 'payload'
+            ((Get-PropertyValue $payload 'type') -ceq 'function_call' -and (Get-PropertyValue $payload 'name') -ceq 'wait_agent')
+        })
+        if ($waitCalls.Count -lt 1) { Fail 'Parent never called V2 wait_agent after spawning the child.' }
+        $waitSuccessCount = 0
+        foreach ($waitRecord in $waitCalls) {
+            $waitPayload = Get-PropertyValue $waitRecord 'payload'
+            $waitCallId = [string](Get-PropertyValue $waitPayload 'call_id')
+            if ([string]::IsNullOrWhiteSpace($waitCallId)) { continue }
+            $waitOutputs = @($parentRecords | Where-Object {
+                if ((Get-PropertyValue $_ 'type') -cne 'response_item') { return $false }
+                $payload = Get-PropertyValue $_ 'payload'
+                ((Get-PropertyValue $payload 'type') -ceq 'function_call_output' -and [string](Get-PropertyValue $payload 'call_id') -ceq $waitCallId)
+            })
+            if ($waitOutputs.Count -ne 1) { continue }
+            $waitOutputText = [string](Get-PropertyValue (Get-PropertyValue $waitOutputs[0] 'payload') 'output')
+            $waitOutput = ConvertFrom-JsonLine $waitOutputText
+            if ($null -ne $waitOutput -and (Get-PropertyValue $waitOutput 'timed_out') -eq $false) { $waitSuccessCount++ }
+        }
+        if ($waitSuccessCount -lt 1) { Fail 'Parent wait_agent calls never produced a correlated non-timeout mailbox update.' }
+        Ok 'Parent waited for a non-timeout V2 child mailbox update'
+
+        $childMatches = New-Object 'System.Collections.Generic.List[string]'
+        $sessionFiles = @(Get-ChildItem -LiteralPath $sessionsDir -Recurse -File -Filter '*.jsonl' -ErrorAction SilentlyContinue)
+        foreach ($sessionFile in $sessionFiles) {
+            if ($sessionFile.FullName -ceq $parentTrace) { continue }
+            $metaRecord = $null
+            foreach ($line in [System.IO.File]::ReadLines($sessionFile.FullName)) {
+                $record = ConvertFrom-JsonLine $line
+                if ($null -ne $record -and (Get-PropertyValue $record 'type') -ceq 'session_meta') { $metaRecord = $record; break }
+            }
+            if ($null -eq $metaRecord) { continue }
+            $payload = Get-PropertyValue $metaRecord 'payload'
+            $source = Get-PropertyValue $payload 'source'
+            $subagent = Get-PropertyValue $source 'subagent'
+            $threadSpawn = Get-PropertyValue $subagent 'thread_spawn'
+            if ($null -eq $threadSpawn) { continue }
+            if ([string](Get-PropertyValue $threadSpawn 'parent_thread_id') -cne $parentThreadId) { continue }
+            if ([string](Get-PropertyValue $threadSpawn 'agent_role') -cne 'luna_explorer') { continue }
+            $agentPath = [string](Get-PropertyValue $threadSpawn 'agent_path')
+            if (-not $agentPath.EndsWith('/explorer_pantheon_verify') -and -not $agentPath.EndsWith('\explorer_pantheon_verify')) { continue }
+            $childMatches.Add($sessionFile.FullName)
+        }
+        if ($childMatches.Count -ne 1) { Fail "Expected exactly one child rollout with matching parent/role/path provenance; found $($childMatches.Count)." }
+        $childTrace = $childMatches[0]
+        $childRecords = @([System.IO.File]::ReadAllLines($childTrace) | ForEach-Object { ConvertFrom-JsonLine $_ } | Where-Object { $null -ne $_ })
+
+        $turnMatches = @($childRecords | Where-Object {
+            if ((Get-PropertyValue $_ 'type') -cne 'turn_context') { return $false }
+            $payload = Get-PropertyValue $_ 'payload'
+            $effortObject = Get-PropertyValue (Get-PropertyValue $payload 'effort') 'effort'
+            $effortValue = if ($null -ne $effortObject) { [string]$effortObject } else { [string](Get-PropertyValue $payload 'effort') }
+            ([string](Get-PropertyValue $payload 'model') -ceq 'gpt-5.6-luna' -and $effortValue -ceq 'high')
+        })
+        if ($turnMatches.Count -lt 1) { Fail 'Child rollout did not record effective GPT-5.6 Luna High execution.' }
+
+        $expectedChildReply = "PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET"
+        $childReplyCount = 0
+        foreach ($record in $childRecords) {
+            if ((Get-PropertyValue $record 'type') -cne 'response_item') { continue }
+            $payload = Get-PropertyValue $record 'payload'
+            if ((Get-PropertyValue $payload 'type') -cne 'message' -or (Get-PropertyValue $payload 'role') -cne 'assistant') { continue }
+            foreach ($content in @(Get-PropertyValue $payload 'content')) {
+                if ((Get-PropertyValue $content 'type') -ceq 'output_text' -and [string](Get-PropertyValue $content 'text') -ceq $expectedChildReply) {
+                    $childReplyCount++
+                }
+            }
+        }
+        if ($childReplyCount -ne 1) { Fail 'Child rollout does not contain exactly one assistant output reply with the expected verification token.' }
+        $childCompleteMatches = @($childRecords | Where-Object {
+            if ((Get-PropertyValue $_ 'type') -cne 'event_msg') { return $false }
+            $payload = Get-PropertyValue $_ 'payload'
+            ((Get-PropertyValue $payload 'type') -ceq 'task_complete' -and [string](Get-PropertyValue $payload 'last_agent_message') -ceq $expectedChildReply)
+        })
+        if ($childCompleteMatches.Count -ne 1) { Fail 'Child rollout does not contain exactly one terminal task_complete with the expected final message.' }
+        if ((Read-Text $childTrace).Contains($secret)) { Fail 'Child rollout contains the parent-only secret; fork_turns none isolation did not hold.' }
+        Ok 'Configured Explorer resolved to GPT-5.6 Luna High and completed normally'
+        Ok 'fork_turns none kept the parent-only secret out of the child context'
+        Ok 'Parent received and reconciled the terminal child result'
+
+        Say
+        Say 'Status: VERIFIED'
     }
-
-    if ($null -eq $parentTrace) { Fail 'Could not prove the V2 spawn arguments from the Codex session rollout.' }
-    $parentText = Read-Text $parentTrace
-    foreach ($marker in @('spawn_agent', 'luna_explorer', 'explorer_pantheon_verify', 'fork_turns', 'none')) {
-        if (-not $parentText.Contains($marker)) { Fail "Parent rollout is missing required spawn marker: $marker" }
+    finally {
+        if (Test-Path -LiteralPath $verifyTemp) { Remove-Item -LiteralPath $verifyTemp -Recurse -Force -ErrorAction SilentlyContinue }
     }
-    Ok 'V2 spawn used luna_explorer, fork_turns none, and explorer_pantheon_verify'
-
-    if ($null -eq $childTrace) { Fail 'Could not prove that the configured luna-explorer agent resolved to a child rollout.' }
-    $childText = Read-Text $childTrace
-    if (-not $childText.Contains('gpt-5.6-luna')) { Fail 'Child rollout did not record GPT-5.6 Luna.' }
-    if (-not $childText.Contains("PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET")) { Fail 'Child rollout does not contain the expected verification reply.' }
-    if ($childText.Contains($secret)) { Fail 'Child rollout contains the parent-only secret; fork_turns none isolation did not hold.' }
-    Ok 'Configured Explorer resolved to GPT-5.6 Luna'
-    Ok 'fork_turns none kept the parent-only secret out of the child context'
-
-    Say
-    Say 'Status: VERIFIED'
 }
 
 function Cmd-Uninstall {
