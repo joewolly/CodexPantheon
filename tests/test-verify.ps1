@@ -167,6 +167,7 @@ public static class Program
         if ($result.ExitCode -eq 0) { throw "Pantheon verify unexpectedly passed in mode '$mode':`n$($result.Text)" }
     }
 
+    $global:LASTEXITCODE = 0
     Write-Output 'ok - pantheon verify fails closed on misleading evidence and tolerates harmless native stderr on Windows'
 }
 finally {
