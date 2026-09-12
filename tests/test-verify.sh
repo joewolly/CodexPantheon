@@ -70,7 +70,7 @@ if [ "$mode" != "no-child" ]; then
   effort="high"
   [ "$mode" = "wrong-effort" ] && effort="medium"
   printf '{"type":"turn_context","payload":{"model":"gpt-5.6-luna","effort":"%s"}}\n' "$effort" >> "$child_file"
-  printf '{"type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"input_text","text":"Reply exactly PANTHEON_CHILD_OK_%s_NO_PARENT_SECRET"}]}}\n' "$nonce" >> "$child_file"
+  printf '{"type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"input_text","text":"PANTHEON_CHILD_OK_%s_NO_PARENT_SECRET"}]}}\n' "$nonce" >> "$child_file"
   if [ "$mode" = "secret-leak" ]; then
     printf '{"type":"event_msg","payload":{"type":"debug","message":"%s"}}\n' "$secret" >> "$child_file"
   fi
