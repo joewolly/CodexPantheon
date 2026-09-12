@@ -424,7 +424,7 @@ cmd_verify() {
   local output stderr_file last_message start_marker parent_reply parent_thread_id
   local parent_trace="" child_trace="" spawn_lines spawn_line spawn_count call_id
   local spawn_output_lines spawn_output_count child_count=0 child_reply_count turn_context_line
-  local file session_meta_line candidate
+  local file session_meta_line
 
   codex_bin="$(find_codex 2>/dev/null)" || fail "Codex executable is required for live verification."
   explorer_config="${AGENT_DEST_DIR}/luna-explorer.toml"
@@ -511,7 +511,7 @@ EOF_VERIFY
     [ -n "$session_meta_line" ] || continue
     if printf '%s\n' "$session_meta_line" | grep -Fq '"thread_spawn"' \
       && printf '%s\n' "$session_meta_line" | grep -Fq "\"parent_thread_id\":\"${parent_thread_id}\"" \
-      && printf '%s\n' "$session_meta_line" | grep -Fq '"agent_path":"/root/explorer_pantheon_verify"' \
+      && printf '%s\n' "$session_meta_line" | grep -Eq '"agent_path":"[^"]*/explorer_pantheon_verify"' \
       && printf '%s\n' "$session_meta_line" | grep -Fq '"agent_role":"luna_explorer"'; then
       child_count=$((child_count + 1))
       child_trace="$file"
@@ -522,8 +522,8 @@ EOF_VERIFY
   turn_context_line="$(grep -F '"type":"turn_context"' "$child_trace" | grep -F '"model":"gpt-5.6-luna"' | grep -F '"effort":"high"' | tail -n 1 || true)"
   [ -n "$turn_context_line" ] || fail "Child rollout did not record effective GPT-5.6 Luna High execution."
 
-  child_reply_count="$(grep -F '"type":"response_item"' "$child_trace" | grep -F '"type":"message"' | grep -F '"role":"assistant"' | grep -F "\"text\":\"PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET\"" | wc -l | tr -d '[:space:]')"
-  [ "$child_reply_count" -eq 1 ] || fail "Child rollout does not contain exactly one assistant reply with the expected verification token."
+  child_reply_count="$(grep -F '"type":"response_item"' "$child_trace" | grep -F '"type":"message"' | grep -F '"role":"assistant"' | grep -F '"type":"output_text"' | grep -F "\"text\":\"PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET\"" | wc -l | tr -d '[:space:]')"
+  [ "$child_reply_count" -eq 1 ] || fail "Child rollout does not contain exactly one assistant output reply with the expected verification token."
   if grep -Fq "$secret" "$child_trace"; then
     fail "Child rollout contains the parent-only secret; fork_turns none isolation did not hold."
   fi
