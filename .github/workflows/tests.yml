@@ -24,6 +24,18 @@ jobs:
       - name: Verify live-smoke command contract
         run: bash ./tests/test-verify.sh
 
+  macos:
+    name: macOS Bash 3.2 compatibility
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Report Bash version
+        run: /bin/bash --version
+      - name: Parse Pantheon with system Bash
+        run: /bin/bash -n ./pantheon
+      - name: Run Bash lifecycle suite with system Bash
+        run: /bin/bash ./tests/test.sh
+
   windows:
     name: Windows PowerShell 5.1 lifecycle
     runs-on: windows-latest
