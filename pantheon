@@ -420,7 +420,7 @@ cmd_verify() {
   say "Static preflight"
   cmd_doctor
 
-  local codex_bin explorer_config nonce secret prompt sessions_dir
+  local codex_bin explorer_config nonce secret prompt prompt_file sessions_dir
   local output stderr_file last_message parent_reply parent_thread_id
   local parent_matches parent_match_count parent_trace="" child_trace="" spawn_lines spawn_line spawn_count call_id
   local spawn_output_lines spawn_output_count wait_lines wait_count wait_success_count wait_line wait_call_id wait_output_lines
@@ -433,7 +433,10 @@ cmd_verify() {
 
   nonce="$(date +%s)-$$-${RANDOM:-0}"
   secret="PANTHEON_PARENTSECRET_${nonce}_${RANDOM:-0}"
-  prompt="$(cat <<EOF_VERIFY
+  VERIFY_TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/pantheon-verify.XXXXXX")"
+  trap 'rm -rf -- "${VERIFY_TMP_DIR:-}"' EXIT
+  prompt_file="${VERIFY_TMP_DIR}/prompt.txt"
+  cat > "$prompt_file" <<EOF_VERIFY
 Pantheon live runtime smoke test. Do not modify files and do not perform unrelated work.
 
 Parent-only secret: ${secret}
@@ -448,10 +451,7 @@ Pantheon verify nonce: ${nonce}. Inspect only your initial context. If it contai
 
 After spawning, use native MultiAgent V2 wait_agent and do not finalize until a wait result reports timed_out false. Then use the child's exact final reply. If it is PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET, reply exactly PANTHEON_VERIFY_OK_${nonce}. Otherwise reply exactly PANTHEON_VERIFY_FAIL_${nonce}.
 EOF_VERIFY
-)"
-
-  VERIFY_TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/pantheon-verify.XXXXXX")"
-  trap 'rm -rf -- "${VERIFY_TMP_DIR:-}"' EXIT
+  prompt="$(cat "$prompt_file")"
   output="${VERIFY_TMP_DIR}/events.jsonl"
   stderr_file="${VERIFY_TMP_DIR}/stderr.log"
   last_message="${VERIFY_TMP_DIR}/last-message.txt"
