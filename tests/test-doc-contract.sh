@@ -22,7 +22,7 @@ done
 # User-facing architecture must stay aligned with the managed policy.
 contains "$README" "hard dependency barrier"
 contains "$README" "structured implementation receipt"
-contains "$README" "unfinished evidence cannot change an already-issued Fixer specification"
+contains "$README" "no unfinished evidence can change an already-issued Fixer specification"
 contains "$README" "./pantheon verify"
 contains "$README" "normal parent/child session rollouts"
 
