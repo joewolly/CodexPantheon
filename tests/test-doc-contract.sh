@@ -41,7 +41,7 @@ contains "$DOCTRINE" "Live verification is explicit and fail-closed"
 contains "$CONTRIBUTING" "**Every repository implementation edit** routes to Fixer"
 contains "$CONTRIBUTING" "structured implementation receipt"
 contains "$CONTRIBUTING" "hard dependency barrier"
-contains "$CONTRIBUTING" "unfinished evidence must never be able to change an already-issued Fixer specification"
+contains "$CONTRIBUTING" "Unfinished evidence must never be able to change an already-issued Fixer specification"
 contains "$CONTRIBUTING" "./pantheon verify"
 
 contains "$RELEASING" "**Every repository implementation edit** routes through Fixer"
