@@ -9,7 +9,7 @@ Run one read-only review, then resume the prior profile. This skill does not act
 
 The main-thread Orchestrator owns review and verdict. Inspect behavior, diff/static evidence, risk, and validation evidence. Use Explorer for material repository gaps and Librarian for material authoritative/reference gaps. Both are read-only; **do not use Fixer**.
 
-Every required evidence result is a hard dependency barrier: do not finalize a dependent finding, merge/release judgment, or verdict until it returns and is reconciled. Independent evidence lanes may run in parallel. The Orchestrator may run focused tests/builds/reproduction directly. Specialist agreement is not proof; passing tests do not erase static correctness issues.
+Every required evidence result is a hard dependency barrier: do not finalize a dependent finding, merge/release judgment, or verdict until it returns and is reconciled. Respect the prior profile's parallelism: Daily stays sequential; Full or no prior sticky Pantheon profile may parallelize independent evidence lanes. The Orchestrator may run focused tests/builds/reproduction directly. Specialist agreement is not proof; passing tests do not erase static correctness issues.
 
 For merge/release decisions return `PASS`, `PASS WITH NOTES`, or `FAIL / NO-MERGE` with blockers and material unverified gates.
 
