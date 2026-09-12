@@ -46,6 +46,7 @@ mkdir -p "$session_dir"
 parent_file="$session_dir/rollout-${parent_id}.jsonl"
 child_file="$session_dir/rollout-${child_id}.jsonl"
 call_id="call-${nonce}"
+wait_call_id="wait-${nonce}"
 
 printf '%s\n' 'fake codex diagnostic on stderr' >&2
 printf '{"type":"thread.started","thread_id":"%s"}\n' "$parent_id"
@@ -64,6 +65,18 @@ fi
 if [ "$mode" = "multiple-spawn" ]; then
   printf '{"type":"response_item","payload":{"type":"function_call","name":"spawn_agent","arguments":"{\\"message\\":\\"Pantheon verify nonce: %s. Duplicate.\\",\\"agent_type\\":\\"luna_explorer\\",\\"fork_turns\\":\\"none\\",\\"task_name\\":\\"explorer_pantheon_verify\\"}","call_id":"duplicate-%s"}}\n' "$nonce" "$nonce" >> "$parent_file"
 fi
+if [ "$mode" = "extra-spawn" ]; then
+  printf '{"type":"response_item","payload":{"type":"function_call","name":"spawn_agent","arguments":"{\\"message\\":\\"Unrelated extra child.\\",\\"agent_type\\":\\"luna_explorer\\",\\"fork_turns\\":\\"none\\",\\"task_name\\":\\"explorer_unrelated_extra\\"}","call_id":"extra-%s"}}\n' "$nonce" >> "$parent_file"
+fi
+
+if [ "$mode" != "missing-wait" ]; then
+  printf '{"type":"response_item","payload":{"type":"function_call","name":"wait_agent","arguments":"{\\"timeout_ms\\":120000}","call_id":"%s"}}\n' "$wait_call_id" >> "$parent_file"
+  if [ "$mode" = "timed-out-wait" ]; then
+    printf '{"type":"response_item","payload":{"type":"function_call_output","call_id":"%s","output":"{\\"message\\":\\"Timed out waiting for agent updates.\\",\\"timed_out\\":true}"}}\n' "$wait_call_id" >> "$parent_file"
+  else
+    printf '{"type":"response_item","payload":{"type":"function_call_output","call_id":"%s","output":"{\\"message\\":\\"Mailbox update received.\\",\\"timed_out\\":false}"}}\n' "$wait_call_id" >> "$parent_file"
+  fi
+fi
 
 if [ "$mode" != "no-child" ]; then
   printf '{"type":"session_meta","payload":{"id":"%s","source":{"subagent":{"thread_spawn":{"parent_thread_id":"%s","depth":1,"agent_path":"/root/explorer_pantheon_verify","agent_role":"luna_explorer"}}}}}\n' "$child_id" "$parent_id" > "$child_file"
@@ -74,10 +87,11 @@ if [ "$mode" != "no-child" ]; then
   if [ "$mode" = "secret-leak" ]; then
     printf '{"type":"event_msg","payload":{"type":"debug","message":"%s"}}\n' "$secret" >> "$child_file"
   fi
-  if [ "$mode" = "child-prompt-only" ]; then
-    printf '{"type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"PANTHEON_CHILD_FAIL_%s_PARENT_SECRET_SEEN"}]}}\n' "$nonce" >> "$child_file"
-  else
-    printf '{"type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"PANTHEON_CHILD_OK_%s_NO_PARENT_SECRET"}]}}\n' "$nonce" >> "$child_file"
+  child_reply="PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET"
+  [ "$mode" = "child-prompt-only" ] && child_reply="PANTHEON_CHILD_FAIL_${nonce}_PARENT_SECRET_SEEN"
+  printf '{"type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"%s"}]}}\n' "$child_reply" >> "$child_file"
+  if [ "$mode" != "missing-task-complete" ]; then
+    printf '{"type":"event_msg","payload":{"type":"task_complete","last_agent_message":"%s"}}\n' "$child_reply" >> "$child_file"
   fi
 fi
 
@@ -95,10 +109,11 @@ export PATH="$FAKE_BIN:$PATH"
 run_success() {
   local out="$TMP/verify-success.out"
   PANTHEON_VERIFY_FAKE_MODE=success "$PANTHEON" verify >"$out" 2>&1
-  grep -Fq 'Parent received and reconciled the child result' "$out"
   grep -Fq 'V2 spawn used luna_explorer, fork_turns none, and explorer_pantheon_verify' "$out"
-  grep -Fq 'Configured Explorer resolved to GPT-5.6 Luna High' "$out"
+  grep -Fq 'Parent waited for a non-timeout V2 child mailbox update' "$out"
+  grep -Fq 'Configured Explorer resolved to GPT-5.6 Luna High and completed normally' "$out"
   grep -Fq 'fork_turns none kept the parent-only secret out of the child context' "$out"
+  grep -Fq 'Parent received and reconciled the terminal child result' "$out"
   grep -Fq 'Status: VERIFIED' "$out"
 }
 
@@ -113,7 +128,7 @@ expect_failure() {
 }
 
 run_success
-for mode in misleading-parent prompt-only missing-output multiple-spawn child-prompt-only wrong-effort secret-leak no-child; do
+for mode in misleading-parent prompt-only missing-output multiple-spawn extra-spawn missing-wait timed-out-wait child-prompt-only missing-task-complete wrong-effort secret-leak no-child; do
   expect_failure "$mode"
 done
 
@@ -123,4 +138,4 @@ if find "$TMPDIR" -mindepth 1 -maxdepth 1 -name 'pantheon-verify.*' -print -quit
   exit 1
 fi
 
-printf '%s\n' 'ok - pantheon verify fails closed on misleading evidence and cleans temporary state'
+printf '%s\n' 'ok - pantheon verify proves spawn/wait/terminal-child flow and fails closed on misleading evidence'
