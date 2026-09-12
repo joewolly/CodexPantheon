@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+AGENTS="$ROOT/AGENTS.md"
 POLICY="$ROOT/policy/managed-block.md"
 FULL="$ROOT/skills/pantheon/SKILL.md"
 DAILY="$ROOT/skills/pantheon-daily/SKILL.md"
@@ -21,6 +22,13 @@ contains "$POLICY" "never take over implementation"
 contains "$POLICY" "Required child results are hard barriers"
 contains "$POLICY" "unfinished evidence cannot change an issued Fixer specification"
 contains "$POLICY" "structured implementation receipt"
+contains "$POLICY" "no code-review judgment"
+contains "$POLICY" "The Orchestrator alone reviews diffs/implementations"
+contains "$POLICY" "Never delegate those judgments to Explorer"
+
+contains "$AGENTS" "During review, Luna Explorer may answer only bounded factual repository questions"
+contains "$AGENTS" "Never delegate review judgment to Explorer"
+contains "$AGENTS" "The Orchestrator personally inspects and synthesizes the review findings and verdict"
 
 contains "$FULL" "Route every repository edit to Fixer"
 contains "$FULL" "Multiple Fixers may run in parallel only with explicit non-overlapping write ownership"
@@ -42,11 +50,19 @@ contains "$REVIEW" "hard dependency barrier"
 contains "$REVIEW" "Daily stays sequential"
 contains "$REVIEW" "Full or no prior sticky Pantheon profile may parallelize independent evidence lanes"
 contains "$REVIEW" "do not use Fixer"
+contains "$REVIEW" "The main-thread Orchestrator owns the review itself and the verdict"
+contains "$REVIEW" "Use Explorer only for a bounded factual repository question"
+contains "$REVIEW" "Never ask Explorer to review a diff/PR/implementation"
+contains "$REVIEW" "Explorer reports repository facts and clearly labeled inference only"
 
 contains "$EXPLORER" "fast read-only codebase navigation specialist"
 contains "$EXPLORER" "Run independent searches in parallel when useful"
 contains "$EXPLORER" "Do not design the solution"
 contains "$EXPLORER" "delegate/spawn subagents"
+contains "$EXPLORER" "During review workflows, reject any assignment"
+contains "$EXPLORER" "hunt for bugs or regressions"
+contains "$EXPLORER" "Those are Orchestrator responsibilities"
+contains "$EXPLORER" "restated as a factual evidence question"
 contains "$LIBRARIAN" "read-only external research specialist"
 contains "$LIBRARIAN" "Prefer primary/official sources"
 contains "$LIBRARIAN" "distinguish authoritative behavior from community convention"
@@ -67,4 +83,4 @@ not_contains "$POLICY" "delegation costs more than execution"
 not_contains "$FULL" "substantive implementation"
 not_contains "$DAILY" "Delegate only when a specialist materially reduces"
 
-printf 'ok - Pantheon ownership, dependency barriers, profile sequencing, and Fixer receipts are strict\n'
+printf 'ok - Pantheon ownership, review boundaries, dependency barriers, profile sequencing, and Fixer receipts are strict\n'
