@@ -92,22 +92,24 @@ Windows PowerShell:
 .\pantheon.ps1 verify
 ```
 
-`verify` first runs the static Doctor preflight, then executes one real read-only Codex parent turn. The parent must use native MultiAgent V2 to spawn exactly one `luna_explorer` with `fork_turns: "none"` and task name `explorer_pantheon_verify`.
+`verify` first runs the static Doctor preflight, then executes one real read-only Codex parent turn. The parent must use native MultiAgent V2 to spawn exactly one `luna_explorer` with `fork_turns: "none"` and task name `explorer_pantheon_verify`, then wait for that child through native `wait_agent` before finalizing.
 
 The verifier fails closed. It requires all of the following evidence from the same run:
 
 - the parent's **exact** final reply from `codex exec --output-last-message`;
 - the exact parent thread ID from Codex's JSON event stream;
-- one real parent-rollout `spawn_agent` function call with the expected agent type, task name, and `fork_turns` value;
+- exactly one total parent-rollout `spawn_agent` function call, with the expected agent type, task name, `fork_turns` value, and verification nonce;
 - one correlated function-call result for that spawn;
+- at least one real parent-rollout `wait_agent` call whose correlated result reports `timed_out: false`;
 - exactly one newly created child rollout whose `session_meta` records the matching parent, Luna Explorer role, and task path;
 - child `turn_context` showing effective `gpt-5.6-luna` with `high` reasoning;
-- one exact child assistant verification reply;
-- absence of the parent-only sentinel from the child rollout.
+- one exact child assistant `output_text` verification reply;
+- one terminal child `task_complete` event carrying that same expected final message;
+- absence of the concrete parent-only sentinel from the child rollout.
 
-Prompt text or other raw substring co-occurrence is not accepted as proof. The verifier identifies the exact parent rollout by thread ID and limits child discovery to rollouts created or updated during the smoke test rather than content-scanning the user's entire session store.
+Prompt text or other raw substring co-occurrence is not accepted as proof. The verifier identifies the exact parent rollout by thread ID, correlates spawn/wait calls to their actual outputs, and limits child discovery to rollouts created or updated during the smoke test rather than content-scanning the user's entire session store.
 
-A successful run ends with `Status: VERIFIED`. Failure is visible and non-fallback: missing authentication/provider/model availability, unavailable V2 control, wrong role/task metadata, a missing or duplicate spawn/result, failed round trip, wrong effective model/effort, or context-isolation failure all make `verify` fail.
+A successful run ends with `Status: VERIFIED`. Failure is visible and non-fallback: missing authentication/provider/model availability, unavailable V2 control, wrong role/task metadata, an extra or missing spawn, a missing correlated spawn result, no non-timeout `wait_agent` mailbox update, missing terminal child completion, wrong effective model/effort, failed round trip, or context-isolation failure all make `verify` fail.
 
 The command does not run automatically from `install`, `update`, `bootstrap`, or `doctor` because it consumes live model usage. Temporary verifier artifacts are deleted on success or failure. Normal Codex parent/child session rollouts created by the real turn remain in the Codex session store under normal Codex retention behavior.
 
