@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Added
+
+- Structured `luna_fixer` implementation receipts covering completion status, files/changes, validation evidence, deviations/blockers, and explicit parent-verification obligations.
+- Hard dependency/reconciliation barriers: a dependent plan, specification, implementation assignment, review conclusion, or final verdict waits for required child results to return and be reconciled.
+- Explicit Full-Pantheon cross-role overlap for genuinely independent Explorer/Librarian/Fixer work items, while preserving non-overlapping Fixer writes and fully sequential Daily behavior.
+- Opt-in `pantheon verify` / `pantheon.ps1 verify` live runtime smoke tests for native V2 spawn routing, Luna role resolution, effective GPT-5.6 Luna High execution, parent/child round-trip evidence, and `fork_turns: "none"` isolation.
+
 ### Changed
 
 - The Astra/Sol Orchestrator contract now follows the `oh-my-opencode-slim` workflow-manager shape more closely: understand, build a dependency-aware work graph, delegate, reconcile, and verify.
@@ -10,7 +17,16 @@
 - Pantheon now requires the Orchestrator's native MultiAgent V2 control plane for child spawning and coordination.
 - Post-spawn Luna coordination uses V2 `send_message`/`followup_task`; generic task/thread messaging is not a Pantheon child-control fallback.
 - Luna Explorer, Librarian, and Fixer remain GPT-5.6 Luna High with the same ownership boundaries; this change removes legacy control-plane compatibility, not the Luna worker roles.
-- User-facing doctrine and upstream attribution now document the stricter Pantheon divergence from `oh-my-opencode-slim`.
+- Live verification now fails closed on **structured runtime evidence** rather than raw substring co-occurrence: exact parent final output, one real/correlated `spawn_agent` call/result, matching child session provenance, effective Luna High turn context, one exact child assistant reply, and sentinel isolation are all required.
+- Windows live verification tolerates harmless native Codex stderr while preserving exit-code failure handling; Bash live verification uses exit-safe temporary cleanup.
+- Child rollout discovery is limited to the current smoke-test window instead of content-scanning the entire Codex session store.
+- User-facing README, guide, doctrine, install, CLI, and changelog documentation are synchronized around receipts, dependency barriers, cross-role independent overlap, and the live-verification evidence/state boundary.
+
+### Evidence boundary
+
+- `doctor` remains static/read-only installation validation.
+- `verify` consumes a real parent turn plus one Luna Explorer child turn and therefore depends on authentication, provider/model availability, live quota, and native MultiAgent V2.
+- Temporary verifier artifacts are removed on success/failure. Normal Codex parent/child session rollouts created by the live turn remain in the configured Codex session store under normal Codex retention behavior.
 
 ## 0.7.0 — 2026-09-09
 
