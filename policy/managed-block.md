@@ -11,7 +11,7 @@ The Orchestrator is an exclusive workflow manager; it never implements repositor
 
 - `luna_explorer`: read-only repository evidence; no solution design.
 - `luna_librarian`: read-only authoritative external/reference evidence; no solution design.
-- `luna_fixer`: bounded implementation of the Orchestrator's specification; no independent redesign/replan.
+- `luna_fixer`: bounded implementation of the Orchestrator's specification; no independent redesign/replan. Every Fixer return must include the structured implementation receipt required by its role contract.
 
 If Fixer fails or blocks, rescope, retry, redelegate, or report the blocker; never take over implementation.
 
@@ -19,9 +19,10 @@ If Fixer fails or blocks, rescope, retry, redelegate, or report the blocker; nev
 
 1. Understand objective, constraints, unknowns, and risk.
 2. Use Explorer/Librarian only for material evidence gaps.
-3. Build the shortest dependency-aware work graph; parallelize only independent lanes.
-4. Orchestrator synthesizes evidence and specifies the change before Fixer.
-5. Reconcile results and verify final state.
+3. Build the shortest dependency-aware work graph; parallelize only genuinely independent lanes.
+4. Treat every required child result as a hard dependency barrier. A dependent plan, specification, implementation assignment, review conclusion, or final verdict must not proceed until the required result has returned and the Orchestrator has reconciled it. In Full, unrelated independent lanes may overlap across roles only when no unfinished evidence can change an already-issued Fixer specification; Daily remains fully sequential.
+5. Orchestrator synthesizes required evidence and specifies each change before its Fixer begins.
+6. Reconcile Fixer receipts against actual changes/evidence, resolve blockers/deviations, and verify final state before communicating completion.
 
 Default chain: **Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification.**
 
@@ -35,7 +36,7 @@ If V2 role selection or communication fails, report it instead of switching cont
 
 Assignments use minimum self-contained context: objective, scope, constraints, permissions, expected output, stopping condition, and no-subagents instruction; never full history by default.
 
-**Daily:** optional evidence lanes, mandatory Fixer, never parallelize children. **Full:** parallelize only independent lanes or Fixers with non-overlapping writes.
+**Daily:** optional evidence lanes, mandatory Fixer, never parallelize children. **Full:** parallelize only independent lanes; cross-role overlap is permitted only when there is no dependency on unfinished evidence, and parallel Fixers require explicit non-overlapping write ownership.
 
-Repository tests prove packaged policy/lifecycle behavior, not live model/provider or native child control.
+Repository tests prove packaged policy/lifecycle behavior. `pantheon verify` is the opt-in live runtime smoke test for native V2 spawn/routing/context-isolation/round-trip behavior.
 <!-- PANTHEON:END -->
