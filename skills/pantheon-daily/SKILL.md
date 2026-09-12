@@ -11,7 +11,9 @@ Daily changes delegation intensity, never ownership:
 - Explorer/Librarian are optional and used only for material evidence gaps.
 - Fixer is mandatory for every repository implementation edit, including tiny or obvious changes.
 - Never parallelize children. There is no numeric worker-call ceiling.
+- Treat each required child result as a hard dependency barrier: wait for it and reconcile it before any dependent plan, specification, implementation assignment, review conclusion, or final verdict.
 - When evidence is needed, use only necessary lanes sequentially; then the Orchestrator plans and Fixer implements.
+- Require the Fixer's structured implementation receipt and reconcile it against actual changes/evidence before review or completion.
 - Do not collapse open-ended research, planning, and implementation into one Fixer call to save a spawn.
 
 Typical shapes: `Orchestrator plan → Fixer → Orchestrator review`; add Explorer/Librarian before the plan only when evidence is missing.
