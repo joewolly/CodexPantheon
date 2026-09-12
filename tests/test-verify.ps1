@@ -88,6 +88,7 @@ public static class Program
         var parentId = "parent-" + nonce;
         var childId = "child-" + nonce;
         var callId = "call-" + nonce;
+        var waitCallId = "wait-" + nonce;
         var codexHome = Environment.GetEnvironmentVariable("CODEX_HOME");
         var sessionDir = Path.Combine(codexHome, "sessions", "fake");
         Directory.CreateDirectory(sessionDir);
@@ -118,6 +119,19 @@ public static class Program
                 var arguments = "{\\\"message\\\":\\\"Pantheon verify nonce: " + nonce + ". Duplicate.\\\",\\\"agent_type\\\":\\\"luna_explorer\\\",\\\"fork_turns\\\":\\\"none\\\",\\\"task_name\\\":\\\"explorer_pantheon_verify\\\"}";
                 parent.WriteLine("{\"type\":\"response_item\",\"payload\":{\"type\":\"function_call\",\"name\":\"spawn_agent\",\"arguments\":\"" + arguments + "\",\"call_id\":\"duplicate-" + nonce + "\"}}");
             }
+            if (mode == "extra-spawn")
+            {
+                var arguments = "{\\\"message\\\":\\\"Unrelated extra child.\\\",\\\"agent_type\\\":\\\"luna_explorer\\\",\\\"fork_turns\\\":\\\"none\\\",\\\"task_name\\\":\\\"explorer_unrelated_extra\\\"}";
+                parent.WriteLine("{\"type\":\"response_item\",\"payload\":{\"type\":\"function_call\",\"name\":\"spawn_agent\",\"arguments\":\"" + arguments + "\",\"call_id\":\"extra-" + nonce + "\"}}");
+            }
+
+            if (mode != "missing-wait")
+            {
+                parent.WriteLine("{\"type\":\"response_item\",\"payload\":{\"type\":\"function_call\",\"name\":\"wait_agent\",\"arguments\":\"{\\\"timeout_ms\\\":120000}\",\"call_id\":\"" + waitCallId + "\"}}");
+                var timedOut = mode == "timed-out-wait" ? "true" : "false";
+                var waitMessage = mode == "timed-out-wait" ? "Timed out waiting for agent updates." : "Mailbox update received.";
+                parent.WriteLine("{\"type\":\"response_item\",\"payload\":{\"type\":\"function_call_output\",\"call_id\":\"" + waitCallId + "\",\"output\":\"{\\\"message\\\":\\\"" + waitMessage + "\\\",\\\"timed_out\\\":" + timedOut + "}\"}}");
+            }
         }
 
         if (mode != "no-child")
@@ -136,6 +150,10 @@ public static class Program
                     ? "PANTHEON_CHILD_FAIL_" + nonce + "_PARENT_SECRET_SEEN"
                     : "PANTHEON_CHILD_OK_" + nonce + "_NO_PARENT_SECRET";
                 child.WriteLine("{\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"output_text\",\"text\":\"" + childReply + "\"}]}}");
+                if (mode != "missing-task-complete")
+                {
+                    child.WriteLine("{\"type\":\"event_msg\",\"payload\":{\"type\":\"task_complete\",\"last_agent_message\":\"" + childReply + "\"}}");
+                }
             }
         }
 
@@ -158,16 +176,17 @@ public static class Program
     $success = Invoke-PantheonVerify 'success'
     if ($success.ExitCode -ne 0) { throw "Pantheon verify failed on success case:`n$($success.Text)" }
     foreach ($expected in @(
-        'Parent received and reconciled the child result',
         'V2 spawn used luna_explorer, fork_turns none, and explorer_pantheon_verify',
-        'Configured Explorer resolved to GPT-5.6 Luna High',
+        'Parent waited for a non-timeout V2 child mailbox update',
+        'Configured Explorer resolved to GPT-5.6 Luna High and completed normally',
         'fork_turns none kept the parent-only secret out of the child context',
+        'Parent received and reconciled the terminal child result',
         'Status: VERIFIED'
     )) {
         if (-not $success.Text.Contains($expected)) { throw "Missing verify output: $expected`n$($success.Text)" }
     }
 
-    foreach ($mode in @('misleading-parent', 'prompt-only', 'missing-output', 'multiple-spawn', 'child-prompt-only', 'wrong-effort', 'secret-leak', 'no-child')) {
+    foreach ($mode in @('misleading-parent', 'prompt-only', 'missing-output', 'multiple-spawn', 'extra-spawn', 'missing-wait', 'timed-out-wait', 'child-prompt-only', 'missing-task-complete', 'wrong-effort', 'secret-leak', 'no-child')) {
         $result = Invoke-PantheonVerify $mode
         if ($result.ExitCode -eq 0) { throw "Pantheon verify unexpectedly passed in mode '$mode':`n$($result.Text)" }
     }
@@ -178,7 +197,7 @@ public static class Program
     }
 
     $global:LASTEXITCODE = 0
-    Write-Output 'ok - pantheon verify fails closed, cleans temporary state, and tolerates harmless native stderr on Windows'
+    Write-Output 'ok - pantheon verify proves spawn/wait/terminal-child flow, cleans state, and tolerates harmless native stderr'
 }
 finally {
     $env:CODEX_HOME = $Original.CODEX_HOME
