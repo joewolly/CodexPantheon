@@ -522,7 +522,7 @@ Use native MultiAgent V2 spawn_agent exactly once with:
 Do NOT include or quote the parent-only secret in the child assignment. Give the child only this assignment:
 Pantheon verify nonce: $nonce. Inspect only your initial context. If it contains any single token that starts with PANTHEON_PARENTSECRET_ and also contains $nonce, reply exactly PANTHEON_CHILD_FAIL_${nonce}_PARENT_SECRET_SEEN. Otherwise reply exactly PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET. Do not use tools or spawn subagents.
 
-Wait for that child to complete. If its exact reply is PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET, reply exactly PANTHEON_VERIFY_OK_$nonce. Otherwise reply exactly PANTHEON_VERIFY_FAIL_$nonce.
+After spawning, use native MultiAgent V2 wait_agent and do not finalize until a wait result reports timed_out false. Then use the child's exact final reply. If it is PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET, reply exactly PANTHEON_VERIFY_OK_$nonce. Otherwise reply exactly PANTHEON_VERIFY_FAIL_$nonce.
 "@
 
     $verifyTemp = Join-Path ([System.IO.Path]::GetTempPath()) ('pantheon-verify-' + [Guid]::NewGuid().ToString('N'))
@@ -557,7 +557,6 @@ Wait for that child to complete. If its exact reply is PANTHEON_CHILD_OK_${nonce
             if (-not [string]::IsNullOrWhiteSpace($outputText)) { [Console]::Error.WriteLine($outputText) }
             Fail 'Parent final reply was not the exact expected Luna child result.'
         }
-        Ok 'Parent received and reconciled the child result'
 
         $parentThreadId = $null
         foreach ($line in $outputLines) {
@@ -586,22 +585,19 @@ Wait for that child to complete. If its exact reply is PANTHEON_CHILD_OK_${nonce
         })
         if ($parentMetaMatches.Count -ne 1) { Fail 'Parent rollout session metadata does not match the Codex thread id.' }
 
-        $spawnMatches = New-Object 'System.Collections.Generic.List[object]'
-        foreach ($record in $parentRecords) {
-            if ((Get-PropertyValue $record 'type') -cne 'response_item') { continue }
-            $payload = Get-PropertyValue $record 'payload'
-            if ((Get-PropertyValue $payload 'type') -cne 'function_call' -or (Get-PropertyValue $payload 'name') -cne 'spawn_agent') { continue }
-            $argumentsText = [string](Get-PropertyValue $payload 'arguments')
-            $arguments = ConvertFrom-JsonLine $argumentsText
-            if ($null -eq $arguments) { continue }
-            if (-not ([string](Get-PropertyValue $arguments 'message')).Contains($nonce)) { continue }
-            if ((Get-PropertyValue $arguments 'agent_type') -cne 'luna_explorer') { continue }
-            if ((Get-PropertyValue $arguments 'fork_turns') -cne 'none') { continue }
-            if ((Get-PropertyValue $arguments 'task_name') -cne 'explorer_pantheon_verify') { continue }
-            $spawnMatches.Add($payload)
-        }
-        if ($spawnMatches.Count -ne 1) { Fail "Expected exactly one actual spawn_agent function call with the required routing metadata; found $($spawnMatches.Count)." }
-        $spawnCall = $spawnMatches[0]
+        $spawnCalls = @($parentRecords | Where-Object {
+            if ((Get-PropertyValue $_ 'type') -cne 'response_item') { return $false }
+            $payload = Get-PropertyValue $_ 'payload'
+            ((Get-PropertyValue $payload 'type') -ceq 'function_call' -and (Get-PropertyValue $payload 'name') -ceq 'spawn_agent')
+        })
+        if ($spawnCalls.Count -ne 1) { Fail "Expected exactly one total spawn_agent function call; found $($spawnCalls.Count)." }
+        $spawnCall = Get-PropertyValue $spawnCalls[0] 'payload'
+        $arguments = ConvertFrom-JsonLine ([string](Get-PropertyValue $spawnCall 'arguments'))
+        if ($null -eq $arguments) { Fail 'Could not parse spawn_agent arguments.' }
+        if (-not ([string](Get-PropertyValue $arguments 'message')).Contains($nonce)) { Fail 'spawn_agent assignment did not contain the verification nonce.' }
+        if ((Get-PropertyValue $arguments 'agent_type') -cne 'luna_explorer') { Fail 'spawn_agent did not request agent_type luna_explorer.' }
+        if ((Get-PropertyValue $arguments 'fork_turns') -cne 'none') { Fail 'spawn_agent did not request fork_turns none.' }
+        if ((Get-PropertyValue $arguments 'task_name') -cne 'explorer_pantheon_verify') { Fail 'spawn_agent did not use explorer_pantheon_verify.' }
         $callId = [string](Get-PropertyValue $spawnCall 'call_id')
         if ([string]::IsNullOrWhiteSpace($callId)) { Fail 'Could not correlate the spawn_agent call to its result.' }
 
@@ -614,6 +610,30 @@ Wait for that child to complete. If its exact reply is PANTHEON_CHILD_OK_${nonce
         $spawnOutputText = [string](Get-PropertyValue (Get-PropertyValue $spawnOutputMatches[0] 'payload') 'output')
         if (-not $spawnOutputText.Contains('explorer_pantheon_verify')) { Fail 'Correlated spawn_agent result does not identify the requested task.' }
         Ok 'V2 spawn used luna_explorer, fork_turns none, and explorer_pantheon_verify'
+
+        $waitCalls = @($parentRecords | Where-Object {
+            if ((Get-PropertyValue $_ 'type') -cne 'response_item') { return $false }
+            $payload = Get-PropertyValue $_ 'payload'
+            ((Get-PropertyValue $payload 'type') -ceq 'function_call' -and (Get-PropertyValue $payload 'name') -ceq 'wait_agent')
+        })
+        if ($waitCalls.Count -lt 1) { Fail 'Parent never called V2 wait_agent after spawning the child.' }
+        $waitSuccessCount = 0
+        foreach ($waitRecord in $waitCalls) {
+            $waitPayload = Get-PropertyValue $waitRecord 'payload'
+            $waitCallId = [string](Get-PropertyValue $waitPayload 'call_id')
+            if ([string]::IsNullOrWhiteSpace($waitCallId)) { continue }
+            $waitOutputs = @($parentRecords | Where-Object {
+                if ((Get-PropertyValue $_ 'type') -cne 'response_item') { return $false }
+                $payload = Get-PropertyValue $_ 'payload'
+                ((Get-PropertyValue $payload 'type') -ceq 'function_call_output' -and [string](Get-PropertyValue $payload 'call_id') -ceq $waitCallId)
+            })
+            if ($waitOutputs.Count -ne 1) { continue }
+            $waitOutputText = [string](Get-PropertyValue (Get-PropertyValue $waitOutputs[0] 'payload') 'output')
+            $waitOutput = ConvertFrom-JsonLine $waitOutputText
+            if ($null -ne $waitOutput -and (Get-PropertyValue $waitOutput 'timed_out') -eq $false) { $waitSuccessCount++ }
+        }
+        if ($waitSuccessCount -lt 1) { Fail 'Parent wait_agent calls never produced a correlated non-timeout mailbox update.' }
+        Ok 'Parent waited for a non-timeout V2 child mailbox update'
 
         $childMatches = New-Object 'System.Collections.Generic.List[string]'
         $recentFiles = @(Get-ChildItem -LiteralPath $sessionsDir -Recurse -File -Filter '*.jsonl' -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTimeUtc -ge $startedUtc })
@@ -661,10 +681,17 @@ Wait for that child to complete. If its exact reply is PANTHEON_CHILD_OK_${nonce
                 }
             }
         }
-        if ($childReplyCount -ne 1) { Fail 'Child rollout does not contain exactly one assistant reply with the expected verification token.' }
+        if ($childReplyCount -ne 1) { Fail 'Child rollout does not contain exactly one assistant output reply with the expected verification token.' }
+        $childCompleteMatches = @($childRecords | Where-Object {
+            if ((Get-PropertyValue $_ 'type') -cne 'event_msg') { return $false }
+            $payload = Get-PropertyValue $_ 'payload'
+            ((Get-PropertyValue $payload 'type') -ceq 'task_complete' -and [string](Get-PropertyValue $payload 'last_agent_message') -ceq $expectedChildReply)
+        })
+        if ($childCompleteMatches.Count -ne 1) { Fail 'Child rollout does not contain exactly one terminal task_complete with the expected final message.' }
         if ((Read-Text $childTrace).Contains($secret)) { Fail 'Child rollout contains the parent-only secret; fork_turns none isolation did not hold.' }
-        Ok 'Configured Explorer resolved to GPT-5.6 Luna High'
+        Ok 'Configured Explorer resolved to GPT-5.6 Luna High and completed normally'
         Ok 'fork_turns none kept the parent-only secret out of the child context'
+        Ok 'Parent received and reconciled the terminal child result'
 
         Say
         Say 'Status: VERIFIED'
