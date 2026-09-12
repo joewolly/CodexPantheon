@@ -44,19 +44,19 @@ User → Orchestrator plan/specification → Luna Fixer → receipt → Orchestr
 Repository unknowns:
 
 ```text
-User → Orchestrator scopes unknown → Luna Explorer → reconcile evidence → Orchestrator plan/specification → Luna Fixer → receipt → Orchestrator review/verification → User
+User → Orchestrator scopes unknown → Luna Explorer → reconcile evidence → Orchestrator plan/specification → Luna Fixer → receipt → reconcile receipt → Orchestrator review/verification → User
 ```
 
 External/version-sensitive unknowns:
 
 ```text
-User → Orchestrator scopes unknown → Luna Librarian → reconcile evidence → Orchestrator plan/specification → Luna Fixer → receipt → Orchestrator review/verification → User
+User → Orchestrator scopes unknown → Luna Librarian → reconcile evidence → Orchestrator plan/specification → Luna Fixer → receipt → reconcile receipt → Orchestrator review/verification → User
 ```
 
 Both evidence types:
 
 ```text
-Explorer/Librarian → Orchestrator reconciles/synthesizes evidence → Orchestrator plan/specification → Fixer → receipt → Orchestrator review/verification
+Explorer/Librarian → Orchestrator reconciles/synthesizes evidence → Orchestrator plan/specification → Fixer → receipt → reconcile receipt → Orchestrator review/verification
 ```
 
 Independent Full work items may overlap:

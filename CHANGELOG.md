@@ -19,7 +19,7 @@
 - Luna Explorer, Librarian, and Fixer remain GPT-5.6 Luna High with the same ownership boundaries; this change removes legacy control-plane compatibility, not the Luna worker roles.
 - Live verification now fails closed on **structured runtime evidence** rather than raw substring co-occurrence: exact parent final output, one real/correlated `spawn_agent` call/result, matching child session provenance, effective Luna High turn context, one exact child assistant reply, and sentinel isolation are all required.
 - Windows live verification tolerates harmless native Codex stderr while preserving exit-code failure handling; Bash live verification uses exit-safe temporary cleanup.
-- Child rollout discovery is limited to the current smoke-test window instead of content-scanning the entire Codex session store.
+- Child rollout discovery is correlated by exact parent/role/path provenance rather than filesystem timestamps or content-scanning the entire Codex session store.
 - User-facing README, guide, doctrine, install, CLI, and changelog documentation are synchronized around receipts, dependency barriers, cross-role independent overlap, and the live-verification evidence/state boundary.
 
 ### Evidence boundary

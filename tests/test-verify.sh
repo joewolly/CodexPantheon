@@ -78,6 +78,10 @@ if [ "$mode" != "missing-wait" ]; then
   fi
 fi
 
+if [ "$mode" = "ambiguous-parent" ]; then
+  cp "$parent_file" "$session_dir/duplicate-${parent_id}.jsonl"
+fi
+
 if [ "$mode" != "no-child" ]; then
   printf '{"type":"session_meta","payload":{"id":"%s","source":{"subagent":{"thread_spawn":{"parent_thread_id":"%s","depth":1,"agent_path":"/root/explorer_pantheon_verify","agent_role":"luna_explorer"}}}}}\n' "$child_id" "$parent_id" > "$child_file"
   effort="high"
@@ -93,6 +97,9 @@ if [ "$mode" != "no-child" ]; then
   if [ "$mode" != "missing-task-complete" ]; then
     printf '{"type":"event_msg","payload":{"type":"task_complete","last_agent_message":"%s"}}\n' "$child_reply" >> "$child_file"
   fi
+  if [ "$mode" = "old-child-mtime" ]; then
+    touch -t 200001010000 "$child_file"
+  fi
 fi
 
 parent_reply="PANTHEON_VERIFY_OK_${nonce}"
@@ -107,8 +114,9 @@ export PATH="$FAKE_BIN:$PATH"
 "$PANTHEON" install >/dev/null
 
 run_success() {
-  local out="$TMP/verify-success.out"
-  PANTHEON_VERIFY_FAKE_MODE=success "$PANTHEON" verify >"$out" 2>&1
+  local mode="${1:-success}"
+  local out="$TMP/verify-success-${mode}.out"
+  PANTHEON_VERIFY_FAKE_MODE="$mode" "$PANTHEON" verify >"$out" 2>&1
   grep -Fq 'V2 spawn used luna_explorer, fork_turns none, and explorer_pantheon_verify' "$out"
   grep -Fq 'Parent waited for a non-timeout V2 child mailbox update' "$out"
   grep -Fq 'Configured Explorer resolved to GPT-5.6 Luna High and completed normally' "$out"
@@ -127,8 +135,9 @@ expect_failure() {
   fi
 }
 
-run_success
-for mode in misleading-parent prompt-only missing-output multiple-spawn extra-spawn missing-wait timed-out-wait child-prompt-only missing-task-complete wrong-effort secret-leak no-child; do
+run_success success
+run_success old-child-mtime
+for mode in misleading-parent prompt-only missing-output multiple-spawn extra-spawn ambiguous-parent missing-wait timed-out-wait child-prompt-only missing-task-complete wrong-effort secret-leak no-child; do
   expect_failure "$mode"
 done
 

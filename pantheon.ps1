@@ -528,7 +528,6 @@ After spawning, use native MultiAgent V2 wait_agent and do not finalize until a 
     $verifyTemp = Join-Path ([System.IO.Path]::GetTempPath()) ('pantheon-verify-' + [Guid]::NewGuid().ToString('N'))
     New-Item -ItemType Directory -Path $verifyTemp -Force | Out-Null
     $lastMessage = Join-Path $verifyTemp 'last-message.txt'
-    $startedUtc = [DateTime]::UtcNow
 
     try {
         Say
@@ -636,8 +635,8 @@ After spawning, use native MultiAgent V2 wait_agent and do not finalize until a 
         Ok 'Parent waited for a non-timeout V2 child mailbox update'
 
         $childMatches = New-Object 'System.Collections.Generic.List[string]'
-        $recentFiles = @(Get-ChildItem -LiteralPath $sessionsDir -Recurse -File -Filter '*.jsonl' -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTimeUtc -ge $startedUtc })
-        foreach ($sessionFile in $recentFiles) {
+        $sessionFiles = @(Get-ChildItem -LiteralPath $sessionsDir -Recurse -File -Filter '*.jsonl' -ErrorAction SilentlyContinue)
+        foreach ($sessionFile in $sessionFiles) {
             if ($sessionFile.FullName -ceq $parentTrace) { continue }
             $metaRecord = $null
             foreach ($line in [System.IO.File]::ReadLines($sessionFile.FullName)) {

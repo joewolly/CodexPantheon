@@ -421,8 +421,8 @@ cmd_verify() {
   cmd_doctor
 
   local codex_bin explorer_config nonce secret prompt sessions_dir
-  local output stderr_file last_message start_marker parent_reply parent_thread_id
-  local parent_trace="" child_trace="" spawn_lines spawn_line spawn_count call_id
+  local output stderr_file last_message parent_reply parent_thread_id
+  local parent_matches parent_match_count parent_trace="" child_trace="" spawn_lines spawn_line spawn_count call_id
   local spawn_output_lines spawn_output_count wait_lines wait_count wait_success_count wait_line wait_call_id wait_output_lines
   local child_count=0 child_reply_count child_complete_count turn_context_line file session_meta_line
 
@@ -455,8 +455,6 @@ EOF_VERIFY
   output="${VERIFY_TMP_DIR}/events.jsonl"
   stderr_file="${VERIFY_TMP_DIR}/stderr.log"
   last_message="${VERIFY_TMP_DIR}/last-message.txt"
-  start_marker="${VERIFY_TMP_DIR}/started"
-  : > "$start_marker"
 
   say ""
   say "Live V2 round trip"
@@ -482,8 +480,10 @@ EOF_VERIFY
 
   sessions_dir="${CODEX_HOME_DIR}/sessions"
   [ -d "$sessions_dir" ] || fail "Codex session rollouts were not found under ${sessions_dir}; cannot verify native spawn metadata."
-  parent_trace="$(find "$sessions_dir" -type f -name "*${parent_thread_id}.jsonl" -print -quit 2>/dev/null || true)"
-  [ -n "$parent_trace" ] || fail "Could not locate the parent rollout for thread ${parent_thread_id}."
+  parent_matches="$(find "$sessions_dir" -type f -name "*${parent_thread_id}.jsonl" -print 2>/dev/null || true)"
+  parent_match_count="$(printf '%s\n' "$parent_matches" | grep -c . || true)"
+  [ "$parent_match_count" -eq 1 ] || fail "Expected exactly one parent rollout for thread ${parent_thread_id}; found ${parent_match_count}."
+  parent_trace="$parent_matches"
 
   session_meta_line="$(grep -F '"type":"session_meta"' "$parent_trace" | head -n 1 || true)"
   printf '%s\n' "$session_meta_line" | grep -Fq "\"id\":\"${parent_thread_id}\"" || fail "Parent rollout session metadata does not match the Codex thread id."
@@ -533,7 +533,7 @@ EOF_VERIFY
       child_count=$((child_count + 1))
       child_trace="$file"
     fi
-  done < <(find "$sessions_dir" -type f -name '*.jsonl' -newer "$start_marker" -print 2>/dev/null)
+  done < <(find "$sessions_dir" -type f -name '*.jsonl' -print 2>/dev/null)
 
   [ "$child_count" -eq 1 ] || fail "Expected exactly one child rollout with matching parent/role/path provenance; found ${child_count}."
   turn_context_line="$(grep -F '"type":"turn_context"' "$child_trace" | grep -F '"model":"gpt-5.6-luna"' | grep -F '"effort":"high"' | tail -n 1 || true)"

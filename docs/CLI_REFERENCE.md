@@ -101,13 +101,13 @@ The verifier fails closed. It requires all of the following evidence from the sa
 - exactly one total parent-rollout `spawn_agent` function call, with the expected agent type, task name, `fork_turns` value, and verification nonce;
 - one correlated function-call result for that spawn;
 - at least one real parent-rollout `wait_agent` call whose correlated result reports `timed_out: false`;
-- exactly one newly created child rollout whose `session_meta` records the matching parent, Luna Explorer role, and task path;
+- exactly one correlated child rollout whose `session_meta` records the matching parent, Luna Explorer role, and task path;
 - child `turn_context` showing effective `gpt-5.6-luna` with `high` reasoning;
 - one exact child assistant `output_text` verification reply;
 - one terminal child `task_complete` event carrying that same expected final message;
 - absence of the concrete parent-only sentinel from the child rollout.
 
-Prompt text or other raw substring co-occurrence is not accepted as proof. The verifier identifies the exact parent rollout by thread ID, correlates spawn/wait calls to their actual outputs, and limits child discovery to rollouts created or updated during the smoke test rather than content-scanning the user's entire session store.
+Prompt text or other raw substring co-occurrence is not accepted as proof. The verifier identifies the exact parent rollout by thread ID, correlates spawn/wait calls to their actual outputs, and identifies the child by the current parent thread ID plus Luna Explorer role/task-path provenance rather than filesystem timestamps or content-scanning the user's entire session store.
 
 A successful run ends with `Status: VERIFIED`. Failure is visible and non-fallback: missing authentication/provider/model availability, unavailable V2 control, wrong role/task metadata, an extra or missing spawn, a missing correlated spawn result, no non-timeout `wait_agent` mailbox update, missing terminal child completion, wrong effective model/effort, failed round trip, or context-isolation failure all make `verify` fail.
 

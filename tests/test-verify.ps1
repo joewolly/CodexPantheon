@@ -134,6 +134,11 @@ public static class Program
             }
         }
 
+        if (mode == "ambiguous-parent")
+        {
+            File.Copy(parentFile, Path.Combine(sessionDir, "duplicate-" + parentId + ".jsonl"), true);
+        }
+
         if (mode != "no-child")
         {
             using (var child = new StreamWriter(childFile, false))
@@ -154,6 +159,10 @@ public static class Program
                 {
                     child.WriteLine("{\"type\":\"event_msg\",\"payload\":{\"type\":\"task_complete\",\"last_agent_message\":\"" + childReply + "\"}}");
                 }
+            }
+            if (mode == "old-child-mtime")
+            {
+                File.SetLastWriteTimeUtc(childFile, new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc));
             }
         }
 
@@ -186,7 +195,10 @@ public static class Program
         if (-not $success.Text.Contains($expected)) { throw "Missing verify output: $expected`n$($success.Text)" }
     }
 
-    foreach ($mode in @('misleading-parent', 'prompt-only', 'missing-output', 'multiple-spawn', 'extra-spawn', 'missing-wait', 'timed-out-wait', 'child-prompt-only', 'missing-task-complete', 'wrong-effort', 'secret-leak', 'no-child')) {
+    $oldMtime = Invoke-PantheonVerify 'old-child-mtime'
+    if ($oldMtime.ExitCode -ne 0 -or -not $oldMtime.Text.Contains('Status: VERIFIED')) { throw "Pantheon verify failed with an old child mtime:`n$($oldMtime.Text)" }
+
+    foreach ($mode in @('misleading-parent', 'prompt-only', 'missing-output', 'multiple-spawn', 'extra-spawn', 'ambiguous-parent', 'missing-wait', 'timed-out-wait', 'child-prompt-only', 'missing-task-complete', 'wrong-effort', 'secret-leak', 'no-child')) {
         $result = Invoke-PantheonVerify $mode
         if ($result.ExitCode -eq 0) { throw "Pantheon verify unexpectedly passed in mode '$mode':`n$($result.Text)" }
     }

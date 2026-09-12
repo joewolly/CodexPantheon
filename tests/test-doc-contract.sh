@@ -36,6 +36,7 @@ contains "$DOCTRINE" "Fixer returns evidence, not a bare claim"
 contains "$DOCTRINE" "Required results are hard barriers"
 contains "$DOCTRINE" "Full Pantheon earns parallelism"
 contains "$DOCTRINE" "Live verification is explicit and fail-closed"
+contains "$DOCTRINE" "receipt → reconcile receipt → Orchestrator review/verification"
 
 # Contributor/release governance must preserve the same invariants.
 contains "$CONTRIBUTING" "**Every repository implementation edit** routes to Fixer"
@@ -63,6 +64,7 @@ contains "$CLI" 'one terminal child `task_complete` event'
 contains "$CLI" 'effective `gpt-5.6-luna` with `high` reasoning'
 contains "$CLI" "Prompt text or other raw substring co-occurrence is not accepted as proof"
 contains "$CLI" "Normal Codex parent/child session rollouts created by the real turn remain"
+contains "$CLI" "rather than filesystem timestamps"
 
 # Unreleased notes must describe the same post-v0.7 contract.
 contains "$CHANGELOG" 'Structured `luna_fixer` implementation receipts'
