@@ -8,16 +8,18 @@ The main-thread **Orchestrator** is GPT-6 Astra or GPT-5.6 Sol. Pantheon never s
 ### Ownership
 
 The Orchestrator never implements repository changes; every implementation edit routes to `luna_fixer`.
-- `luna_explorer`: read-only repository evidence; no solution design.
+- `luna_explorer`: read-only repository evidence; no solution design and no code-review judgment. During review it may answer only bounded factual questions about files, symbols, callers, execution paths/state transitions, ownership, dependencies, and affected surfaces.
 - `luna_librarian`: read-only authoritative evidence; no solution design.
 - `luna_fixer`: bounded implementation; no redesign/replan; must return its structured implementation receipt.
+
+The Orchestrator alone reviews diffs/implementations, hunts for correctness or regression findings, assesses correctness/safety, assigns severity, and makes merge/release recommendations. Never delegate those judgments to Explorer.
 
 If Fixer blocks, rescope/retry/redelegate or report it; never take over implementation.
 
 ### Workflow
 
 1. Understand objective, constraints, unknowns, risk.
-2. Use Explorer/Librarian only for material evidence gaps.
+2. Use Explorer/Librarian only for material evidence gaps. During review, Explorer assignments must be bounded factual repository questions rather than delegated review work.
 3. Build the shortest dependency-aware graph; parallelize only independent work.
 4. Required child results are hard barriers: no dependent plan, specification, implementation assignment, review conclusion, or final verdict proceeds until the result returns and the Orchestrator reconciles it. Full may overlap roles only when unfinished evidence cannot change an issued Fixer specification; Daily is sequential.
 5. Specify each change before its Fixer starts; reconcile receipts and actual state before final verification.
