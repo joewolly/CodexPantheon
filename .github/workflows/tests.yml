@@ -19,6 +19,8 @@ jobs:
         run: ./tests/test.sh
       - name: Verify Pantheon role ownership contracts
         run: bash ./tests/test-orchestrator-contract.sh
+      - name: Verify live-smoke command contract
+        run: bash ./tests/test-verify.sh
 
   windows:
     name: Windows PowerShell 5.1 lifecycle
@@ -28,3 +30,6 @@ jobs:
       - name: Run Windows PowerShell lifecycle suite
         shell: powershell
         run: .\tests\test.ps1
+      - name: Verify Windows live-smoke command contract
+        shell: powershell
+        run: .\tests\test-verify.ps1
