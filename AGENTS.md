@@ -10,6 +10,7 @@ Keep Pantheon slim, explicit, model-neutral at the Orchestrator layer, and Codex
 - The Orchestrator is an exclusive workflow manager. It owns planning, architecture, product/tradeoff decisions, prioritization, scheduling, delegation, integration, review, final verification judgment, and the final response. It never implements repository changes.
 - Luna Explorer and Librarian are read-only evidence specialists. Luna Fixer implements the Orchestrator's scoped specification and must not independently redesign or replan the mission.
 - Every repository implementation edit routes to Luna Fixer regardless of size, obviousness, or delegation overhead. If Fixer cannot be spawned or complete the assignment, rescope/retry/redelegate or report the blocker; never fall back to direct Orchestrator implementation.
+- Every Luna Fixer return must be a structured implementation receipt covering status, summary, files/changes, validation with PASS/FAIL/SKIPPED/UNKNOWN evidence, deviations/blockers, and parent-verification obligations. The Orchestrator must reconcile the receipt against actual state rather than accepting a bare completion claim.
 - Pantheon requires the selected Orchestrator/runtime to expose native MultiAgent V2. If V2 is unavailable, fail visibly; do not substitute a legacy control plane.
 - Pantheon workers must always resolve to the configured `luna_explorer`, `luna_librarian`, or `luna_fixer` role. Those role files pin `model = "gpt-5.6-luna"` and `model_reasoning_effort = "high"`.
 - Every spawn must use the native V2 `spawn_agent`, explicitly set `agent_type` to the configured Luna role, set `fork_turns: "none"`, and use only the required concise `task_name` routing/path metadata. Never omit role selection and allow the Astra/Sol parent model to be inherited.
@@ -18,12 +19,14 @@ Keep Pantheon slim, explicit, model-neutral at the Orchestrator layer, and Codex
 - Keep Pantheon worker coordination on the V2 agent control plane: use `send_message` for a running worker and `followup_task` to assign another task/turn. Never use generic task/thread delegation such as `send_message_to_thread`, `create_thread`, `fork_thread`, or direct task turn/resume calls to steer a Pantheon child.
 - Do not use legacy/non-V2 multi-agent primitives as compatibility fallbacks.
 - Parent-mediated steering is the supported coordination model. A child composer is optional Codex UI; Pantheon does not depend on or promise one.
-- Preserve the dependency chain for implementation: Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification.
+- Preserve the dependency chain for each implementation work item: Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification.
+- Treat required child results as hard dependency barriers. The Orchestrator must not proceed with or finalize a dependent decision/stage until the required result has returned and been reconciled. In Full, genuinely independent work items may overlap across Explorer/Librarian/Fixer only when unfinished evidence cannot change an already-issued Fixer specification; parallel Fixers still require non-overlapping writes. Daily remains fully sequential.
 - Keep Daily and Full Pantheon as the only delegation-intensity profiles. Daily may use fewer evidence specialists and does not parallelize children, but it must not alter implementation ownership or impose a numeric worker-call ceiling.
 - Preserve minimum self-contained child context and never inherit full parent history by default.
 - Preserve user-owned Codex configuration outside Pantheon-managed files/markers.
 - Custom agent roles must be installed as regular files, not symlinks/reparse points.
 - Keep one shared payload under `agents/`, `skills/`, and `policy/`; Bash and PowerShell lifecycle frontends must not fork or duplicate it.
+- `doctor` remains static/read-only installation validation. `verify` is the explicit opt-in live runtime smoke test and may consume a real Codex/model turn; never run it implicitly from install/update/bootstrap/doctor.
 - Run `./tests/test.sh` after lifecycle-script, policy, skill, migration, or agent changes. When Windows behavior changes, also run `./tests/test.ps1` on PowerShell/Windows or rely on Windows CI before merge.
 
 ## Codex-assisted lifecycle
@@ -35,7 +38,8 @@ When the user asks Codex to install, set up, upgrade, update, repair, or verify 
 - `bootstrap` installs or refreshes only Pantheon-owned files, removes Pantheon-owned legacy v0.4/v0.5 payloads, and then runs `doctor`.
 - If `bootstrap` fails, report the exact safeguard or validation failure. Do not bypass malformed-marker, symlink/reparse-point, source-integrity, or user-owned configuration protections by manually overwriting files.
 - If the user asks only for instructions or explicitly says not to make changes, explain the platform-appropriate commands without executing them.
-- For verification-only requests, run `./pantheon doctor` on macOS/Linux or `.\pantheon.ps1 doctor` on Windows.
+- For static installation/integrity verification, run `./pantheon doctor` on macOS/Linux or `.\pantheon.ps1 doctor` on Windows.
+- For explicit live/runtime verification, run `./pantheon verify` on macOS/Linux or `.\pantheon.ps1 verify` on Windows. Report that it invokes a real Codex turn and therefore depends on authentication, model/provider availability, and native MultiAgent V2.
 - For removal, run `./pantheon uninstall` on macOS/Linux or `.\pantheon.ps1 uninstall` on Windows only when the user explicitly asks to uninstall/remove Pantheon.
 
 Lifecycle requests do not activate Pantheon orchestration. `$pantheon` and `$pantheon-daily` are the explicit sticky activation controls.

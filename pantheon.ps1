@@ -55,6 +55,7 @@ Usage:
   .\pantheon.ps1 install
   .\pantheon.ps1 update
   .\pantheon.ps1 doctor
+  .\pantheon.ps1 verify
   .\pantheon.ps1 uninstall
   .\pantheon.ps1 version
   .\pantheon.ps1 help
@@ -471,6 +472,104 @@ function Cmd-Doctor {
     exit 1
 }
 
+function Cmd-Verify {
+    Require-SourceTree
+
+    Say 'Codex Pantheon Verify'
+    Say "Version: $Version"
+    Say 'This runs one real Codex parent turn plus one Luna Explorer child turn.'
+    Say
+    Say 'Static preflight'
+    Cmd-Doctor
+
+    $codexBin = Find-Codex
+    if ($null -eq $codexBin) { Fail 'Codex executable is required for live verification.' }
+
+    $explorerConfig = Join-Path $AgentDestDir 'luna-explorer.toml'
+    $explorerText = Read-Text $explorerConfig
+    if (-not [regex]::IsMatch($explorerText, '(?m)^model\s*=\s*"gpt-5\.6-luna"\s*$')) {
+        Fail 'Installed luna-explorer.toml does not pin GPT-5.6 Luna.'
+    }
+
+    $nonce = "$([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds())-$PID-$([Guid]::NewGuid().ToString('N').Substring(0, 8))"
+    $secret = "PANTHEON_PARENT_SECRET_${nonce}_$([Guid]::NewGuid().ToString('N').Substring(0, 8))"
+    $prompt = @"
+Pantheon live runtime smoke test. Do not modify files and do not perform unrelated work.
+
+Parent-only secret: $secret
+
+Use native MultiAgent V2 spawn_agent exactly once with:
+- agent_type: luna_explorer
+- fork_turns: none
+- task_name: explorer_pantheon_verify
+
+Do NOT include or quote the parent-only secret in the child assignment. Give the child only this assignment:
+Pantheon verify nonce: $nonce. Inspect only your initial context. If it contains any full token beginning PANTHEON_PARENT_SECRET_, reply exactly PANTHEON_CHILD_FAIL_${nonce}_PARENT_SECRET_SEEN. Otherwise reply exactly PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET. Do not use tools or spawn subagents.
+
+Wait for that child to complete. If its exact reply is PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET, reply exactly PANTHEON_VERIFY_OK_$nonce. Otherwise reply exactly PANTHEON_VERIFY_FAIL_$nonce.
+"@
+
+    Say
+    Say 'Live V2 round trip'
+    $codexArgs = @('exec', '--json', '--skip-git-repo-check', '--sandbox', 'read-only', '-C', $ScriptDir, $prompt)
+    $outputLines = @(& $codexBin @codexArgs 2>&1)
+    $exitCode = $LASTEXITCODE
+    $outputText = (($outputLines | ForEach-Object { [string]$_ }) -join [Environment]::NewLine)
+    if ($exitCode -ne 0) {
+        if (-not [string]::IsNullOrWhiteSpace($outputText)) { [Console]::Error.WriteLine($outputText) }
+        Fail 'Codex live verification turn failed.'
+    }
+    if (-not $outputText.Contains("PANTHEON_VERIFY_OK_$nonce")) {
+        if (-not [string]::IsNullOrWhiteSpace($outputText)) { [Console]::Error.WriteLine($outputText) }
+        Fail 'Parent did not confirm the expected Luna child result.'
+    }
+    Ok 'Parent received and reconciled the child result'
+
+    $sessionsDir = Join-Path $CodexHomeDir 'sessions'
+    if (-not (Test-Path -LiteralPath $sessionsDir -PathType Container)) {
+        Fail "Codex session rollouts were not found under $sessionsDir; cannot verify native spawn metadata."
+    }
+
+    $parentTrace = $null
+    $childTrace = $null
+    $sessionFiles = @(Get-ChildItem -LiteralPath $sessionsDir -Recurse -File -Filter '*.jsonl' -ErrorAction SilentlyContinue)
+    foreach ($sessionFile in $sessionFiles) {
+        $text = Read-Text $sessionFile.FullName
+        if (-not $text.Contains($nonce)) { continue }
+        if ($null -eq $parentTrace -and
+            $text.Contains('spawn_agent') -and
+            $text.Contains('luna_explorer') -and
+            $text.Contains('explorer_pantheon_verify') -and
+            $text.Contains('fork_turns') -and
+            $text.Contains('none')) {
+            $parentTrace = $sessionFile.FullName
+        }
+        if ($null -eq $childTrace -and
+            $text.Contains('subagent.thread_spawn') -and
+            $text.Contains('luna-explorer.toml')) {
+            $childTrace = $sessionFile.FullName
+        }
+    }
+
+    if ($null -eq $parentTrace) { Fail 'Could not prove the V2 spawn arguments from the Codex session rollout.' }
+    $parentText = Read-Text $parentTrace
+    foreach ($marker in @('spawn_agent', 'luna_explorer', 'explorer_pantheon_verify', 'fork_turns', 'none')) {
+        if (-not $parentText.Contains($marker)) { Fail "Parent rollout is missing required spawn marker: $marker" }
+    }
+    Ok 'V2 spawn used luna_explorer, fork_turns none, and explorer_pantheon_verify'
+
+    if ($null -eq $childTrace) { Fail 'Could not prove that the configured luna-explorer agent resolved to a child rollout.' }
+    $childText = Read-Text $childTrace
+    if (-not $childText.Contains('gpt-5.6-luna')) { Fail 'Child rollout did not record GPT-5.6 Luna.' }
+    if (-not $childText.Contains("PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET")) { Fail 'Child rollout does not contain the expected verification reply.' }
+    if ($childText.Contains($secret)) { Fail 'Child rollout contains the parent-only secret; fork_turns none isolation did not hold.' }
+    Ok 'Configured Explorer resolved to GPT-5.6 Luna'
+    Ok 'fork_turns none kept the parent-only secret out of the child context'
+
+    Say
+    Say 'Status: VERIFIED'
+}
+
 function Cmd-Uninstall {
     Validate-MarkerState | Out-Null
     foreach ($file in @($AgentFiles + $LegacyAgentFiles)) { Remove-OwnedPath (Join-Path $AgentDestDir $file) }
@@ -486,6 +585,7 @@ switch ($Command.ToLowerInvariant()) {
     'install' { Cmd-Install; break }
     'update' { Cmd-Update; break }
     'doctor' { Cmd-Doctor; break }
+    'verify' { Cmd-Verify; break }
     'uninstall' { Cmd-Uninstall; break }
     'version' { Say "Codex Pantheon $Version"; break }
     '--version' { Say "Codex Pantheon $Version"; break }
