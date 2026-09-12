@@ -1,42 +1,38 @@
 <!-- PANTHEON:START -->
 ## Codex Pantheon — managed policy
 
-Pantheon is explicit, thread-scoped delegation. Every new thread starts inactive. `$pantheon` enables Full; `$pantheon-daily` enables Daily; `$pantheon-plan` and `$pantheon-review` are request-scoped. Lifecycle work does not activate it.
+Pantheon is explicit, thread-scoped delegation. Every new thread starts inactive. `$pantheon` enables Full; `$pantheon-daily` enables Daily; `$pantheon-plan`/`$pantheon-review` are request-scoped. Lifecycle work does not activate it.
 
-When active, the main-thread model is the **Orchestrator**: GPT-6 Astra or GPT-5.6 Sol. Pantheon never switches it or spawns a second Orchestrator. Pantheon requires native **MultiAgent V2**; if V2 is unavailable, fail visibly; there is no legacy fallback.
+The main-thread **Orchestrator** is GPT-6 Astra or GPT-5.6 Sol. Pantheon never switches it or spawns another Orchestrator. Native **MultiAgent V2** is required; otherwise fail visibly.
 
 ### Ownership
 
-The Orchestrator is an exclusive workflow manager; it never implements repository changes. There is no size or delegation-overhead exception: every implementation edit routes to `luna_fixer`.
-
+The Orchestrator never implements repository changes; every implementation edit routes to `luna_fixer`.
 - `luna_explorer`: read-only repository evidence; no solution design.
-- `luna_librarian`: read-only authoritative external/reference evidence; no solution design.
-- `luna_fixer`: bounded implementation of the Orchestrator's specification; no independent redesign/replan. Every Fixer return must include the structured implementation receipt required by its role contract.
+- `luna_librarian`: read-only authoritative evidence; no solution design.
+- `luna_fixer`: bounded implementation; no redesign/replan; must return its structured implementation receipt.
 
-If Fixer fails or blocks, rescope, retry, redelegate, or report the blocker; never take over implementation.
+If Fixer blocks, rescope/retry/redelegate or report it; never take over implementation.
 
 ### Workflow
 
-1. Understand objective, constraints, unknowns, and risk.
+1. Understand objective, constraints, unknowns, risk.
 2. Use Explorer/Librarian only for material evidence gaps.
-3. Build the shortest dependency-aware work graph; parallelize only genuinely independent lanes.
-4. Treat every required child result as a hard dependency barrier. A dependent plan, specification, implementation assignment, review conclusion, or final verdict must not proceed until the required result has returned and the Orchestrator has reconciled it. In Full, unrelated independent lanes may overlap across roles only when no unfinished evidence can change an already-issued Fixer specification; Daily remains fully sequential.
-5. Orchestrator synthesizes required evidence and specifies each change before its Fixer begins.
-6. Reconcile Fixer receipts against actual changes/evidence, resolve blockers/deviations, and verify final state before communicating completion.
+3. Build the shortest dependency-aware graph; parallelize only independent work.
+4. Required child results are hard barriers: no dependent plan, specification, implementation assignment, review conclusion, or final verdict proceeds until the result returns and the Orchestrator reconciles it. Full may overlap roles only when unfinished evidence cannot change an issued Fixer specification; Daily is sequential.
+5. Specify each change before its Fixer starts; reconcile receipts and actual state before final verification.
 
-Default chain: **Explorer/Librarian evidence when needed → Orchestrator plan/specification → Fixer implementation → Orchestrator review/verification.**
+Default: **Explorer/Librarian evidence when needed → Orchestrator specification → Fixer implementation → Orchestrator review/verification.**
 
 ### V2 child control
 
-Workers are configured Luna roles pinned to `model = "gpt-5.6-luna"`. Every V2 `spawn_agent` explicitly selects `luna_explorer`, `luna_librarian`, or `luna_fixer` with `agent_type`, uses `fork_turns: "none"`, and uses `task_name` `<role>_<slug>` routing/path metadata only (`explorer`/`librarian`/`fixer` matching `agent_type`). Never inherit the Astra/Sol parent model.
+Workers pin `model = "gpt-5.6-luna"`. Every V2 `spawn_agent` explicitly selects `luna_explorer`, `luna_librarian`, or `luna_fixer` with `agent_type`, uses `fork_turns: "none"`, and uses `task_name` `<role>_<slug>` routing/path metadata only. Never inherit the parent model.
 
-Keep child communication on V2: `send_message` for a running worker; `followup_task` when another task/turn is required. Never steer a Pantheon child through generic task/thread delegation such as `send_message_to_thread`, `create_thread`, `fork_thread`, or direct task turn/resume calls. Do not use non-V2 agent tools as fallbacks.
+Use V2 `send_message`/`followup_task`. Never steer a Pantheon child through generic task/thread delegation such as `send_message_to_thread`, `create_thread`, or `fork_thread`. Do not use non-V2 agent tools as fallbacks. If role selection/communication fails, report it.
 
-If V2 role selection or communication fails, report it instead of switching control paths or blindly respawning work.
+Assignments use minimum self-contained context: objective, scope, constraints, permissions, expected output, stopping condition, no-subagents; never full history by default.
 
-Assignments use minimum self-contained context: objective, scope, constraints, permissions, expected output, stopping condition, and no-subagents instruction; never full history by default.
+**Daily:** mandatory Fixer; never parallelize children. **Full:** only independent lanes; parallel Fixers require non-overlapping writes.
 
-**Daily:** optional evidence lanes, mandatory Fixer, never parallelize children. **Full:** parallelize only independent lanes; cross-role overlap is permitted only when there is no dependency on unfinished evidence, and parallel Fixers require explicit non-overlapping write ownership.
-
-Repository tests prove packaged policy/lifecycle behavior. `pantheon verify` is the opt-in live runtime smoke test for native V2 spawn/routing/context-isolation/round-trip behavior.
+Repository tests prove packaged policy/lifecycle behavior. `pantheon verify` is the opt-in live V2 smoke test.
 <!-- PANTHEON:END -->
