@@ -423,8 +423,8 @@ cmd_verify() {
   local codex_bin explorer_config nonce secret prompt sessions_dir
   local output stderr_file last_message start_marker parent_reply parent_thread_id
   local parent_trace="" child_trace="" spawn_lines spawn_line spawn_count call_id
-  local spawn_output_lines spawn_output_count child_count=0 child_reply_count turn_context_line
-  local file session_meta_line
+  local spawn_output_lines spawn_output_count wait_lines wait_count wait_success_count wait_line wait_call_id wait_output_lines
+  local child_count=0 child_reply_count child_complete_count turn_context_line file session_meta_line
 
   codex_bin="$(find_codex 2>/dev/null)" || fail "Codex executable is required for live verification."
   explorer_config="${AGENT_DEST_DIR}/luna-explorer.toml"
@@ -446,7 +446,7 @@ Use native MultiAgent V2 spawn_agent exactly once with:
 Do NOT include or quote the parent-only secret in the child assignment. Give the child only this assignment:
 Pantheon verify nonce: ${nonce}. Inspect only your initial context. If it contains any single token that starts with PANTHEON_PARENTSECRET_ and also contains ${nonce}, reply exactly PANTHEON_CHILD_FAIL_${nonce}_PARENT_SECRET_SEEN. Otherwise reply exactly PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET. Do not use tools or spawn subagents.
 
-Wait for that child to complete. If its exact reply is PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET, reply exactly PANTHEON_VERIFY_OK_${nonce}. Otherwise reply exactly PANTHEON_VERIFY_FAIL_${nonce}.
+After spawning, use native MultiAgent V2 wait_agent and do not finalize until a wait result reports timed_out false. Then use the child's exact final reply. If it is PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET, reply exactly PANTHEON_VERIFY_OK_${nonce}. Otherwise reply exactly PANTHEON_VERIFY_FAIL_${nonce}.
 EOF_VERIFY
 )"
 
@@ -476,7 +476,6 @@ EOF_VERIFY
     cat "$stderr_file" >&2 2>/dev/null || true
     fail "Parent final reply was not the exact expected Luna child result."
   fi
-  ok "Parent received and reconciled the child result"
 
   parent_thread_id="$(sed -n 's/.*"type":"thread.started".*"thread_id":"\([^"]*\)".*/\1/p' "$output" | head -n 1)"
   [ -n "$parent_thread_id" ] || fail "Could not read the parent thread id from Codex JSON output."
@@ -489,10 +488,11 @@ EOF_VERIFY
   session_meta_line="$(grep -F '"type":"session_meta"' "$parent_trace" | head -n 1 || true)"
   printf '%s\n' "$session_meta_line" | grep -Fq "\"id\":\"${parent_thread_id}\"" || fail "Parent rollout session metadata does not match the Codex thread id."
 
-  spawn_lines="$(grep -F '"type":"response_item"' "$parent_trace" | grep -F '"type":"function_call"' | grep -F '"name":"spawn_agent"' | grep -F "$nonce" || true)"
+  spawn_lines="$(grep -F '"type":"response_item"' "$parent_trace" | grep -F '"type":"function_call"' | grep -F '"name":"spawn_agent"' || true)"
   spawn_count="$(printf '%s\n' "$spawn_lines" | grep -c . || true)"
-  [ "$spawn_count" -eq 1 ] || fail "Expected exactly one actual spawn_agent function call for the verification nonce; found ${spawn_count}."
+  [ "$spawn_count" -eq 1 ] || fail "Expected exactly one total spawn_agent function call; found ${spawn_count}."
   spawn_line="$spawn_lines"
+  printf '%s\n' "$spawn_line" | grep -Fq "$nonce" || fail "spawn_agent assignment did not contain the verification nonce."
   printf '%s\n' "$spawn_line" | grep -Eq '\\"agent_type\\"[[:space:]]*:[[:space:]]*\\"luna_explorer\\"' || fail "spawn_agent did not request agent_type luna_explorer."
   printf '%s\n' "$spawn_line" | grep -Eq '\\"fork_turns\\"[[:space:]]*:[[:space:]]*\\"none\\"' || fail "spawn_agent did not request fork_turns none."
   printf '%s\n' "$spawn_line" | grep -Eq '\\"task_name\\"[[:space:]]*:[[:space:]]*\\"explorer_pantheon_verify\\"' || fail "spawn_agent did not use explorer_pantheon_verify."
@@ -504,6 +504,23 @@ EOF_VERIFY
   [ "$spawn_output_count" -eq 1 ] || fail "Expected exactly one correlated spawn_agent result; found ${spawn_output_count}."
   printf '%s\n' "$spawn_output_lines" | grep -Fq 'explorer_pantheon_verify' || fail "Correlated spawn_agent result does not identify the requested task."
   ok "V2 spawn used luna_explorer, fork_turns none, and explorer_pantheon_verify"
+
+  wait_lines="$(grep -F '"type":"response_item"' "$parent_trace" | grep -F '"type":"function_call"' | grep -F '"name":"wait_agent"' || true)"
+  wait_count="$(printf '%s\n' "$wait_lines" | grep -c . || true)"
+  [ "$wait_count" -ge 1 ] || fail "Parent never called V2 wait_agent after spawning the child."
+  wait_success_count=0
+  while IFS= read -r wait_line; do
+    [ -n "$wait_line" ] || continue
+    wait_call_id="$(printf '%s\n' "$wait_line" | sed -n 's/.*"call_id":"\([^"]*\)".*/\1/p')"
+    [ -n "$wait_call_id" ] || continue
+    wait_output_lines="$(grep -F '"type":"response_item"' "$parent_trace" | grep -F '"type":"function_call_output"' | grep -F "\"call_id\":\"${wait_call_id}\"" || true)"
+    if [ "$(printf '%s\n' "$wait_output_lines" | grep -c . || true)" -eq 1 ] \
+      && printf '%s\n' "$wait_output_lines" | grep -Eq '\\"timed_out\\"[[:space:]]*:[[:space:]]*false'; then
+      wait_success_count=$((wait_success_count + 1))
+    fi
+  done <<< "$wait_lines"
+  [ "$wait_success_count" -ge 1 ] || fail "Parent wait_agent calls never produced a correlated non-timeout mailbox update."
+  ok "Parent waited for a non-timeout V2 child mailbox update"
 
   while IFS= read -r file; do
     [ "$file" = "$parent_trace" ] && continue
@@ -524,11 +541,14 @@ EOF_VERIFY
 
   child_reply_count="$(grep -F '"type":"response_item"' "$child_trace" | grep -F '"type":"message"' | grep -F '"role":"assistant"' | grep -F '"type":"output_text"' | grep -F "\"text\":\"PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET\"" | wc -l | tr -d '[:space:]')"
   [ "$child_reply_count" -eq 1 ] || fail "Child rollout does not contain exactly one assistant output reply with the expected verification token."
+  child_complete_count="$(grep -F '"type":"event_msg"' "$child_trace" | grep -F '"type":"task_complete"' | grep -F "\"last_agent_message\":\"PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET\"" | wc -l | tr -d '[:space:]')"
+  [ "$child_complete_count" -eq 1 ] || fail "Child rollout does not contain exactly one terminal task_complete with the expected final message."
   if grep -Fq "$secret" "$child_trace"; then
     fail "Child rollout contains the parent-only secret; fork_turns none isolation did not hold."
   fi
-  ok "Configured Explorer resolved to GPT-5.6 Luna High"
+  ok "Configured Explorer resolved to GPT-5.6 Luna High and completed normally"
   ok "fork_turns none kept the parent-only secret out of the child context"
+  ok "Parent received and reconciled the terminal child result"
 
   say ""
   say "Status: VERIFIED"
