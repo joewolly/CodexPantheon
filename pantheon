@@ -54,6 +54,7 @@ Usage:
   ./pantheon install
   ./pantheon update
   ./pantheon doctor
+  ./pantheon verify
   ./pantheon uninstall
   ./pantheon version
   ./pantheon help
@@ -409,6 +410,98 @@ cmd_doctor() {
   return 1
 }
 
+cmd_verify() {
+  require_source_tree
+
+  say "Codex Pantheon Verify"
+  say "Version: ${VERSION}"
+  say "This runs one real Codex parent turn plus one Luna Explorer child turn."
+  say ""
+  say "Static preflight"
+  cmd_doctor
+
+  local codex_bin explorer_config nonce secret prompt output sessions_dir
+  local parent_trace="" child_trace="" file marker
+
+  codex_bin="$(find_codex 2>/dev/null)" || fail "Codex executable is required for live verification."
+  explorer_config="${AGENT_DEST_DIR}/luna-explorer.toml"
+  grep -Eq '^model[[:space:]]*=[[:space:]]*"gpt-5\.6-luna"[[:space:]]*$' "$explorer_config" || fail "Installed luna-explorer.toml does not pin GPT-5.6 Luna."
+
+  nonce="$(date +%s)-$$-${RANDOM:-0}"
+  secret="PANTHEON_PARENT_SECRET_${nonce}_${RANDOM:-0}"
+  prompt="$(cat <<EOF_VERIFY
+Pantheon live runtime smoke test. Do not modify files and do not perform unrelated work.
+
+Parent-only secret: ${secret}
+
+Use native MultiAgent V2 spawn_agent exactly once with:
+- agent_type: luna_explorer
+- fork_turns: none
+- task_name: explorer_pantheon_verify
+
+Do NOT include or quote the parent-only secret in the child assignment. Give the child only this assignment:
+Pantheon verify nonce: ${nonce}. Inspect only your initial context. If it contains any full token beginning PANTHEON_PARENT_SECRET_, reply exactly PANTHEON_CHILD_FAIL_${nonce}_PARENT_SECRET_SEEN. Otherwise reply exactly PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET. Do not use tools or spawn subagents.
+
+Wait for that child to complete. If its exact reply is PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET, reply exactly PANTHEON_VERIFY_OK_${nonce}. Otherwise reply exactly PANTHEON_VERIFY_FAIL_${nonce}.
+EOF_VERIFY
+)"
+
+  output="$(mktemp "${TMPDIR:-/tmp}/pantheon-verify.XXXXXX")"
+  trap 'rm -f "$output"' RETURN
+
+  say ""
+  say "Live V2 round trip"
+  if ! CODEX_HOME="$CODEX_HOME_DIR" "$codex_bin" exec --json --skip-git-repo-check --sandbox read-only -C "$SCRIPT_DIR" "$prompt" >"$output" 2>&1; then
+    cat "$output" >&2
+    fail "Codex live verification turn failed."
+  fi
+
+  grep -Fq "PANTHEON_VERIFY_OK_${nonce}" "$output" || {
+    cat "$output" >&2
+    fail "Parent did not confirm the expected Luna child result."
+  }
+  ok "Parent received and reconciled the child result"
+
+  sessions_dir="${CODEX_HOME_DIR}/sessions"
+  [ -d "$sessions_dir" ] || fail "Codex session rollouts were not found under ${sessions_dir}; cannot verify native spawn metadata."
+
+  while IFS= read -r file; do
+    if [ -z "$parent_trace" ] \
+      && grep -Fq 'spawn_agent' "$file" \
+      && grep -Fq 'luna_explorer' "$file" \
+      && grep -Fq 'explorer_pantheon_verify' "$file" \
+      && grep -Fq 'fork_turns' "$file" \
+      && grep -Fq 'none' "$file"; then
+      parent_trace="$file"
+    fi
+    if [ -z "$child_trace" ] \
+      && grep -Fq 'subagent.thread_spawn' "$file" \
+      && grep -Fq 'luna-explorer.toml' "$file"; then
+      child_trace="$file"
+    fi
+  done < <(find "$sessions_dir" -type f -name '*.jsonl' -exec grep -lF "$nonce" {} \; 2>/dev/null)
+
+  [ -n "$parent_trace" ] || fail "Could not prove the V2 spawn arguments from the Codex session rollout."
+  for marker in 'spawn_agent' 'luna_explorer' 'explorer_pantheon_verify' 'fork_turns' 'none'; do
+    grep -Fq "$marker" "$parent_trace" || fail "Parent rollout is missing required spawn marker: ${marker}"
+  done
+  ok "V2 spawn used luna_explorer, fork_turns none, and explorer_pantheon_verify"
+
+  [ -n "$child_trace" ] || fail "Could not prove that the configured luna-explorer agent resolved to a child rollout."
+  grep -Fq 'gpt-5.6-luna' "$child_trace" || fail "Child rollout did not record GPT-5.6 Luna."
+  grep -Fq "PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET" "$child_trace" || fail "Child rollout does not contain the expected verification reply."
+  if grep -Fq "$secret" "$child_trace"; then
+    fail "Child rollout contains the parent-only secret; fork_turns none isolation did not hold."
+  fi
+  ok "Configured Explorer resolved to GPT-5.6 Luna"
+  ok "fork_turns none kept the parent-only secret out of the child context"
+
+  say ""
+  say "Status: VERIFIED"
+  trap - RETURN
+  rm -f "$output"
+}
+
 cmd_uninstall() {
   validate_marker_state
 
@@ -437,6 +530,7 @@ main() {
     install) cmd_install "$@" ;;
     update) cmd_update "$@" ;;
     doctor) cmd_doctor "$@" ;;
+    verify) cmd_verify "$@" ;;
     uninstall) cmd_uninstall "$@" ;;
     version|--version|-v) say "Codex Pantheon ${VERSION}" ;;
     help|--help|-h) usage ;;
