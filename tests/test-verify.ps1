@@ -10,6 +10,8 @@ $Original = @{
     PANTHEON_SKILLS_HOME = $env:PANTHEON_SKILLS_HOME
     USERPROFILE = $env:USERPROFILE
     PATH = $env:PATH
+    TEMP = $env:TEMP
+    TMP = $env:TMP
     PANTHEON_VERIFY_FAKE_MODE = $env:PANTHEON_VERIFY_FAKE_MODE
 }
 
@@ -34,8 +36,11 @@ try {
     $env:USERPROFILE = Join-Path $Temp 'home'
     $env:CODEX_HOME = Join-Path $Temp 'codex'
     $env:PANTHEON_SKILLS_HOME = Join-Path $Temp 'skills'
+    $RuntimeTemp = Join-Path $Temp 'runtime-tmp'
+    $env:TEMP = $RuntimeTemp
+    $env:TMP = $RuntimeTemp
     $FakeBin = Join-Path $Temp 'bin'
-    New-Item -ItemType Directory -Path $env:USERPROFILE, $env:CODEX_HOME, $env:PANTHEON_SKILLS_HOME, $FakeBin -Force | Out-Null
+    New-Item -ItemType Directory -Path $env:USERPROFILE, $env:CODEX_HOME, $env:PANTHEON_SKILLS_HOME, $RuntimeTemp, $FakeBin -Force | Out-Null
 
     $FakeExe = Join-Path $FakeBin 'codex.exe'
     $Source = @'
@@ -122,7 +127,7 @@ public static class Program
                 child.WriteLine("{\"type\":\"session_meta\",\"payload\":{\"id\":\"" + childId + "\",\"source\":{\"subagent\":{\"thread_spawn\":{\"parent_thread_id\":\"" + parentId + "\",\"depth\":1,\"agent_path\":\"/root/explorer_pantheon_verify\",\"agent_role\":\"luna_explorer\"}}}}}");
                 var effort = mode == "wrong-effort" ? "medium" : "high";
                 child.WriteLine("{\"type\":\"turn_context\",\"payload\":{\"model\":\"gpt-5.6-luna\",\"effort\":\"" + effort + "\"}}");
-                child.WriteLine("{\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"input_text\",\"text\":\"Reply exactly PANTHEON_CHILD_OK_" + nonce + "_NO_PARENT_SECRET\"}]}}");
+                child.WriteLine("{\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"input_text\",\"text\":\"PANTHEON_CHILD_OK_" + nonce + "_NO_PARENT_SECRET\"}]}}");
                 if (mode == "secret-leak")
                 {
                     child.WriteLine("{\"type\":\"event_msg\",\"payload\":{\"type\":\"debug\",\"message\":\"" + secret + "\"}}");
@@ -167,14 +172,21 @@ public static class Program
         if ($result.ExitCode -eq 0) { throw "Pantheon verify unexpectedly passed in mode '$mode':`n$($result.Text)" }
     }
 
+    $leakedVerifyTemp = @(Get-ChildItem -LiteralPath $RuntimeTemp -Directory -Filter 'pantheon-verify-*' -ErrorAction SilentlyContinue)
+    if ($leakedVerifyTemp.Count -ne 0) {
+        throw "Pantheon verify leaked temporary directories after a failure: $($leakedVerifyTemp.FullName -join ', ')"
+    }
+
     $global:LASTEXITCODE = 0
-    Write-Output 'ok - pantheon verify fails closed on misleading evidence and tolerates harmless native stderr on Windows'
+    Write-Output 'ok - pantheon verify fails closed, cleans temporary state, and tolerates harmless native stderr on Windows'
 }
 finally {
     $env:CODEX_HOME = $Original.CODEX_HOME
     $env:PANTHEON_SKILLS_HOME = $Original.PANTHEON_SKILLS_HOME
     $env:USERPROFILE = $Original.USERPROFILE
     $env:PATH = $Original.PATH
+    $env:TEMP = $Original.TEMP
+    $env:TMP = $Original.TMP
     $env:PANTHEON_VERIFY_FAKE_MODE = $Original.PANTHEON_VERIFY_FAKE_MODE
     if (Test-Path -LiteralPath $Temp) { Remove-Item -LiteralPath $Temp -Recurse -Force -ErrorAction SilentlyContinue }
 }
