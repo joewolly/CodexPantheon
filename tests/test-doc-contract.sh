@@ -7,13 +7,15 @@ fail() { printf 'not ok - %s\n' "$1" >&2; exit 1; }
 contains() { grep -Fq -- "$2" "$1" || fail "expected '$2' in ${1#"$ROOT/"}"; }
 
 README="$ROOT/README.md"
+CONTRIBUTING="$ROOT/CONTRIBUTING.md"
 GUIDE="$ROOT/docs/USER_GUIDE.md"
 DOCTRINE="$ROOT/docs/DESIGN_DOCTRINE.md"
 INSTALL="$ROOT/docs/CODEX_INSTALL.md"
 CLI="$ROOT/docs/CLI_REFERENCE.md"
+RELEASING="$ROOT/docs/RELEASING.md"
 CHANGELOG="$ROOT/CHANGELOG.md"
 
-for file in "$README" "$GUIDE" "$DOCTRINE" "$INSTALL" "$CLI" "$CHANGELOG"; do
+for file in "$README" "$CONTRIBUTING" "$GUIDE" "$DOCTRINE" "$INSTALL" "$CLI" "$RELEASING" "$CHANGELOG"; do
   [ -f "$file" ] || fail "missing documentation file: ${file#"$ROOT/"}"
 done
 
@@ -35,6 +37,19 @@ contains "$DOCTRINE" "Required results are hard barriers"
 contains "$DOCTRINE" "Full Pantheon earns parallelism"
 contains "$DOCTRINE" "Live verification is explicit and fail-closed"
 
+# Contributor/release governance must preserve the same invariants.
+contains "$CONTRIBUTING" "**Every repository implementation edit** routes to Fixer"
+contains "$CONTRIBUTING" "structured implementation receipt"
+contains "$CONTRIBUTING" "hard dependency barrier"
+contains "$CONTRIBUTING" "unfinished evidence must never be able to change an already-issued Fixer specification"
+contains "$CONTRIBUTING" "./pantheon verify"
+
+contains "$RELEASING" "**Every repository implementation edit** routes through Fixer"
+contains "$RELEASING" "structured implementation receipt"
+contains "$RELEASING" "Required child results remain hard dependency barriers"
+contains "$RELEASING" "unfinished evidence cannot change an already-issued Fixer specification"
+contains "$RELEASING" "./pantheon verify"
+
 # Lifecycle docs must distinguish static validation from live runtime proof.
 contains "$INSTALL" 'Evidence boundary: `doctor` versus `verify`'
 contains "$INSTALL" "one Luna Explorer child turn"
@@ -53,4 +68,4 @@ contains "$CHANGELOG" "Hard dependency/reconciliation barriers"
 contains "$CHANGELOG" "cross-role overlap"
 contains "$CHANGELOG" "Live verification now fails closed"
 
-printf '%s\n' 'ok - public documentation matches receipts, dependency barriers, concurrency, and live verification contracts'
+printf '%s\n' 'ok - public and governance docs match receipts, dependency barriers, concurrency, and live verification contracts'
