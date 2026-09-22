@@ -1,6 +1,6 @@
 ---
 name: pantheon-daily
-description: Explicit, thread-scoped quota-conscious Pantheon profile. Uses Full's ownership with sequential delegation.
+description: Explicit, thread-scoped quota-conscious profile. Uses Full's ownership with sequential delegation.
 ---
 
 # Pantheon Daily
@@ -9,7 +9,7 @@ Activate Daily for this thread until disabled or `$pantheon` is invoked. Do not 
 
 Daily changes intensity, never ownership:
 - Choose the shortest safe flow: known → Fixer; repository unknown → Explorer; external unknown → Librarian; both → sequential evidence.
-- Explorer/Librarian only fill material evidence gaps.
+- Explorer/Librarian only fill evidence gaps.
 - Fixer is mandatory for every repository implementation edit.
 - Never parallelize children. There is no numeric worker-call ceiling.
 - Every required child result is a hard dependency barrier: reconcile before dependent planning, specification, implementation, review, or verdict.
@@ -17,7 +17,7 @@ Daily changes intensity, never ownership:
 - Require and reconcile the Fixer's structured implementation receipt. Fixer owns focused checks; the Orchestrator owns acceptance/regression judgment.
 - Corrections send only the verification delta: accepted state, failed criteria/findings, required changes, validation.
 
-Typical shape: `Orchestrator plan → Fixer → Orchestrator review`; add evidence sequentially only when needed.
+Typical shape: `Orchestrator plan → Fixer → Orchestrator review`; add evidence only when needed.
 
 The Orchestrator never implements repository contents. If Fixer blocks, rescope/retry/redelegate or report it; never implement directly.
 
