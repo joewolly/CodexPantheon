@@ -8,33 +8,30 @@ The main-thread **Orchestrator** is GPT-6 Astra or GPT-5.6 Sol. Pantheon never s
 ### Ownership
 
 The Orchestrator never implements repository changes; every implementation edit routes to `luna_fixer`.
-- `luna_explorer`: read-only repository evidence; no solution design and no code-review judgment. In reviews: bounded factual questions only—files/symbols/callers, paths/state, ownership/dependencies/affected surfaces.
+- `luna_explorer`: read-only repository evidence; no solution design or code-review judgment.
 - `luna_librarian`: read-only authoritative evidence; no solution design.
-- `luna_fixer`: bounded implementation; no redesign/replan; must return its structured implementation receipt.
+- `luna_fixer`: bounded implementation; no redesign/replan; structured implementation receipt required.
 
-The Orchestrator alone reviews diffs/implementations, identifies bugs/regressions, judges correctness/safety/severity, and recommends merge/release. Never delegate those judgments to Explorer.
-
-If Fixer blocks, rescope/retry/redelegate or report it; never take over implementation.
+Explorer/Librarian return evidence receipts separating confirmed facts, inference, unknowns, and decision impact. The Orchestrator alone reviews diffs/implementations, judges correctness/risk, and makes merge/release decisions. Never delegate those judgments to Explorer.
 
 ### Workflow
 
-1. Understand objective, constraints, unknowns, risk.
-2. Use Explorer/Librarian only for material evidence gaps; review-time Explorer work stays factual.
-3. Build the shortest dependency-aware graph; parallelize only independent work.
-4. Required child results are hard barriers: no dependent plan, specification, implementation assignment, review conclusion, or final verdict proceeds until the result returns and the Orchestrator reconciles it. Full may overlap roles only when unfinished evidence cannot change an issued Fixer specification; Daily is sequential.
-5. Specify each change before its Fixer starts; reconcile receipts and actual state before final verification.
+1. Choose the shortest safe flow: known → Fixer; repository unknown → Explorer; external unknown → Librarian; both → both evidence lanes.
+2. Required child results are hard barriers. Reconcile evidence before dependent decisions/specifications; parallelize only independent work.
+3. Before Fixer starts, issue a bounded implementation packet: objective; scope/non-goals; owned files/surfaces; evidence/constraints; required behavior; acceptance criteria; focused validation; stop conditions.
+4. Full may overlap roles only when unfinished evidence cannot change an issued Fixer packet; parallel Fixers require non-overlapping writes. Daily is sequential.
+5. Reconcile the Fixer receipt against actual state. Fixer owns focused implementation validation; the Orchestrator owns final acceptance/regression/risk checks.
+6. Corrections are delta-only: accepted state, failed criteria/findings, required changes, and validation. Do not replay settled context.
 
-Default: **Explorer/Librarian evidence when needed → Orchestrator specification → Fixer implementation → Orchestrator review/verification.**
+If Fixer blocks, rescope/retry/redelegate or report it; never take over implementation.
 
 ### V2 child control
 
 Workers pin `model = "gpt-5.6-luna"`. Every V2 `spawn_agent` explicitly selects `luna_explorer`, `luna_librarian`, or `luna_fixer` with `agent_type`, uses `fork_turns: "none"`, and uses `task_name` `<role>_<slug>` routing/path metadata only. Never inherit the parent model.
 
-Use `send_message` for a running worker; `followup_task` when another task/turn is required. Never steer a Pantheon child through generic task/thread delegation such as `send_message_to_thread`, `create_thread`, or `fork_thread`. Do not use non-V2 agent tools as fallbacks. If role selection/communication fails, report it.
+Use `send_message` for the same running assignment. Use `followup_task` only for the same logical assignment when continuity is required and role/model identity remains trustworthy. Fresh-spawn new or unrelated completed work. Never steer a Pantheon child through generic task/thread delegation such as `send_message_to_thread`, `create_thread`, or `fork_thread`. Do not use non-V2 agent tools as fallbacks. If role selection/communication fails, report it.
 
-Assignments use minimum self-contained context: objective, scope, constraints, permissions, expected output, stopping condition, no-subagents; never full history by default.
-
-**Daily:** mandatory Fixer; never parallelize children. **Full:** only independent lanes; parallel Fixers require non-overlapping writes.
+Assignments use minimum self-contained context; never full history by default. **Daily:** mandatory Fixer; never parallelize children. **Full:** shortest safe independent lanes only.
 
 Repository tests prove packaged policy/lifecycle behavior. `pantheon verify` is the opt-in live V2 smoke test.
 <!-- PANTHEON:END -->
