@@ -5,7 +5,7 @@ Keep Pantheon slim, explicit, model-neutral at the Orchestrator layer, and Codex
 - Prefer configuration, skills, and small scripts over custom runtime machinery.
 - Do not add automatic activation, prompt interception, background daemons, persistent mission state, recursive child-agent orchestration, or a model-switching runtime without an explicit design decision changing project doctrine.
 - Preserve solo-by-default behavior.
-- Preserve the v0.7 orchestration architecture: the current supported main-thread model is the Orchestrator; supported choices are GPT-6 Astra and GPT-5.6 Sol. `luna_explorer`, `luna_librarian`, and `luna_fixer` are the only Pantheon child roles.
+- Preserve the v0.8 orchestration architecture: the current supported main-thread model is the Orchestrator; supported choices are GPT-6 Astra and GPT-5.6 Sol. `luna_explorer`, `luna_librarian`, and `luna_fixer` are the only Pantheon child roles.
 - Do not install or spawn a separate Astra/Sol Orchestrator. Pantheon must not pretend to switch the main-thread model; model selection stays with native Codex controls.
 - The Orchestrator is an exclusive workflow manager. It owns planning, architecture, product/tradeoff decisions, prioritization, scheduling, delegation, integration, review, final verification judgment, and the final response. It never implements repository changes.
 - Luna Explorer and Librarian are read-only evidence specialists. Luna Fixer implements the Orchestrator's scoped specification and must not independently redesign or replan the mission.

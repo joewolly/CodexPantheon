@@ -4,7 +4,7 @@ Codex Pantheon is a slim, explicit, Codex-native orchestration layer. It gives a
 
 > **Orchestrator decides. Luna specialists execute their lane.**
 
-Pantheon v0.7 keeps the Orchestrator contract model-neutral between GPT-6 Astra and GPT-5.6 Sol while retaining the Explorer/Librarian/Fixer role semantics adapted from the MIT-licensed `oh-my-opencode-slim` project. OpenCode-specific plugin, TUI, scheduler, job-board, and SDK machinery is intentionally not ported.
+Pantheon v0.8 keeps the Orchestrator contract model-neutral between GPT-6 Astra and GPT-5.6 Sol while retaining the Explorer/Librarian/Fixer role semantics adapted from the MIT-licensed `oh-my-opencode-slim` project. OpenCode-specific plugin, TUI, scheduler, job-board, and SDK machinery is intentionally not ported.
 
 ## Non-negotiable principles
 

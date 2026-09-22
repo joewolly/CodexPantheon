@@ -1,6 +1,6 @@
 # Install Codex Pantheon with Codex
 
-Pantheon v0.7.0 bootstraps through an ordinary Codex workspace. No separate orchestration or model-routing runtime is required.
+Pantheon v0.8.0 bootstraps through an ordinary Codex workspace. No separate orchestration or model-routing runtime is required.
 
 Pantheon uses one shared payload and two platform-native lifecycle frontends:
 
@@ -98,7 +98,7 @@ Same-named Pantheon paths are replaced on install/update and removed on uninstal
 
 ## v0.5 migration cleanup
 
-v0.7 continues removing the former v0.5 `<Codex home>/agents/pantheon-worker.toml` during install/update/bootstrap/uninstall, plus Pantheon's older v0.4 owned agent filenames:
+v0.8 continues removing the former v0.5 `<Codex home>/agents/pantheon-worker.toml` during install/update/bootstrap/uninstall, plus Pantheon's older v0.4 owned agent filenames:
 
 - `pantheon-explorer.toml`
 - `pantheon-librarian.toml`

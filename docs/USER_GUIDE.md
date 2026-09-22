@@ -1,6 +1,6 @@
 # Codex Pantheon User Guide
 
-Pantheon v0.7 has one model-neutral Orchestrator contract and three named Luna specialists. It stays inactive until you explicitly enable it. Current `main` also requires structured Fixer receipts, hard dependency reconciliation, and offers an opt-in live runtime verifier.
+Pantheon v0.8 has one model-neutral Orchestrator contract and three named Luna specialists. It stays inactive until explicitly enabled and adds structured evidence/Fixer receipts, hard dependency reconciliation, optimized handoffs, strict native V2 control, and an opt-in live runtime verifier.
 
 ## 1. Choose the Orchestrator
 
@@ -197,6 +197,6 @@ Remove Pantheon only when intended:
 .\pantheon.ps1 uninstall
 ```
 
-## 8. Upgrade from v0.6
+## 8. Upgrade from v0.7
 
-v0.7 keeps the same three Luna files and four skills. Bootstrap refreshes their model-neutral, context-compacted contracts and the managed policy block while preserving unrelated Codex configuration. The Luna model/effort settings remain GPT-5.6 Luna High in this release so the Orchestrator change is isolated from worker-tuning changes.
+v0.8 keeps the same three Luna files and four skills. Bootstrap refreshes their hardened V2, evidence-receipt, implementation-packet, validation-ownership, and delta-correction contracts plus the managed policy block while preserving unrelated Codex configuration. All three Luna roles remain GPT-5.6 Luna High.

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.0 — 2026-09-22
+
 ### Added
 
 - Structured Explorer/Librarian evidence receipts with confirmed facts, labeled inference, material unknowns, and decision impact.
