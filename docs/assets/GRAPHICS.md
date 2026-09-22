@@ -15,8 +15,8 @@ Older versioned graphics remain recoverable from Git history. Historical release
 
 ## Content contract
 
-- GPT-6 Astra **or** GPT-5.6 Sol fills one main-thread Orchestrator role, selected using native Codex controls.
-- All three specialists use GPT-5.6 Luna High. Explorer and Librarian gather read-only evidence. Fixer implements the Orchestrator's specification and runs assigned validation.
+- GPT-6 Astra **or** GPT-6 Sol fills one main-thread Orchestrator role, selected using native Codex controls.
+- Explorer and Librarian use GPT-6 Luna High. Fixer uses GPT-6 Luna Max and implements the Orchestrator's specification with assigned validation.
 - Evidence when needed → Orchestrator plan → Luna Fixer implementation → Orchestrator review and verification.
 - Activation is explicit and thread-scoped. Daily delegates sequentially; Full permits justified parallelism.
 - Assignments use minimum sufficient context; `fork_turns: "none"` remains the default.
@@ -57,7 +57,7 @@ Three large foreground moons with distinctly different crater texture, cyan Expl
 Explorer panel exact text: "LUNA EXPLORER" / "Repository reconnaissance" / "Finds and inspects relevant code" / "Traces behavior and dependencies" / "Returns focused evidence" / "READ-ONLY".
 Librarian panel: "LUNA LIBRARIAN" / "Research & references" / "Checks documentation and APIs" / "Finds authoritative sources" / "Returns focused evidence" / "READ-ONLY".
 Fixer panel: "LUNA FIXER" / "Implementation" / "Receives the scoped specification" / "Makes the code changes" / "Runs assigned validation" / "WORKSPACE-WRITE".
-A shared readable caption: "All specialists: GPT-5.6 Luna High".
+Use readable role captions: "Explorer/Librarian: GPT-6 Luna High" and "Fixer: GPT-6 Luna Max".
 Right edge small "RESULTS" callout with "Implemented changes" / "Validation evidence" / "Clear explanations". Make clear results follow Orchestrator review, not automatic direct Fixer-to-user delivery.
 Bottom explicit handoff strip with arrows: "Evidence when needed" → "Orchestrator plan" → "Fixer implements" → "Orchestrator reviews & verifies".
 Below that three concise footer groups:

@@ -43,7 +43,7 @@ When routing, role ownership, dependency semantics, completion evidence, or runt
 
 Confirm:
 
-- The current supported main-thread model is the Orchestrator; GPT-6 Astra and GPT-5.6 Sol share one model-neutral contract.
+- The current supported main-thread model is the Orchestrator; GPT-6 Astra and GPT-6 Sol share one model-neutral contract.
 - Pantheon does not spawn a separate Orchestrator or maintain a duplicate model preference.
 - Model selection remains native Codex state.
 - Explorer/Librarian remain read-only evidence roles and do not create the solution plan.

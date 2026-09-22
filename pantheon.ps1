@@ -7,7 +7,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$Version = '0.8.0'
+$Version = '0.8.1'
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $StartMarker = '<!-- PANTHEON:START -->'
 $EndMarker = '<!-- PANTHEON:END -->'
@@ -500,8 +500,8 @@ function Cmd-Verify {
 
     $explorerConfig = Join-Path $AgentDestDir 'luna-explorer.toml'
     $explorerText = Read-Text $explorerConfig
-    if (-not [regex]::IsMatch($explorerText, '(?m)^model\s*=\s*"gpt-5\.6-luna"\s*$')) {
-        Fail 'Installed luna-explorer.toml does not pin GPT-5.6 Luna.'
+    if (-not [regex]::IsMatch($explorerText, '(?m)^model\s*=\s*"gpt-6-luna"\s*$')) {
+        Fail 'Installed luna-explorer.toml does not pin GPT-6 Luna.'
     }
     if (-not [regex]::IsMatch($explorerText, '(?m)^model_reasoning_effort\s*=\s*"high"\s*$')) {
         Fail 'Installed luna-explorer.toml does not pin High reasoning.'
@@ -664,9 +664,9 @@ After spawning, use native MultiAgent V2 wait_agent and do not finalize until a 
             $payload = Get-PropertyValue $_ 'payload'
             $effortObject = Get-PropertyValue (Get-PropertyValue $payload 'effort') 'effort'
             $effortValue = if ($null -ne $effortObject) { [string]$effortObject } else { [string](Get-PropertyValue $payload 'effort') }
-            ([string](Get-PropertyValue $payload 'model') -ceq 'gpt-5.6-luna' -and $effortValue -ceq 'high')
+            ([string](Get-PropertyValue $payload 'model') -ceq 'gpt-6-luna' -and $effortValue -ceq 'high')
         })
-        if ($turnMatches.Count -lt 1) { Fail 'Child rollout did not record effective GPT-5.6 Luna High execution.' }
+        if ($turnMatches.Count -lt 1) { Fail 'Child rollout did not record effective GPT-6 Luna High execution.' }
 
         $expectedChildReply = "PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET"
         $childReplyCount = 0
@@ -688,7 +688,7 @@ After spawning, use native MultiAgent V2 wait_agent and do not finalize until a 
         })
         if ($childCompleteMatches.Count -ne 1) { Fail 'Child rollout does not contain exactly one terminal task_complete with the expected final message.' }
         if ((Read-Text $childTrace).Contains($secret)) { Fail 'Child rollout contains the parent-only secret; fork_turns none isolation did not hold.' }
-        Ok 'Configured Explorer resolved to GPT-5.6 Luna High and completed normally'
+        Ok 'Configured Explorer resolved to GPT-6 Luna High and completed normally'
         Ok 'fork_turns none kept the parent-only secret out of the child context'
         Ok 'Parent received and reconciled the terminal child result'
 

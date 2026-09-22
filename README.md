@@ -6,24 +6,24 @@
 
 Codex Pantheon is a slim, explicit, Codex-native orchestration layer for a supported main-thread Orchestrator.
 
-**v0.8.0 hardens Pantheon's Astra/Sol → Luna workflow with structured evidence and implementation receipts, hard dependency barriers, shortest-safe-flow dispatch, delta-only correction loops, strict native V2 child control, and fail-closed live runtime verification—without adding another role, mode, or orchestration runtime.**
+**v0.8.1 refreshes Pantheon onto GPT-6 Sol and GPT-6 Luna while preserving the v0.8 orchestration contract. Explorer and Librarian run GPT-6 Luna High; Fixer runs GPT-6 Luna Max; live verification remains an Explorer/High smoke test.**
 
 > **Orchestrator decides. Luna specialists execute their lane.**
 
 **Astra or Sol = Orchestrator. Luna = Explorer + Librarian + Fixer.**
 
 <p align="center">
-  <img src="docs/pantheon.png" alt="Codex Pantheon architecture: choose Astra or Sol as one main-thread Orchestrator. Luna Explorer and Librarian gather read-only evidence; Luna Fixer implements the specification. The Orchestrator reviews and verifies." width="100%">
+  <img src="docs/assets/codex-pantheon-v0.8.1-architecture.svg" alt="Codex Pantheon architecture: choose Astra or Sol as one main-thread Orchestrator. Luna Explorer and Librarian gather read-only evidence; Luna Fixer implements the specification. The Orchestrator reviews and verifies." width="100%">
 </p>
 
-[View the detailed architecture diagram](docs/assets/codex-pantheon-v0.7-architecture.svg) · [Graphics and generation brief](docs/assets/GRAPHICS.md)
+[View the detailed architecture diagram](docs/assets/codex-pantheon-v0.8.1-architecture.svg) · [Graphics and generation brief](docs/assets/GRAPHICS.md)
 
 ## Architecture
 
-- **GPT-6 Astra or GPT-5.6 Sol — main thread / Orchestrator.** Understands the request, gathers evidence when needed, makes architecture/product decisions, creates the implementation specification, schedules/delegates work, reconciles results, reviews, verifies, and owns the final answer. It never implements repository changes.
-- **GPT-5.6 Luna High — `luna_explorer`.** Read-only repository reconnaissance. Finds files, symbols, execution paths, ownership, and code evidence. It does not design the solution.
-- **GPT-5.6 Luna High — `luna_librarian`.** Read-only documentation/API/upstream/reference research. It does not design the solution.
-- **GPT-5.6 Luna High — `luna_fixer`.** Write-enabled implementation specialist. Executes the Orchestrator's scoped specification and assigned validation. It does not independently replan or redesign the mission. Every return includes a structured implementation receipt with status, files/changes, validation evidence, deviations/blockers, and explicit parent-verification obligations.
+- **GPT-6 Astra or GPT-6 Sol — main thread / Orchestrator.** Understands the request, gathers evidence when needed, makes architecture/product decisions, creates the implementation specification, schedules/delegates work, reconciles results, reviews, verifies, and owns the final answer. It never implements repository changes.
+- **GPT-6 Luna High — `luna_explorer`.** Read-only repository reconnaissance. Finds files, symbols, execution paths, ownership, and code evidence. It does not design the solution.
+- **GPT-6 Luna High — `luna_librarian`.** Read-only documentation/API/upstream/reference research. It does not design the solution.
+- **GPT-6 Luna Max — `luna_fixer`.** Write-enabled implementation specialist. Executes the Orchestrator's scoped specification and assigned validation. It does not independently replan or redesign the mission. Every return includes a structured implementation receipt with status, files/changes, validation evidence, deviations/blockers, and explicit parent-verification obligations.
 
 The Orchestrator chooses the **shortest safe flow** for each request: known work goes directly to Fixer; repository unknowns use Explorer; external/version unknowns use Librarian; use both only when both can change the decision/specification.
 
@@ -41,7 +41,7 @@ Every implementation edit goes through Luna Fixer, even a tiny or obvious change
 
 Pantheon deliberately does not maintain a second model selector.
 
-1. Select **GPT-6 Astra** or **GPT-5.6 Sol** with Codex's native main-thread model control.
+1. Select **GPT-6 Astra** or **GPT-6 Sol** with Codex's native main-thread model control.
 2. Invoke `$pantheon` or `$pantheon-daily`.
 3. The selected supported main-thread model follows the same Pantheon Orchestrator contract.
 
@@ -59,7 +59,7 @@ Every Pantheon worker is created through native V2 `spawn_agent` with:
 
 Pantheon formats that V2 `task_name` as `<role>_<concise_task_slug>` so the current Codex Subagents UI exposes the worker lane at a glance. Examples: `fixer_v020_implement`, `explorer_v020_versions`, and `librarian_v020_release_map`.
 
-The configured role pins the actual worker to **GPT-5.6 Luna High**. `agent_type` remains authoritative; the `explorer` / `librarian` / `fixer` task-name prefix is display/path metadata only and never selects or impersonates a role or model.
+The configured roles pin Explorer/Librarian to **GPT-6 Luna High** and Fixer to **GPT-6 Luna Max**. `agent_type` remains authoritative; the `explorer` / `librarian` / `fixer` task-name prefix is display/path metadata only and never selects or impersonates a role or model.
 
 After spawn, the Orchestrator keeps coordination on the native V2 agent plane:
 
@@ -219,7 +219,7 @@ Use `verify` when you explicitly want to exercise the installed Codex runtime:
 .\pantheon.ps1 verify
 ```
 
-`verify` consumes one real parent turn plus one Luna Explorer child turn. It fails closed unless it can prove an exact parent success reply, one actual/correlated V2 `spawn_agent` call, matching child provenance, effective **GPT-5.6 Luna High** execution, the expected child reply, and `fork_turns: "none"` isolation of a parent-only sentinel.
+`verify` consumes one real parent turn plus one Luna Explorer child turn. It fails closed unless it can prove an exact parent success reply, one actual/correlated V2 `spawn_agent` call, matching child provenance, effective **GPT-6 Luna High** execution, the expected child reply, and `fork_turns: "none"` isolation of a parent-only sentinel.
 
 The check does not run automatically from install/update/bootstrap/doctor. Temporary verifier artifacts are cleaned on success and failure. Because this is a real Codex turn, normal parent/child session rollouts are created in the user's Codex session store and remain subject to normal Codex retention behavior.
 
@@ -245,7 +245,7 @@ Uninstall removes Pantheon-owned current and legacy paths while preserving unrel
 - [Codex-assisted install guide](docs/CODEX_INSTALL.md)
 - [CLI reference](docs/CLI_REFERENCE.md)
 - [Design doctrine](docs/DESIGN_DOCTRINE.md)
-- [v0.8.0 release notes](docs/V0.8.0.md)
+- [v0.8.1 release notes](docs/V0.8.1.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 - [Changelog](CHANGELOG.md)
 

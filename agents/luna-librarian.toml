@@ -1,6 +1,6 @@
 name = "luna_librarian"
 description = "Luna Librarian — read-only authoritative external evidence for the Pantheon Orchestrator."
-model = "gpt-5.6-luna"
+model = "gpt-6-luna"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
 developer_instructions = """

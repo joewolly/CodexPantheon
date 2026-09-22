@@ -18,4 +18,4 @@ For each request:
 
 The Orchestrator never implements repository contents. If Fixer blocks, rescope/retry/redelegate or report it; never implement directly.
 
-All child dispatch follows the managed policy's V2-only minimum-context contract. Use native MultiAgent V2 `spawn_agent`; select Luna with `agent_type`, `fork_turns: "none"`, and role-prefixed `task_name`. The resulting worker must resolve to GPT-5.6 Luna. Use `send_message`/`followup_task` only within the same logical assignment; fresh-spawn new/unrelated completed work. Never use `send_message_to_thread` or non-V2 agent tools as fallbacks. If V2/role control cannot be honored, fail visibly.
+All child dispatch follows the managed policy's V2-only minimum-context contract. Use native MultiAgent V2 `spawn_agent`; select Luna with `agent_type`, `fork_turns: "none"`, and role-prefixed `task_name`. The resulting worker must resolve to GPT-6 Luna. Use `send_message`/`followup_task` only within the same logical assignment; fresh-spawn new/unrelated completed work. Never use `send_message_to_thread` or non-V2 agent tools as fallbacks. If V2/role control cannot be honored, fail visibly.

@@ -145,7 +145,7 @@ public static class Program
             {
                 child.WriteLine("{\"type\":\"session_meta\",\"payload\":{\"id\":\"" + childId + "\",\"source\":{\"subagent\":{\"thread_spawn\":{\"parent_thread_id\":\"" + parentId + "\",\"depth\":1,\"agent_path\":\"/root/explorer_pantheon_verify\",\"agent_role\":\"luna_explorer\"}}}}}");
                 var effort = mode == "wrong-effort" ? "medium" : "high";
-                child.WriteLine("{\"type\":\"turn_context\",\"payload\":{\"model\":\"gpt-5.6-luna\",\"effort\":\"" + effort + "\"}}");
+                child.WriteLine("{\"type\":\"turn_context\",\"payload\":{\"model\":\"gpt-6-luna\",\"effort\":\"" + effort + "\"}}");
                 child.WriteLine("{\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"input_text\",\"text\":\"PANTHEON_CHILD_OK_" + nonce + "_NO_PARENT_SECRET\"}]}}");
                 if (mode == "secret-leak")
                 {
@@ -187,7 +187,7 @@ public static class Program
     foreach ($expected in @(
         'V2 spawn used luna_explorer, fork_turns none, and explorer_pantheon_verify',
         'Parent waited for a non-timeout V2 child mailbox update',
-        'Configured Explorer resolved to GPT-5.6 Luna High and completed normally',
+        'Configured Explorer resolved to GPT-6 Luna High and completed normally',
         'fork_turns none kept the parent-only secret out of the child context',
         'Parent received and reconciled the terminal child result',
         'Status: VERIFIED'

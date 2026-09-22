@@ -32,7 +32,7 @@ The static/lifecycle test suites use temporary Codex/skill homes and do not modi
 ## Change guidelines
 
 - Preserve explicit thread-scoped activation and solo-by-default behavior.
-- Keep the current supported main-thread model as the Orchestrator; GPT-6 Astra and GPT-5.6 Sol share one contract.
+- Keep the current supported main-thread model as the Orchestrator; GPT-6 Astra and GPT-6 Sol share one contract.
 - Do not install a separate Astra/Sol child or add a Pantheon model selector that can drift from Codex's actual active model.
 - Keep `luna_explorer`, `luna_librarian`, and `luna_fixer` as the only core Pantheon child roles unless doctrine explicitly changes.
 - Explorer and Librarian remain hard read-only and return evidence; they do not create the implementation plan.
