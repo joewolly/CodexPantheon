@@ -25,6 +25,8 @@ Codex Pantheon is a slim, explicit, Codex-native orchestration layer for a suppo
 - **GPT-5.6 Luna High — `luna_librarian`.** Read-only documentation/API/upstream/reference research. It does not design the solution.
 - **GPT-5.6 Luna High — `luna_fixer`.** Write-enabled implementation specialist. Executes the Orchestrator's scoped specification and assigned validation. It does not independently replan or redesign the mission. Every return includes a structured implementation receipt with status, files/changes, validation evidence, deviations/blockers, and explicit parent-verification obligations.
 
+The Orchestrator chooses the **shortest safe flow** for each request: known work goes directly to Fixer; repository unknowns use Explorer; external/version unknowns use Librarian; use both only when both can change the decision/specification.
+
 The default dependency is:
 
 ```text
@@ -61,8 +63,9 @@ The configured role pins the actual worker to **GPT-5.6 Luna High**. `agent_type
 
 After spawn, the Orchestrator keeps coordination on the native V2 agent plane:
 
-- `send_message` passes information to a running worker;
-- `followup_task` assigns another task/turn to an existing worker.
+- `send_message` is for the same running assignment;
+- `followup_task` is reserved for the same logical assignment when continuity is trustworthy;
+- new or unrelated work after terminal completion gets a fresh worker.
 
 Pantheon never falls back to generic task/thread delegation such as `send_message_to_thread`, `create_thread`, `fork_thread`, direct task turn/resume calls, or legacy/non-V2 agent tools to steer a child. If V2 configured-role selection or V2 communication cannot be honored, Pantheon reports the runtime limitation instead of switching control paths or silently respawning work.
 
@@ -109,6 +112,12 @@ Full Pantheon uses the same ownership boundaries with fewer delegation constrain
 This is not speculative execution across unresolved dependencies: if a Fixer specification depends on an Explorer/Librarian result, that result must return and be reconciled first.
 
 There is no `$pantheon-team`, no fast/normal/deep layer, and no Oracle/Designer/Reviewer/Verifier child roster.
+
+## Evidence and implementation packets
+
+Explorer and Librarian return structured evidence receipts separating the direct answer, confirmed evidence, labeled inference, material unknowns, and decision impact. Before implementation, the Orchestrator sends Fixer a bounded packet covering objective, scope/non-goals, owned files/surfaces, evidence/constraints, required behavior, acceptance criteria, validation, and stop conditions.
+
+Fixer owns focused implementation checks. The Orchestrator owns final acceptance, regression/risk checks, and merge/release judgment. If corrections are needed, the next Fixer instruction is delta-only: accepted state, failed criteria/findings, required changes, and validation.
 
 ## Fixer implementation receipts
 
