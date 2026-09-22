@@ -4,6 +4,9 @@
 
 ### Added
 
+- Structured Explorer/Librarian evidence receipts with confirmed facts, labeled inference, material unknowns, and decision impact.
+- Bounded Fixer implementation packets covering scope/non-goals, owned surfaces, acceptance criteria, validation, and stop conditions.
+- Delta-only correction handoffs after Orchestrator verification.
 - Structured `luna_fixer` implementation receipts covering completion status, files/changes, validation evidence, deviations/blockers, and explicit parent-verification obligations.
 - Hard dependency/reconciliation barriers: a dependent plan, specification, implementation assignment, review conclusion, or final verdict waits for required child results to return and be reconciled.
 - Explicit Full-Pantheon cross-role overlap for genuinely independent Explorer/Librarian/Fixer work items, while preserving non-overlapping Fixer writes and fully sequential Daily behavior.
@@ -11,6 +14,9 @@
 
 ### Changed
 
+- Full and Daily now choose the shortest safe canonical flow before delegating, avoiding unnecessary evidence lanes.
+- Validation ownership is explicit: Fixer owns focused implementation checks; the Orchestrator owns final acceptance, regression/risk checks, and merge/release judgment.
+- V2 worker continuity is conservative: same-assignment coordination may reuse a worker, while new or unrelated completed work fresh-spawns by default.
 - The Astra/Sol Orchestrator contract now follows the `oh-my-opencode-slim` workflow-manager shape more closely: understand, build a dependency-aware work graph, delegate, reconcile, and verify.
 - The Orchestrator is now implementation-free. Every repository implementation edit routes to `luna_fixer`, including tiny, obvious, or low-risk changes; there is no delegation-overhead escape hatch.
 - Full and Daily share the same hard implementation ownership. If Fixer cannot be spawned or complete an assignment, the Orchestrator must rescope, retry, redelegate, or report the blocker rather than taking over the edit.
