@@ -33,7 +33,9 @@ Explorer/Librarian evidence when needed
    Orchestrator reviews/verifies
 ```
 
-Explorer and Librarian do not create the solution plan. Fixer does not independently redesign it. The Orchestrator never implements repository changes.
+Pantheon first chooses the shortest safe route: known work goes directly to Fixer; repository unknowns use Explorer; external/version unknowns use Librarian; both lanes are used only when both can change the decision/specification.
+
+Explorer and Librarian do not create the solution plan. They return structured evidence receipts separating confirmed facts, labeled inference, material unknowns, and decision impact. Fixer does not independently redesign the plan. The Orchestrator never implements repository changes.
 
 There is no small-change exception. Even a one-line or obvious implementation edit goes to Fixer. If Fixer cannot be spawned or complete the assignment, the Orchestrator rescopes, retries, redelegates, or reports the blocker instead of taking over implementation.
 
@@ -81,7 +83,7 @@ Use for official docs, API contracts, upstream repositories, standards, release 
 
 ### `luna_fixer`
 
-Fixer receives the Orchestrator's implementation specification. It may inspect enough local code to execute that plan, choose exact edit points/order, make small tactical adaptations that preserve the plan, edit scoped files, and run assigned validation.
+Fixer receives a bounded implementation packet: objective, scope/non-goals, owned files/surfaces, confirmed evidence/constraints, required behavior, acceptance criteria, focused validation, and stop conditions. It may inspect enough local code to execute that packet, choose exact edit points/order, make small tactical adaptations that preserve it, edit scoped files, and run assigned validation.
 
 If execution exposes a material architecture/product decision or contradicts the plan, Fixer stops and returns the issue instead of silently replanning.
 
@@ -95,6 +97,8 @@ Every Fixer return is a **structured implementation receipt**:
 - `Parent verification`: what the Orchestrator must independently inspect or verify.
 
 The Orchestrator reconciles that receipt against actual repository state. A bare Fixer claim such as “done” is not sufficient completion evidence.
+
+Fixer owns focused implementation validation; the Orchestrator owns final acceptance, regression/risk checks, and merge/release judgment. Corrections are delta-only: preserve accepted state and send only failed criteria/findings, required changes, and validation.
 
 ## 5. Planning and review workflows
 
@@ -127,8 +131,9 @@ The configured role files pin `model = "gpt-5.6-luna"` and high reasoning, so Lu
 
 After spawn, parent-mediated coordination stays on the V2 agent plane:
 
-- `send_message` passes information to a running worker without treating it as a normal Desktop task;
-- `followup_task` gives an existing worker another unit of work and triggers the appropriate turn.
+- `send_message` is used only for the same running assignment;
+- `followup_task` is used only for the same logical assignment when continuity is trustworthy;
+- new or unrelated work after terminal completion gets a fresh worker.
 
 Pantheon does not use generic task/thread delegation such as `send_message_to_thread`, `create_thread`, `fork_thread`, or direct task turn/resume calls to steer a Pantheon child. It does not fall back to legacy/non-V2 agent primitives.
 

@@ -67,8 +67,9 @@ $WorkflowSkills = @(
 )
 Assert-Contains $Policy 'native **MultiAgent V2**'
 Assert-Contains $Policy 'Every V2 `spawn_agent` explicitly selects'
-Assert-Contains $Policy '`send_message` for a running worker'
-Assert-Contains $Policy '`followup_task` when another task/turn is required'
+Assert-Contains $Policy 'Use `send_message` only for the same running assignment'
+Assert-Contains $Policy '`followup_task` only for the same logical assignment'
+Assert-Contains $Policy 'Fresh-spawn new/unrelated completed work'
 Assert-Contains $Policy 'Never steer a Pantheon child through generic task/thread delegation such as `send_message_to_thread`'
 Assert-Contains $Policy 'Do not use non-V2 agent tools as fallbacks.'
 Assert-NotContains $Policy 'fork_context: false'
@@ -152,8 +153,9 @@ try {
     }
     Assert-Contains $AgentsFile 'native **MultiAgent V2**'
     Assert-Contains $AgentsFile 'Every V2 `spawn_agent` explicitly selects'
-    Assert-Contains $AgentsFile '`send_message` for a running worker'
-    Assert-Contains $AgentsFile '`followup_task` when another task/turn is required'
+    Assert-Contains $AgentsFile 'Use `send_message` only for the same running assignment'
+    Assert-Contains $AgentsFile '`followup_task` only for the same logical assignment'
+    Assert-Contains $AgentsFile 'Fresh-spawn new/unrelated completed work'
     Assert-Contains $AgentsFile '`send_message_to_thread`'
     Assert-Contains $AgentsFile 'Do not use non-V2 agent tools as fallbacks.'
     Assert-NotContains $AgentsFile 'fork_context: false'

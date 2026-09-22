@@ -32,6 +32,11 @@ Pantheon v0.7 keeps the Orchestrator contract model-neutral between GPT-6 Astra 
 22. **Stateless by default.** No databases, persistent budgets, hidden mission state, task queues, daemons, or background schedulers in core Pantheon.
 23. **Safe lifecycle.** Pantheon owns only its named files and marked `AGENTS.md` block; removal preserves unrelated configuration.
 24. **Live verification is explicit and fail-closed.** `doctor` remains static. `pantheon verify` is opt-in because it consumes live model usage and creates normal Codex session rollouts. It only reports success when actual parent/child runtime evidence proves the requested role, routing, effective Luna High configuration, round trip, and context isolation.
+25. **Shortest safe flow wins.** Known work goes directly to Fixer; use Explorer and/or Librarian only when their evidence can change a decision or specification.
+26. **Evidence receipts are structured.** Explorer/Librarian separate confirmed facts, labeled inference, material unknowns, and decision impact so the Orchestrator can reconcile without rereading the mission.
+27. **Fixer receives an implementation packet.** Each packet defines objective, scope/non-goals, owned surfaces, evidence/constraints, required behavior, acceptance criteria, validation, and stop conditions.
+28. **Validation has two owners.** Fixer proves its bounded change locally; the Orchestrator independently owns final acceptance, regression/risk checks, and merge/release judgment.
+29. **Corrections are delta-only and continuity is conservative.** Send only unresolved findings/criteria after verification. Reuse V2 workers only within the same logical assignment; fresh-spawn new or unrelated completed work.
 
 ## Canonical flows
 
