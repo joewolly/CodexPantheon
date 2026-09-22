@@ -6,14 +6,14 @@
 
 Codex Pantheon is a slim, explicit, Codex-native orchestration layer for a supported main-thread Orchestrator.
 
-**v0.7.0 makes the Orchestrator interchangeable between GPT-6 Astra and GPT-5.6 Sol, removes model-specific prompt coupling, and further compresses parent/child context while preserving the Explorer/Librarian/Fixer ownership model. Current `main` additionally hardens dependency reconciliation, Fixer completion evidence, and opt-in live runtime verification.**
+**v0.8.0 hardens Pantheon's Astra/Sol → Luna workflow with structured evidence and implementation receipts, hard dependency barriers, shortest-safe-flow dispatch, delta-only correction loops, strict native V2 child control, and fail-closed live runtime verification—without adding another role, mode, or orchestration runtime.**
 
 > **Orchestrator decides. Luna specialists execute their lane.**
 
 **Astra or Sol = Orchestrator. Luna = Explorer + Librarian + Fixer.**
 
 <p align="center">
-  <img src="docs/pantheon.png" alt="Codex Pantheon v0.7.0: choose Astra or Sol as one main-thread Orchestrator. Luna Explorer and Librarian gather read-only evidence; Luna Fixer implements the specification. The Orchestrator reviews and verifies." width="100%">
+  <img src="docs/pantheon.png" alt="Codex Pantheon architecture: choose Astra or Sol as one main-thread Orchestrator. Luna Explorer and Librarian gather read-only evidence; Luna Fixer implements the specification. The Orchestrator reviews and verifies." width="100%">
 </p>
 
 [View the detailed architecture diagram](docs/assets/codex-pantheon-v0.7-architecture.svg) · [Graphics and generation brief](docs/assets/GRAPHICS.md)
@@ -245,7 +245,7 @@ Uninstall removes Pantheon-owned current and legacy paths while preserving unrel
 - [Codex-assisted install guide](docs/CODEX_INSTALL.md)
 - [CLI reference](docs/CLI_REFERENCE.md)
 - [Design doctrine](docs/DESIGN_DOCTRINE.md)
-- [v0.7.0 release notes](docs/V0.7.0.md)
+- [v0.8.0 release notes](docs/V0.8.0.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 - [Changelog](CHANGELOG.md)
 
