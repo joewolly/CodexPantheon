@@ -277,7 +277,7 @@ assert_equal_files "$FIXER" "$CODEX_HOME/agents/luna-fixer.toml"
 assert_contains "$BOOT_OUT" "Status: HEALTHY"
 pass "bootstrap remains migration-aware and idempotent"
 
-assert_contains "$ROOT/AGENTS.md" "Preserve the v0.7 orchestration architecture"
+assert_contains "$ROOT/AGENTS.md" "Preserve the v0.8 orchestration architecture"
 assert_contains "$ROOT/AGENTS.md" "GPT-6 Astra and GPT-5.6 Sol"
 assert_contains "$ROOT/AGENTS.md" "native MultiAgent V2"
 assert_contains "$ROOT/AGENTS.md" "Every spawn must use the native V2"
