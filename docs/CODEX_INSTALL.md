@@ -1,6 +1,6 @@
 # Install Codex Pantheon with Codex
 
-Pantheon v0.8.0 bootstraps through an ordinary Codex workspace. No separate orchestration or model-routing runtime is required.
+Pantheon v0.8.1 bootstraps through an ordinary Codex workspace. No separate orchestration or model-routing runtime is required.
 
 Pantheon uses one shared payload and two platform-native lifecycle frontends:
 
@@ -39,7 +39,7 @@ Windows PowerShell:
 
 ## Orchestrator selection
 
-Pantheon supports GPT-6 Astra and GPT-5.6 Sol as the main-thread Orchestrator. Select the model with Codex's native model control. Pantheon does not write a separate model preference, does not switch the active main model, and does not spawn a second Orchestrator.
+Pantheon supports GPT-6 Astra and GPT-6 Sol as the main-thread Orchestrator. Select the model with Codex's native model control. Pantheon does not write a separate model preference, does not switch the active main model, and does not spawn a second Orchestrator.
 
 That separation is intentional: the same installed Pantheon payload works for either model and native Codex remains the source of truth for the active model.
 
@@ -98,7 +98,7 @@ Same-named Pantheon paths are replaced on install/update and removed on uninstal
 
 ## v0.5 migration cleanup
 
-v0.8 continues removing the former v0.5 `<Codex home>/agents/pantheon-worker.toml` during install/update/bootstrap/uninstall, plus Pantheon's older v0.4 owned agent filenames:
+v0.8.1 continues removing the former v0.5 `<Codex home>/agents/pantheon-worker.toml` during install/update/bootstrap/uninstall, plus Pantheon's older v0.4 owned agent filenames:
 
 - `pantheon-explorer.toml`
 - `pantheon-librarian.toml`
@@ -114,7 +114,7 @@ If you placed unrelated personal content at one of those exact Pantheon-owned le
 
 ## Architecture note
 
-The selected supported main-thread model is the Orchestrator and is not installed by Pantheon. The children are `luna_explorer`, `luna_librarian`, and `luna_fixer`, all pinned to GPT-5.6 Luna High. Explorer/Librarian are read-only; Fixer is workspace-write.
+The selected supported main-thread model is the Orchestrator and is not installed by Pantheon. The children are `luna_explorer`, `luna_librarian`, and `luna_fixer`: Explorer/Librarian use GPT-6 Luna High; Fixer uses GPT-6 Luna Max. Explorer/Librarian are read-only; Fixer is workspace-write.
 
 Required child evidence/results are dependency barriers for the work that depends on them. Full Pantheon may overlap independent Explorer/Librarian/Fixer work items only when unfinished evidence cannot change an already-issued Fixer specification. Daily remains sequential. Fixer returns a structured implementation receipt that the Orchestrator must reconcile against actual state.
 
@@ -148,6 +148,6 @@ Windows PowerShell:
 .\pantheon.ps1 verify
 ```
 
-`verify` consumes a real parent model turn plus one Luna Explorer child turn. It requires exact/correlated V2 spawn evidence from the parent rollout, matching child provenance, effective `gpt-5.6-luna` with `high` reasoning, an exact child/parent round trip, and proof that `fork_turns: "none"` kept a parent-only sentinel out of the child context.
+`verify` consumes a real parent model turn plus one Luna Explorer child turn. It requires exact/correlated V2 spawn evidence from the parent rollout, matching child provenance, effective `gpt-6-luna` with `high` reasoning, an exact child/parent round trip, and proof that `fork_turns: "none"` kept a parent-only sentinel out of the child context.
 
 The command is intentionally not part of bootstrap/install/update/doctor because it depends on authentication, provider/model availability, native MultiAgent V2, and live quota. It creates normal Codex parent/child session rollouts under the configured Codex home. Pantheon deletes only its temporary verifier artifacts; normal Codex session records remain subject to Codex's own retention behavior.

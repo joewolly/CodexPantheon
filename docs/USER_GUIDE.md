@@ -1,6 +1,6 @@
 # Codex Pantheon User Guide
 
-Pantheon v0.8 has one model-neutral Orchestrator contract and three named Luna specialists. It stays inactive until explicitly enabled and adds structured evidence/Fixer receipts, hard dependency reconciliation, optimized handoffs, strict native V2 control, and an opt-in live runtime verifier.
+Pantheon v0.8.1 has one model-neutral Orchestrator contract and three named Luna specialists. It stays inactive until explicitly enabled and adds structured evidence/Fixer receipts, hard dependency reconciliation, optimized handoffs, strict native V2 control, and an opt-in live runtime verifier.
 
 ## 1. Choose the Orchestrator
 
@@ -10,10 +10,10 @@ Supported Orchestrators:
 
 | Role | Model | Responsibility |
 | --- | --- | --- |
-| Orchestrator / main thread | GPT-6 Astra **or** GPT-5.6 Sol | Understand, plan, decide, schedule, delegate, reconcile, review, verify, communicate; never implement repository changes |
-| `luna_explorer` | GPT-5.6 Luna High | Read-only repository reconnaissance |
-| `luna_librarian` | GPT-5.6 Luna High | Read-only docs/API/upstream/reference research |
-| `luna_fixer` | GPT-5.6 Luna High | Implement the Orchestrator's scoped specification and run assigned focused validation |
+| Orchestrator / main thread | GPT-6 Astra **or** GPT-6 Sol | Understand, plan, decide, schedule, delegate, reconcile, review, verify, communicate; never implement repository changes |
+| `luna_explorer` | GPT-6 Luna High | Read-only repository reconnaissance |
+| `luna_librarian` | GPT-6 Luna High | Read-only docs/API/upstream/reference research |
+| `luna_fixer` | GPT-6 Luna Max | Implement the Orchestrator's scoped specification and run assigned focused validation |
 
 Pantheon does **not** automatically switch your selected main model and does not install a separate Astra or Sol child. The same installed payload works with either supported Orchestrator, so changing the selected model does not require reinstalling Pantheon.
 
@@ -127,7 +127,7 @@ explorer_v020_versions
 librarian_v020_release_map
 ```
 
-The configured role files pin `model = "gpt-5.6-luna"` and high reasoning, so Luna remains the worker model. `agent_type` is authoritative; the role prefix in `task_name` is display/path metadata only and does not select the role or model.
+The configured role files pin `model = "gpt-6-luna"`; Explorer/Librarian use high reasoning and Fixer uses max reasoning, so Luna remains the worker model. `agent_type` is authoritative; the role prefix in `task_name` is display/path metadata only and does not select the role or model.
 
 After spawn, parent-mediated coordination stays on the V2 agent plane:
 
@@ -197,6 +197,6 @@ Remove Pantheon only when intended:
 .\pantheon.ps1 uninstall
 ```
 
-## 8. Upgrade from v0.7
+## 8. Upgrade from v0.8
 
-v0.8 keeps the same three Luna files and four skills. Bootstrap refreshes their hardened V2, evidence-receipt, implementation-packet, validation-ownership, and delta-correction contracts plus the managed policy block while preserving unrelated Codex configuration. All three Luna roles remain GPT-5.6 Luna High.
+v0.8.1 keeps the same three Luna files and four skills. Bootstrap refreshes the model generation and role-specific effort pins while preserving the hardened V2, evidence-receipt, implementation-packet, validation-ownership, delta-correction, and managed-policy contracts. Explorer/Librarian use GPT-6 Luna High; Fixer uses GPT-6 Luna Max.

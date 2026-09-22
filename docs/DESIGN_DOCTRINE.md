@@ -4,13 +4,13 @@ Codex Pantheon is a slim, explicit, Codex-native orchestration layer. It gives a
 
 > **Orchestrator decides. Luna specialists execute their lane.**
 
-Pantheon v0.8 keeps the Orchestrator contract model-neutral between GPT-6 Astra and GPT-5.6 Sol while retaining the Explorer/Librarian/Fixer role semantics adapted from the MIT-licensed `oh-my-opencode-slim` project. OpenCode-specific plugin, TUI, scheduler, job-board, and SDK machinery is intentionally not ported.
+Pantheon v0.8.1 keeps the Orchestrator contract model-neutral between GPT-6 Astra and GPT-6 Sol while retaining the Explorer/Librarian/Fixer role semantics adapted from the MIT-licensed `oh-my-opencode-slim` project. OpenCode-specific plugin, TUI, scheduler, job-board, and SDK machinery is intentionally not ported.
 
 ## Non-negotiable principles
 
 1. **Solo by default.** Installing Pantheon changes no ordinary prompt behavior. Every new thread starts inactive.
 2. **Explicit activation.** Only `$pantheon`, `$pantheon-daily`, or a clear equivalent request activates a sticky Pantheon profile.
-3. **The main thread is the Orchestrator.** The current supported main-thread model may be GPT-6 Astra or GPT-5.6 Sol. Pantheon does not install or spawn a second Orchestrator.
+3. **The main thread is the Orchestrator.** The current supported main-thread model may be GPT-6 Astra or GPT-6 Sol. Pantheon does not install or spawn a second Orchestrator.
 4. **Model selection is native Codex state.** Pantheon never pretends a skill invocation changed the active model. Choose Astra or Sol with Codex's native model control; the same Pantheon contract applies to both.
 5. **The Orchestrator never implements.** Astra/Sol is an exclusive workflow manager. Every repository implementation edit, including tiny or obvious changes, routes to `luna_fixer`; there is no delegation-overhead escape hatch.
 6. **The Orchestrator owns decisions.** Architecture, product behavior, tradeoffs, prioritization, sequencing, implementation specifications, cross-lane integration, final review, verification judgment, and merge/release verdicts remain in the main thread.
@@ -31,7 +31,7 @@ Pantheon v0.8 keeps the Orchestrator contract model-neutral between GPT-6 Astra 
 21. **Thin workflows.** `$pantheon*` skills are routing/instruction recipes, not a model router or custom runtime.
 22. **Stateless by default.** No databases, persistent budgets, hidden mission state, task queues, daemons, or background schedulers in core Pantheon.
 23. **Safe lifecycle.** Pantheon owns only its named files and marked `AGENTS.md` block; removal preserves unrelated configuration.
-24. **Live verification is explicit and fail-closed.** `doctor` remains static. `pantheon verify` is opt-in because it consumes live model usage and creates normal Codex session rollouts. It only reports success when actual parent/child runtime evidence proves the requested role, routing, effective Luna High configuration, round trip, and context isolation.
+24. **Live verification is explicit and fail-closed.** `doctor` remains static. `pantheon verify` is opt-in because it consumes live model usage and creates normal Codex session rollouts. It only reports success when actual parent/child runtime evidence proves the requested role, routing, effective configured Luna role/effort, round trip, and context isolation.
 25. **Shortest safe flow wins.** Known work goes directly to Fixer; use Explorer and/or Librarian only when their evidence can change a decision or specification.
 26. **Evidence receipts are structured.** Explorer/Librarian separate confirmed facts, labeled inference, material unknowns, and decision impact so the Orchestrator can reconcile without rereading the mission.
 27. **Fixer receives an implementation packet.** Each packet defines objective, scope/non-goals, owned surfaces, evidence/constraints, required behavior, acceptance criteria, validation, and stop conditions.

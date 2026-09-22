@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="0.8.0"
+VERSION="0.8.1"
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 CODEX_HOME_DIR="${CODEX_HOME:-${HOME}/.codex}"
 AGENT_DEST_DIR="${CODEX_HOME_DIR}/agents"
@@ -428,7 +428,7 @@ cmd_verify() {
 
   codex_bin="$(find_codex 2>/dev/null)" || fail "Codex executable is required for live verification."
   explorer_config="${AGENT_DEST_DIR}/luna-explorer.toml"
-  grep -Eq '^model[[:space:]]*=[[:space:]]*"gpt-5\.6-luna"[[:space:]]*$' "$explorer_config" || fail "Installed luna-explorer.toml does not pin GPT-5.6 Luna."
+  grep -Eq '^model[[:space:]]*=[[:space:]]*"gpt-6-luna"[[:space:]]*$' "$explorer_config" || fail "Installed luna-explorer.toml does not pin GPT-6 Luna."
   grep -Eq '^model_reasoning_effort[[:space:]]*=[[:space:]]*"high"[[:space:]]*$' "$explorer_config" || fail "Installed luna-explorer.toml does not pin High reasoning."
 
   nonce="$(date +%s)-$$-${RANDOM:-0}"
@@ -536,8 +536,8 @@ EOF_VERIFY
   done < <(find "$sessions_dir" -type f -name '*.jsonl' -print 2>/dev/null)
 
   [ "$child_count" -eq 1 ] || fail "Expected exactly one child rollout with matching parent/role/path provenance; found ${child_count}."
-  turn_context_line="$(grep -F '"type":"turn_context"' "$child_trace" | grep -F '"model":"gpt-5.6-luna"' | grep -F '"effort":"high"' | tail -n 1 || true)"
-  [ -n "$turn_context_line" ] || fail "Child rollout did not record effective GPT-5.6 Luna High execution."
+  turn_context_line="$(grep -F '"type":"turn_context"' "$child_trace" | grep -F '"model":"gpt-6-luna"' | grep -F '"effort":"high"' | tail -n 1 || true)"
+  [ -n "$turn_context_line" ] || fail "Child rollout did not record effective GPT-6 Luna High execution."
 
   child_reply_count="$(grep -F '"type":"response_item"' "$child_trace" | grep -F '"type":"message"' | grep -F '"role":"assistant"' | grep -F '"type":"output_text"' | grep -F "\"text\":\"PANTHEON_CHILD_OK_${nonce}_NO_PARENT_SECRET\"" | wc -l | tr -d '[:space:]')"
   [ "$child_reply_count" -eq 1 ] || fail "Child rollout does not contain exactly one assistant output reply with the expected verification token."
@@ -546,7 +546,7 @@ EOF_VERIFY
   if grep -Fq "$secret" "$child_trace"; then
     fail "Child rollout contains the parent-only secret; fork_turns none isolation did not hold."
   fi
-  ok "Configured Explorer resolved to GPT-5.6 Luna High and completed normally"
+  ok "Configured Explorer resolved to GPT-6 Luna High and completed normally"
   ok "fork_turns none kept the parent-only secret out of the child context"
   ok "Parent received and reconciled the terminal child result"
 

@@ -102,7 +102,7 @@ The verifier fails closed. It requires all of the following evidence from the sa
 - one correlated function-call result for that spawn;
 - at least one real parent-rollout `wait_agent` call whose correlated result reports `timed_out: false`;
 - exactly one correlated child rollout whose `session_meta` records the matching parent, Luna Explorer role, and task path;
-- child `turn_context` showing effective `gpt-5.6-luna` with `high` reasoning;
+- child `turn_context` showing effective `gpt-6-luna` with `high` reasoning;
 - one exact child assistant `output_text` verification reply;
 - one terminal child `task_complete` event carrying that same expected final message;
 - absence of the concrete parent-only sentinel from the child rollout.

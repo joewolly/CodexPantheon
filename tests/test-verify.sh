@@ -86,7 +86,7 @@ if [ "$mode" != "no-child" ]; then
   printf '{"type":"session_meta","payload":{"id":"%s","source":{"subagent":{"thread_spawn":{"parent_thread_id":"%s","depth":1,"agent_path":"/root/explorer_pantheon_verify","agent_role":"luna_explorer"}}}}}\n' "$child_id" "$parent_id" > "$child_file"
   effort="high"
   [ "$mode" = "wrong-effort" ] && effort="medium"
-  printf '{"type":"turn_context","payload":{"model":"gpt-5.6-luna","effort":"%s"}}\n' "$effort" >> "$child_file"
+  printf '{"type":"turn_context","payload":{"model":"gpt-6-luna","effort":"%s"}}\n' "$effort" >> "$child_file"
   printf '{"type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"input_text","text":"PANTHEON_CHILD_OK_%s_NO_PARENT_SECRET"}]}}\n' "$nonce" >> "$child_file"
   if [ "$mode" = "secret-leak" ]; then
     printf '{"type":"event_msg","payload":{"type":"debug","message":"%s"}}\n' "$secret" >> "$child_file"
@@ -119,7 +119,7 @@ run_success() {
   PANTHEON_VERIFY_FAKE_MODE="$mode" "$PANTHEON" verify >"$out" 2>&1
   grep -Fq 'V2 spawn used luna_explorer, fork_turns none, and explorer_pantheon_verify' "$out"
   grep -Fq 'Parent waited for a non-timeout V2 child mailbox update' "$out"
-  grep -Fq 'Configured Explorer resolved to GPT-5.6 Luna High and completed normally' "$out"
+  grep -Fq 'Configured Explorer resolved to GPT-6 Luna High and completed normally' "$out"
   grep -Fq 'fork_turns none kept the parent-only secret out of the child context' "$out"
   grep -Fq 'Parent received and reconciled the terminal child result' "$out"
   grep -Fq 'Status: VERIFIED' "$out"

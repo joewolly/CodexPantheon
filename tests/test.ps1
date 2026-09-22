@@ -42,10 +42,10 @@ function Invoke-Pantheon([string[]]$Arguments) {
 
 Assert-File $Pantheon
 Assert-File (Join-Path $Root 'install.ps1')
-Assert-Contains (Join-Path $Root 'VERSION') '0.8.0'
-Assert-Contains $Pantheon '$Version = ''0.8.0'''
+Assert-Contains (Join-Path $Root 'VERSION') '0.8.1'
+Assert-Contains $Pantheon '$Version = ''0.8.1'''
 $version = Invoke-Pantheon @('version')
-Assert-True ($version.ExitCode -eq 0 -and $version.Output.Contains('Codex Pantheon 0.8.0')) 'version command mismatch'
+Assert-True ($version.ExitCode -eq 0 -and $version.Output.Contains('Codex Pantheon 0.8.1')) 'version command mismatch'
 Pass 'PowerShell entrypoints match current release metadata'
 
 $Explorer = Join-Path (Join-Path $Root 'agents') 'luna-explorer.toml'
@@ -53,10 +53,12 @@ $Librarian = Join-Path (Join-Path $Root 'agents') 'luna-librarian.toml'
 $Fixer = Join-Path (Join-Path $Root 'agents') 'luna-fixer.toml'
 foreach ($agent in @($Explorer, $Librarian, $Fixer)) {
     Assert-File $agent
-    Assert-Contains $agent 'model = "gpt-5.6-luna"'
-    Assert-Contains $agent 'model_reasoning_effort = "high"'
+    Assert-Contains $agent 'model = "gpt-6-luna"'
 }
-Pass 'Windows consumes the shared Luna payload'
+Assert-Contains $Explorer 'model_reasoning_effort = "high"'
+Assert-Contains $Librarian 'model_reasoning_effort = "high"'
+Assert-Contains $Fixer 'model_reasoning_effort = "max"'
+Pass 'Windows consumes the shared GPT-6 Luna payload with role-specific effort'
 
 $Policy = Join-Path (Join-Path $Root 'policy') 'managed-block.md'
 $WorkflowSkills = @(
@@ -130,7 +132,7 @@ try {
     $install = Invoke-Pantheon @('install')
     Assert-True ($install.ExitCode -eq 0) "install failed: $($install.Output)"
     Assert-Contains $AgentsFile 'Keep this exact user-owned line.'
-    Assert-Contains (Join-Path $env:CODEX_HOME '.pantheon-version') '0.8.0'
+    Assert-Contains (Join-Path $env:CODEX_HOME '.pantheon-version') '0.8.1'
     Assert-File (Join-Path (Join-Path $env:CODEX_HOME 'agents') 'user-custom.toml')
     Assert-File (Join-Path $UserSkill 'SKILL.md')
     Assert-True ((@([System.IO.File]::ReadAllLines($AgentsFile) | Where-Object { $_ -ceq '<!-- PANTHEON:START -->' }).Count) -eq 1) 'expected one start marker'
@@ -207,7 +209,7 @@ try {
     $env:PANTHEON_SKILLS_HOME = Join-Path $Temp 'bootstrap-skills'
     $bootstrap = Invoke-Pantheon @('bootstrap')
     Assert-True ($bootstrap.ExitCode -eq 0) "bootstrap failed: $($bootstrap.Output)"
-    Assert-True ($bootstrap.Output.Contains('Pantheon-owned files synchronized to v0.8.0.') -and $bootstrap.Output.Contains('Status: HEALTHY')) 'bootstrap did not install and run doctor'
+    Assert-True ($bootstrap.Output.Contains('Pantheon-owned files synchronized to v0.8.1.') -and $bootstrap.Output.Contains('Status: HEALTHY')) 'bootstrap did not install and run doctor'
     Pass 'bootstrap installs and verifies Windows state'
 
     $env:USERPROFILE = Join-Path $Temp 'profile'
@@ -230,11 +232,11 @@ finally {
     Remove-Item -LiteralPath $Temp -Recurse -Force -ErrorAction SilentlyContinue
 }
 
-Assert-Contains (Join-Path $Root 'README.md') 'v0.8.0'
+Assert-Contains (Join-Path $Root 'README.md') 'v0.8.1'
 Assert-Contains (Join-Path $Root 'README.md') 'Windows'
 Assert-Contains (Join-Path (Join-Path $Root 'docs') 'CODEX_INSTALL.md') '.\pantheon.ps1 bootstrap'
 Assert-Contains (Join-Path (Join-Path $Root 'docs') 'CLI_REFERENCE.md') 'pantheon.ps1'
-Assert-Contains (Join-Path $Root 'CHANGELOG.md') '## 0.8.0'
+Assert-Contains (Join-Path $Root 'CHANGELOG.md') '## 0.8.1'
 Assert-Contains (Join-Path $Root 'CHANGELOG.md') '2026-09-09'
 Pass 'Windows documentation and release metadata coverage'
 

@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 0.8.1 — 2026-09-22
+
+### Changed
+
+- Supported main-thread Orchestrators are now GPT-6 Astra and GPT-6 Sol under the same model-neutral Orchestrator contract.
+- `luna_explorer` and `luna_librarian` now pin `gpt-6-luna` with high reasoning.
+- `luna_fixer` now pins `gpt-6-luna` with max reasoning for stronger bounded implementation work.
+- Live `pantheon verify` remains an Explorer smoke test and now fails closed unless runtime evidence proves effective GPT-6 Luna High execution.
+- Current policy, skills, lifecycle scripts, tests, user/install/CLI docs, and architecture artwork are synchronized to the GPT-6 model generation without changing Pantheon orchestration semantics.
+
+
 ## 0.8.0 — 2026-09-22
 
 ### Added
